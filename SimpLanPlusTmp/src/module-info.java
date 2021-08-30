@@ -1,0 +1,3 @@
+module ArrayOfInt {
+	requires antlr;
+}
