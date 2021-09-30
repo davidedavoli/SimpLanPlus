@@ -20,7 +20,7 @@ public class RetEffType  {
 				return b;		
 		}
 	
-	static RetEffType max(RetEffType a, RetEffType b) {
+	public static RetEffType max(RetEffType a, RetEffType b) {
 		if (a.leq(b))
 			return b;
 		else

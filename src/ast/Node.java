@@ -22,7 +22,7 @@ public interface Node {
   
   ArrayList<SemanticError> checkSemantics(Environment env);
   
-  ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl);
+  //ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl);
   
   RetEffType retTypeCheck();
   

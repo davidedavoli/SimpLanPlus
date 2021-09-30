@@ -96,22 +96,22 @@ public class BlockNode implements Node {
 	  return tmp;
   }
 
-  public ArrayList<SemanticError> delTypeCheck(DelEnv env, int n){
-	  ArrayList<SemanticError> err = new ArrayList<SemanticError>();
-	  
-	  for (Node i: declarations) {
-		  err.addAll(i.delTypeCheck(env, n));
-	  }
-	  
-	  for (Node i: statements) {
-		  if (!(i instanceof BlockNode))
-			  err.addAll(i.delTypeCheck(env, n+1));
-		  else
-			  err.addAll(i.delTypeCheck(env, n));
-	  }
-
-	  return err;
-  }
+//  public ArrayList<SemanticError> delTypeCheck(DelEnv env, int n){
+//	  ArrayList<SemanticError> err = new ArrayList<SemanticError>();
+//	  
+//	  for (Node i: declarations) {
+//		  err.addAll(i.delTypeCheck(env, n));
+//	  }
+//	  
+//	  for (Node i: statements) {
+//		  if (!(i instanceof BlockNode))
+//			  err.addAll(i.delTypeCheck(env, n+1));
+//		  else
+//			  err.addAll(i.delTypeCheck(env, n));
+//	  }
+//
+//	  return err;
+//  }
   
   public String codeGeneration() {
 	  String code="";

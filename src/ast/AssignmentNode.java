@@ -62,18 +62,18 @@ public class AssignmentNode implements Node {
 		return exp.codeGeneration();
   }
 
-@Override
-public ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl) {
-	
-	//create result list
-	ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-	
-	res.addAll(exp.delTypeCheck(env, nl));
-	  
-	int dl = lhs.getDerefLevel();
-	
-	
-	return null;
-}  
+//@Override
+//public ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl) {
+//	
+//	//create result list
+//	ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+//	
+//	res.addAll(exp.delTypeCheck(env, nl));
+//	  
+//	int dl = lhs.getDerefLevel();
+//	
+//	
+//	return null;
+//}  
     
 }  

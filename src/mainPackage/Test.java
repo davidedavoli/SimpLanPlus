@@ -8,17 +8,16 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import Interpreter.ExecuteVM;
-
-import parser.SimpLanPlusLexer;
-import parser.SimpLanPlusParser;
-import types.TypeNode;
-import parser.SVMLexer;
-import parser.SVMParser;
-import util.Environment;
-import util.SemanticError;
 import ast.Node;
 import ast.SVMVisitorImpl;
 import ast.SimpLanPlusVisitorImpl;
+import parser.SVMLexer;
+import parser.SVMParser;
+import parser.SimpLanPlusLexer;
+import parser.SimpLanPlusParser;
+import types.TypeNode;
+import util.Environment;
+import util.SemanticError;
 
 public class Test {
 	public static void main(String[] args) throws Exception {

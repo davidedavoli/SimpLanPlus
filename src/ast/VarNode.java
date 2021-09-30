@@ -44,33 +44,33 @@ public class VarNode implements Node {
         return res;
   }
 
-  @Override
-  public ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl) {
-	  
-	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-	  
-	  if (!(type instanceof PointerTypeNode)) {
-		HashSet<Pair<String, Integer>> tmp = new HashSet<Pair<String, Integer>>();
-		tmp.add(new Pair<String, Integer>(id, nl));
-		env.add(new AliasingDomain(tmp, new DelList()));
-		res.addAll(exp.delTypeCheck(env, nl));
-	  }
-	  else {
-		HashSet<Pair<String, Integer>> tmp = new HashSet<Pair<String, Integer>>();
-		tmp.add(new Pair<String, Integer>(id, nl));
-		
-		DelList l = new DelList(((PointerTypeNode)type).getDerefLevel());
-		
-		if ((exp instanceof NewNode)) {
-			l.put(0,new DelEffType(DelEffType.DelT.NIL));// statement del tipo ^type = exp dovrebbero essere consentiti solo se exp è new ^type.
-		}
-		else {
-			res.add(new SemanticError("Errore grave! non dovremmo nemmeno entrare in questo ramo"));
-		}
-	  }
-	  
-	  return res;
-  }
+//  @Override
+//  public ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl) {
+//	  
+//	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+//	  
+//	  if (!(type instanceof PointerTypeNode)) {
+//		HashSet<Pair<String, Integer>> tmp = new HashSet<Pair<String, Integer>>();
+//		tmp.add(new Pair<String, Integer>(id, nl));
+//		env.add(new AliasingDomain(tmp, new DelList()));
+//		res.addAll(exp.delTypeCheck(env, nl));
+//	  }
+//	  else {
+//		HashSet<Pair<String, Integer>> tmp = new HashSet<Pair<String, Integer>>();
+//		tmp.add(new Pair<String, Integer>(id, nl));
+//		
+//		DelList l = new DelList(((PointerTypeNode)type).getDerefLevel());
+//		
+//		if ((exp instanceof NewNode)) {
+//			l.put(0,new DelEffType(DelEffType.DelT.NIL));// statement del tipo ^type = exp dovrebbero essere consentiti solo se exp è new ^type.
+//		}
+//		else {
+//			res.add(new SemanticError("Errore grave! non dovremmo nemmeno entrare in questo ramo"));
+//		}
+//	  }
+//	  
+//	  return res;
+//  }
 
   public String toPrint(String s) {
 	return s+"Var:" + id +"\n"
