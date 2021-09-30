@@ -1,0 +1,31 @@
+x^  :  x -> [offset, [\bot]]
+x^^ :  x -> [offset, [\bot, \bot]]
+
+x = new
+
+x^^ :  x -> [offset, <[rw, \bot], init>]
+z :  x -> [offset, <[], init>]
+
+Dove rw e \bot sono i tipi degli effeti dei puntatori, mentre init e il tipo di inizializzazione del valore
+
+#^ +1 caselle di memoria per ogni variabile (di cui 1 sempre nel rda)
+
+x = 5
+
+x^ avrò una casella nell'rda ed una nello heap, quella nell' RDA punta nello heap
+
+
+int^ x = new: la new (che è un'espressione) alloca una casella nello heap e mette l'indirizzo in $a0. L'assegnamento lo memorizza nello spazio dell'RDA associato ad x e funziona.
+
+int^^ x = new; la new (che è un'espressione) alloca una casella nello heap e mette l'indirizzo in $a0. L'assegnamento lo memorizza nello spazio dell'RDA associato ad x.
+^x = new;  la new (che è un'espressione) alloca una casella nello heap e mette l'indirizzo in $a0, l'assegnazione lo mette nello spazio dello heap puntato da x.
+^^x = 5;
+
+
+int^^ x = new; la new (che è un'espressione) alloca una casella nello heap e mette l'indirizzo in $a0. L'assegnamento lo memorizza nello spazio dell'RDA associato ad x.
+^^x = 5; ERRORE
+
+Per la new e per la delete due istruzioni della VM? 
+
+- sì: poco naturale, ma semplice (lo hanno fatto anche gli altri) bisogna definire due istruzioni
+- no: naturale ma implica che i controlli siano gestiti manualmente

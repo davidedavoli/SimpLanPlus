@@ -1,0 +1,41 @@
+INST SET
+
+
+addi $r1 $r2 int    \\ somma $r2 ed int e mette il risultato in $r1
+add $r1 $r2 $r3     \\ somma $r2 ed $r3 e mette il risultato in $r1
+subi $r1 $r2 int    \\ $r1 := $r2 - int
+sub $r1 $r2 $r3     \\  $r1 := $r2 - $r3
+multi $r1 $r2 int   \\  come sopra 
+mult $r1 $r2 $r3   \\  come sopra
+divi $r1 $r2 int   \\  come sopra 
+div $r1 $r2 $r3   \\  come sopra
+
+beq $r1 $r2 label   \\  se $r1 == $ r2 allora jump alla label label
+bleq $r1 $r2 label  \\  se $r1 <= $ r2 allora jump alla label label
+blt $r1 $r2 label   \\  se $r1 < $ r2 allora jump alla label label
+
+not $r1 $r2         \\ $r1 :=  \lnot r2
+
+li $r1 n            \\ $r1 := n
+
+lw $r1 off($r2)     \\ il contenuto di memoria ad offsett off da $r2 viene messo in $r1
+sw $r1 off($r2)     \\ il contenuto di $r1 viene messo in memoria ad offsett off da $r2
+
+print               \\ stampa il contenuto di $a0
+halt                \\ termina l'esecuzione
+ 
+
+pop  := addi $sp $sp 4 
+
+? push n              \\ metto n in 0($sp) e poi incremento $sp
+? push n := li $a0 n; sw $a0 $(sp); addi $sp $sp 4
+
+Bisogna decidere se fare gli interi di 4 byte e i booleani di 1 byte o tutto di 4 byte (alla C).
+
+- Nel primo caso la gestione della memoria sarebbe più snella e l'instruction set più piccolo, ma la memoria sarebbe meno efficiente
+- Nel secondo caso la gestione della memoria sarebbe più efficiente, ma la gestione delle aree di memoria più complessa.
+
+? del
+? new
+
+
