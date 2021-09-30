@@ -13,7 +13,7 @@ public class RetEffType  {
 		this.val=t;
 	}
 	
-	static RetEffType min(RetEffType a, RetEffType b) {
+	public static RetEffType min(RetEffType a, RetEffType b) {
 			if (a.leq(b))
 				return a;
 			else
