@@ -67,7 +67,7 @@ public class Test {
 		//parserASM.assembly();
 
 		SVMVisitorImpl visitorSVM = new SVMVisitorImpl();
-		visitorSVM.visit(parserASM.assembly()); 
+		visitorSVM.visit(parserASM.assembly());
 
 		System.out.println("You had: "+lexerASM.lexicalErrors+" lexical errors and "+parserASM.getNumberOfSyntaxErrors()+" syntax errors.");
 		if (lexerASM.lexicalErrors>0 || parserASM.getNumberOfSyntaxErrors()>0) System.exit(1);
