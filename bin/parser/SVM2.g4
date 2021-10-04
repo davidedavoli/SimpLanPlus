@@ -28,14 +28,18 @@ instruction:
 	  | MULTI r1=REGISTER r2=REGISTER n=NUMBER
 	  | DIV r1=REGISTER r2=REGISTER r3=REGISTER
 	  | DIVI r1=REGISTER r2=REGISTER n=NUMBER
+	  | OR r1=REGISTER r2=REGISTER r3=REGISTER
 	  | NOT r1=REGISTER r2=REGISTER
 	  | STOREW r1=REGISTER o=NUMBER LPAR r2=REGISTER RPAR
 	  | LOADW r1=REGISTER o=NUMBER LPAR r2=REGISTER RPAR
 	  | LOAD r1=REGISTER n=NUMBER
 	  | BRANCH l=LABEL
-	  | BRANCHEQ l=LABEL r1=REGISTER r2=REGISTER
-	  | BRANCHLESSEQ l=LABEL r1=REGISTER r2=REGISTER
-	  | BRANCHLESS l=LABEL r1=REGISTER r2=REGISTER
+	  | BCOND r1=REGISTER l=LABEL
+	  | EQ r1=REGISTER r2=REGISTER r3=REGISTER
+	  | LE r1=REGISTER r2=REGISTER r3=REGISTER
+	  | LT r1=REGISTER r2=REGISTER r3=REGISTER
+	  | GT r1=REGISTER r2=REGISTER r3=REGISTER
+      | GE r1=REGISTER r2=REGISTER r3=REGISTER
 /*	  | JS
 	  | LOADRA
 	  | STORERA
@@ -47,8 +51,9 @@ instruction:
 	  | LOADHP
 	  | STOREHP
 */
-      | FREE
-      | NEW
+      | FREE r1=REGISTER
+      | NEW r1=REGISTER
+	  | PRINT r1=REGISTER
 	  | PRINT
 	  | HALT
 	  | ADDRESS // fake production that allows us to work with addresses as instructions while resolving labels
@@ -59,7 +64,7 @@ instruction:
  * LEXER RULES
  *------------------------------------------------------------------*/
 
-REGISTER    : ((('a'|'r')('0'..'9'))|('sp'|'fp'|'hp'|'rv'));
+REGISTER    : '$'((('a'|'r')('0'..'9'))|('sp'|'fp'|'hp'|'rv'|'ra'));
 
 PUSH  : 'push' ;
 ADDRESS  : 'address' ;
@@ -73,12 +78,16 @@ MULTI	 : 'multi' ;	// as for addi
 DIV	 : 'div' ;	// as for add
 DIVI	 : 'divi' ;	// as for addi
 NOT	     : 'not' ;	// logical negation
+OR	     : 'or' ;	// logical negation
 STOREW	 : 'sw' ; 	// stores the vaue of a register at offset n from the address in a second register
 LOADW	 : 'lw' ;	// loads the value at offset n from the address in a register ans sotres it in a second register
 BRANCH	 : 'b' ;	// jump to label
-BRANCHEQ : 'beq' ;	// jump to label if $r1 == top
-BRANCHLESSEQ:'bleq' ;	// jump to label if top <= next
-BRANCHLESS:'blr' ;	// jump to label if top < next
+BCOND    : 'bc' ;	// jump to label if $r1 == top
+LE       : 'le' ;	// r1 = r2 <=r3
+LT       : 'lt' ;	//
+EQ       : 'eq' ;	//
+GE       : 'ge' ;	//
+GT       : 'gt' ;	//
 /*
 JS	 : 'js' ;	// jump to instruction pointed by top of stack and store next instruction in ra
 LOADRA	 : 'lra' ;	// load from ra
@@ -104,6 +113,8 @@ LABEL	 : ('a'..'z'|'A'..'Z')('a'..'z' | 'A'..'Z' | '0'..'9')* ;
 NUMBER	 : '0' | ('-')?(('1'..'9')('0'..'9')*) ;
 
 WHITESP  : ( '\t' | ' ' | '\r' | '\n' )+   -> channel(HIDDEN);
+LINECOMMENTS 	: '//' (~('\n'|'\r'))* -> channel(HIDDEN);
+BLOCKCOMMENTS   : '/*'( ~('/'|'*')|'/'~'*'|'*'~'/'|BLOCKCOMMENTS)* '*/' -> channel(HIDDEN);
 
 ERR   	 : . { System.err.println("Invalid char: "+ getText()); lexicalErrors++;  } -> channel(HIDDEN);
 

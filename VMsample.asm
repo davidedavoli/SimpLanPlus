@@ -1,14 +1,14 @@
-push hp
+push $hp
 print
 pop
-new
-push hp
+new $a0
+push $hp
 print
-pop a0
-subi a0 a0 1
-push a0
+pop $a0
+subi $a0 $a0 1
+push $a0
 print
-free
-push hp
+free $a0
+push $hp
 print
 halt

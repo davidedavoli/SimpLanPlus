@@ -105,6 +105,12 @@ public class ExecuteVM2 {
                             arg2 = bytecode.getArg2();
                             regStore(arg1, regRead(arg2) != 0 ? 0 : 1);
                             break;
+                        case SVM2Parser.OR:
+                            arg1 = bytecode.getArg1();
+                            arg2 = bytecode.getArg2();
+                            arg3 = bytecode.getArg3();
+                            regStore(arg1, (regRead(arg2)>0 || regRead(arg3)>0) ?1:0);
+                            break;
                         case SVM2Parser.STOREW: //
                             arg1 = bytecode.getArg1();
                             v1 = Integer.parseInt(bytecode.getArg2());
@@ -136,26 +142,26 @@ public class ExecuteVM2 {
                             address = Integer.parseInt(code[ip].getArg1());
                             ip = address;
                             break;
-                        case SVM2Parser.BRANCHEQ: //
-                            address = Integer.parseInt(code[ip].getArg1());
+                        case SVM2Parser.BCOND: //
+                            address = Integer.parseInt(code[ip].getArg2());
                             ip++;  //aumentiamo ip, in caso non venga effettuato il branch
                             v1 = regRead(bytecode.getArg1());
-                            v2 = regRead(bytecode.getArg2());
-                            if (v2 == v1) ip = address;
+                            if (v1!=0) ip = address;
                             break;
-                        case SVM2Parser.BRANCHLESSEQ:
-                            address = Integer.parseInt(code[ip].getArg1());
-                            ip++;  //aumentiamo ip, in caso non venga effettuato il branch
-                            v1 = regRead(bytecode.getArg1());
-                            v2 = regRead(bytecode.getArg2());
-                            if (v1 <= v2) ip = address;
+                        case SVM2Parser.EQ:
+                            regStore(bytecode.getArg1(), regRead(bytecode.getArg2())==regRead(bytecode.getArg3())?1:0);
                             break;
-                        case SVM2Parser.BRANCHLESS:
-                            address = Integer.parseInt(code[ip].getArg1());
-                            ip++;  //aumentiamo ip, in caso non venga effettuato il branch
-                            v1 = regRead(bytecode.getArg1());
-                            v2 = regRead(bytecode.getArg2());
-                            if (v1 < v2) ip = address;
+                        case SVM2Parser.LE:
+                            regStore(bytecode.getArg1(), regRead(bytecode.getArg2())<=regRead(bytecode.getArg3())?1:0);
+                            break;
+                        case SVM2Parser.LT:
+                            regStore(bytecode.getArg1(), regRead(bytecode.getArg2())<regRead(bytecode.getArg3())?1:0);
+                            break;
+                        case SVM2Parser.GE:
+                            regStore(bytecode.getArg1(), regRead(bytecode.getArg2())>=regRead(bytecode.getArg3())?1:0);
+                            break;
+                        case SVM2Parser.GT:
+                            regStore(bytecode.getArg1(), regRead(bytecode.getArg2())>regRead(bytecode.getArg3())?1:0);
                             break;
                         case SVM2Parser.NEW:
                             address = memory.allocate();
@@ -164,16 +170,20 @@ public class ExecuteVM2 {
                                 System.out.println("Memory is full!!");
                                 return;
                             }
-                            push(address);
+                            regStore(bytecode.getArg1(), address);
                             break;
                         case SVM2Parser.FREE:
-                            address = memory.read(sp); //address è l'indirizzo da liberare.
+                            address = regRead(bytecode.getArg1());
                             if (address == hp - 1)
                                 hp--; //se è l'ultimo indirizzo occupato, allora hp viene decrementato
                             memory.free(address);
                             break;
                         case SVM2Parser.PRINT:
-                            System.out.println((sp < MEMSIZE) ? memory.read(sp) : "Empty stack!");
+                            if (bytecode.getArg1()==null)
+                                System.out.println((sp < MEMSIZE) ? memory.read(sp) : "Empty stack!");
+                            else
+                                System.out.println((sp < MEMSIZE) ? regRead(bytecode.getArg1()) : "Empty stack!");
+
                             break;
                         case SVM2Parser.HALT:
                             //to print the result
@@ -199,11 +209,11 @@ public class ExecuteVM2 {
             case 'a':
                 return a[Integer.parseInt(reg.substring(1))];
             default:
-                if (reg.equals("fp"))
+                if (reg.equals("$fp"))
                     return fp;
-                else if (reg.equals("sp"))
+                else if (reg.equals("$sp"))
                     return sp;
-                else if (reg.equals("hp")) {
+                else if (reg.equals("$hp")) {
                     return hp;
                 }
         }
@@ -217,9 +227,9 @@ public class ExecuteVM2 {
             case 'a':
                 a[Integer.parseInt(reg.substring(1))] = v;
             default:
-                if (reg.equals("fp"))
+                if (reg.equals("$fp"))
                     fp = v;
-                else if (reg.equals("sp")) {
+                else if (reg.equals("$sp")) {
                     sp = v;
                     if (sp <= hp) {
                         throw new Exception("Stack overflow!");
@@ -233,7 +243,7 @@ public class ExecuteVM2 {
     }
 
     private boolean isRegister(String str) {
-        Pattern p = Pattern.compile("([ar][0-9])|(sp)|(fp)|(hp)");
+        Pattern p = Pattern.compile("\\$(([ar][0-9])|(sp)|(fp)|(hp))");
         Matcher m = p.matcher(str);
         return m.matches();
     }

@@ -68,6 +68,9 @@ public class SVM2VisitorImpl extends SVM2BaseVisitor<Void> {
             case SVM2Lexer.NOT:
                 code[i++] = new Instruction(SVM2Parser.NOT,  ctx.r1.getText(), ctx.r2.getText());
                 break;
+            case SVM2Lexer.OR:
+                code[i++] = new Instruction(SVM2Parser.OR,  ctx.r1.getText(), ctx.r2.getText(), ctx.r3.getText());
+                break;
             case SVM2Lexer.LOAD:
                 code[i++] = new Instruction(SVM2Parser.LOAD,  ctx.r1.getText(), ctx.n.getText());
                 break;
@@ -84,26 +87,36 @@ public class SVM2VisitorImpl extends SVM2BaseVisitor<Void> {
                 code[i++] = new Instruction(SVM2Parser.BRANCH, ctx.l.getText());
                 labelRef.put(i++,(ctx.l!=null? ctx.l.getText():null));
                 break;
-            case SVM2Lexer.BRANCHEQ:
-                code[i++] = new Instruction(SVM2Parser.BRANCHEQ, ctx.r1.getText(), ctx.r2.getText(), ctx.l.getText());
+            case SVM2Lexer.BCOND:
+                code[i++] = new Instruction(SVM2Parser.BCOND, ctx.r1.getText(), ctx.l.getText());
                 labelRef.put(i++,(ctx.l!=null? ctx.l.getText():null));
                 break;
-            case SVM2Lexer.BRANCHLESSEQ:
-                code[i++] = new Instruction(SVM2Parser.BRANCHLESSEQ, ctx.r1.getText(), ctx.r2.getText(), ctx.l.getText());
-                labelRef.put(i++,(ctx.l!=null? ctx.l.getText():null));
+            case SVM2Lexer.EQ:
+                code[i++] = new Instruction(SVM2Parser.EQ, ctx.r1.getText(), ctx.r2.getText(), ctx.r3.getText());
                 break;
-            case SVM2Lexer.BRANCHLESS:
-                code[i++] = new Instruction(SVM2Parser.BRANCHLESS, ctx.r1.getText(), ctx.r2.getText(), ctx.l.getText());
-                labelRef.put(i++,(ctx.l!=null? ctx.l.getText():null));
+            case SVM2Lexer.LE:
+                code[i++] = new Instruction(SVM2Parser.LE, ctx.r1.getText(), ctx.r2.getText(), ctx.r3.getText());
+                break;
+            case SVM2Lexer.LT:
+                code[i++] = new Instruction(SVM2Parser.LT, ctx.r1.getText(), ctx.r2.getText(), ctx.r3.getText());
+                break;
+            case SVM2Lexer.GE:
+                code[i++] = new Instruction(SVM2Parser.GE, ctx.r1.getText(), ctx.r2.getText(), ctx.r3.getText());
+                break;
+            case SVM2Lexer.GT:
+                code[i++] = new Instruction(SVM2Parser.GT, ctx.r1.getText(), ctx.r2.getText(), ctx.r3.getText());
                 break;
             case SVM2Lexer.FREE:
-                code[i++] = new Instruction(SVM2Parser.FREE);
+                code[i++] = new Instruction(SVM2Parser.FREE, ctx.r1.getText());
                 break;
             case SVM2Lexer.NEW:
-                code[i++] = new Instruction(SVM2Parser.NEW);
+                code[i++] = new Instruction(SVM2Parser.NEW, ctx.r1.getText());
                 break;
             case SVM2Lexer.PRINT:
-                code[i++] = new Instruction(SVM2Parser.PRINT);
+                if (ctx.r1 == null)
+                    code[i++] = new Instruction(SVM2Parser.PRINT);
+                else
+                    code[i++] = new Instruction(SVM2Parser.PRINT, ctx.r1.getText());
                 break;
             case SVM2Lexer.HALT:
                 code[i++] = new Instruction(SVM2Parser.HALT);
