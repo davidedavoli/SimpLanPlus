@@ -97,10 +97,10 @@ public class SVM2VisitorImpl extends SVM2BaseVisitor<Void> {
                 labelRef.put(i++,(ctx.l!=null? ctx.l.getText():null));
                 break;
             case SVM2Lexer.FREE:
-                code[i++] = new Instruction(SVM2Parser.FREE, ctx.r1.getText());
+                code[i++] = new Instruction(SVM2Parser.FREE);
                 break;
             case SVM2Lexer.NEW:
-                code[i++] = new Instruction(SVM2Parser.NEW, ctx.l.getText());
+                code[i++] = new Instruction(SVM2Parser.NEW);
                 break;
             case SVM2Lexer.PRINT:
                 code[i++] = new Instruction(SVM2Parser.PRINT);
