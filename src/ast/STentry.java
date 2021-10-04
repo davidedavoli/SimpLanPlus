@@ -1,6 +1,6 @@
 package ast;
 
-import types.TypeNode;
+import ast.node.types.TypeNode;
 
 public class STentry {
  

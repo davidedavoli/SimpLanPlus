@@ -10,9 +10,9 @@ mult $r1 $r2 $r3   \\  come sopra
 divi $r1 $r2 int   \\  come sopra 
 div $r1 $r2 $r3   \\  come sopra
 
-beq $r1 label   \\  se $r1 == top allora jump alla label label
-bleq $r1 label  \\  se $r1 <= top allora jump alla label label
-blt $r1 label   \\  se $r1 < top allora jump alla label label
+beq $r1 $r2 label   \\  se $r1 == $ r2 allora jump alla label label
+bleq $r1 $r2 label  \\  se $r1 <= $ r2 allora jump alla label label
+blt $r1 $r2 label   \\  se $r1 < $ r2 allora jump alla label label
 
 not $r1 $r2         \\ $r1 :=  \lnot r2
 

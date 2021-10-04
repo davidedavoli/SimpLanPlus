@@ -1,13 +1,26 @@
 package ast;
 
 import java.util.ArrayList;
+
+import ast.node.ArgNode;
+import ast.node.IdNode;
+import ast.node.LhsNode;
+import ast.node.Node;
+import ast.node.dec.FunNode;
+import ast.node.dec.NewNode;
+import ast.node.dec.VarNode;
+import ast.node.exp.*;
+import ast.node.exp.single_exp.BoolNode;
+import ast.node.exp.single_exp.IntNode;
+import ast.node.exp.NotExpNode;
+import ast.node.statements.*;
 import parser.*;
 import parser.SimpLanPlusParser.*;
-import types.BoolTypeNode;
-import types.IntTypeNode;
-import types.PointerTypeNode;
-import types.TypeNode;
-import types.VoidTypeNode;
+import ast.node.types.BoolTypeNode;
+import ast.node.types.IntTypeNode;
+import ast.node.types.PointerTypeNode;
+import ast.node.types.TypeNode;
+import ast.node.types.VoidTypeNode;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -178,7 +191,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	
 	@Override
 	public Node visitPrint(PrintContext ctx) {
-		return new PrintNode(visit(ctx.exp())); 
+		return new PrintNode(visit(ctx.exp()));
 		//WARNING C'è il caso che non funizoni: nella grammatica SimpLan, la linea print era commentata
 	}
 	
@@ -311,18 +324,18 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		}
 	
 	@Override public Node visitNotExp(SimpLanPlusParser.NotExpContext ctx) { 
-		return new NotExpNode(visit(ctx.exp())); 
+		return new NotExpNode(visit(ctx.exp()));
 		}
 	
-	@Override public Node visitNegExp(SimpLanPlusParser.NegExpContext ctx) { 
+	/*@Override public Node visitNegExp(SimpLanPlusParser.NegExpContext ctx) {
 		return new NegExpNode(visit(ctx.exp())); 
-		}
+		}*/
 	
 	@Override
 	public Node visitBoolExp(BoolExpContext ctx) {
 		
 		//there is no need to perform a check here, the lexer ensures this text is a boolean
-		return new BoolNode(Boolean.parseBoolean(ctx.getText())); 
+		return new BoolNode(Boolean.parseBoolean(ctx.getText()));
 	}
 	
 	@Override

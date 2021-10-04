@@ -4,23 +4,29 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
 
+import Interpreter.SVM;
+import Interpreter.lexer.SVMLexer;
+import Interpreter.parser.SVMParser;
+import Interpreter.ast.SVMVisitorImpl;
+import ast.node.Node;
+import ast.node.types.TypeNode;
+import lexer.SimpLanPlusLexer;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import Interpreter.ExecuteVM;
-import ast.Node;
-import ast.SVMVisitorImpl;
 import ast.SimpLanPlusVisitorImpl;
-import parser.SVMLexer;
-import parser.SVMParser;
-import parser.SimpLanPlusLexer;
 import parser.SimpLanPlusParser;
-import types.TypeNode;
 import util.Environment;
+import util.Label;
 import util.SemanticError;
 
 public class Test {
-	public static void main(String[] args) throws Exception {
+	private Label labelManager = new Label();
+
+	public Label getlabelManager(){
+		return labelManager;
+	}
+	public void main(String[] args) throws Exception {
 
 		String fileName = "prova.simplan";
 
@@ -31,31 +37,31 @@ public class Test {
 
 		SimpLanPlusParser parser = new SimpLanPlusParser(tokens);
 		SimpLanPlusVisitorImpl visitor = new SimpLanPlusVisitorImpl();
-		Node ast = visitor.visit(parser.block()); //generazione AST 
-			
+		Node ast = visitor.visit(parser.block()); //generazione AST
+
 		//SIMPLE CHECK FOR LEXER ERRORS
-		Environment env = new Environment();	
+		Environment env = new Environment();
 		ArrayList<SemanticError> err = ast.checkSemantics(env);
-			if(err.size()>0){
-				System.out.println("You had: " +err.size()+" errors:");
-				for(SemanticError e : err)
-					System.out.println("\t" + e);
-				return;
-			}
-			
-		
+		if(err.size()>0){
+			System.out.println("You had: " +err.size()+" errors:");
+			for(SemanticError e : err)
+				System.out.println("\t" + e);
+			return;
+		}
+
+
 		System.out.println("Visualizing AST...");
 		System.out.println(ast.toPrint(""));
 
-		TypeNode type = ast.typeCheck(); //type-checking bottom-up 
+		TypeNode type = ast.typeCheck(); //type-checking bottom-up
 		System.out.println(type.toPrint("Type checking ok! Type of the program is: "));
 
-
+		this.labelManager = new Label();
 		// CODE GENERATION  prova.SimpLan.asm
-		String code=ast.codeGeneration(); 
-		BufferedWriter out = new BufferedWriter(new FileWriter(fileName+".asm")); 
+		String code=ast.codeGeneration(this.labelManager);
+		BufferedWriter out = new BufferedWriter(new FileWriter(fileName+".asm"));
 		out.write(code);
-		out.close(); 
+		out.close();
 		System.out.println("Code generated! Assembling and running generated code.");
 
 		FileInputStream isASM = new FileInputStream(fileName+".asm");
@@ -73,7 +79,7 @@ public class Test {
 		if (lexerASM.lexicalErrors>0 || parserASM.getNumberOfSyntaxErrors()>0) System.exit(1);
 
 		System.out.println("Starting Virtual Machine...");
-		ExecuteVM vm = new ExecuteVM(visitorSVM.code);
+		SVM vm = new SVM(visitorSVM.code);
 		vm.cpu();
 
 
