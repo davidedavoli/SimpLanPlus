@@ -3,9 +3,9 @@ package ast.node.types;
 import java.util.ArrayList;
 
 import ast.node.Node;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
+import semanticAnalysis.Environment;
+import semanticAnalysis.Label;
+import semanticAnalysis.SemanticError;
 
 public interface TypeNode extends Node{
    

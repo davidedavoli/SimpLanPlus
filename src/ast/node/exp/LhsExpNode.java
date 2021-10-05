@@ -6,9 +6,9 @@ import ast.STentry;
 import ast.node.Node;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
+import semanticAnalysis.Environment;
+import semanticAnalysis.Label;
+import semanticAnalysis.SemanticError;
 
 public class LhsExpNode implements Node {
 

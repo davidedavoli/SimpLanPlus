@@ -1,4 +1,4 @@
-package util;
+package semanticAnalysis;
 
 public class Pair<X, Y>  {
 	public final X _1; 
