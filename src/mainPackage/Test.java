@@ -16,9 +16,9 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import ast.SimpLanPlusVisitorImpl;
 import parser.SimpLanPlusParser;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
+import semanticAnalysis.Environment;
+import semanticAnalysis.Label;
+import semanticAnalysis.SemanticError;
 
 public class Test {
 	private Label labelManager = new Label();

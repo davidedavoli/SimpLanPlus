@@ -5,9 +5,9 @@ import ast.node.types.BoolTypeNode;
 import ast.node.types.IntTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
+import semanticAnalysis.Environment;
+import semanticAnalysis.Label;
+import semanticAnalysis.SemanticError;
 import java.util.ArrayList;
 
 /**

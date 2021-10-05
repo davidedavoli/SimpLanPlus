@@ -9,10 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ast.node.types.TypeUtils;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
-import util.FuncBodyUtils;
+import semanticAnalysis.Environment;
+import semanticAnalysis.Label;
+import semanticAnalysis.SemanticError;
 
 public class VarNode implements Node {
 

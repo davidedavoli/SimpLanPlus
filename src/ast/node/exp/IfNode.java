@@ -7,10 +7,9 @@ import ast.node.types.BoolTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
-import util.FuncBodyUtils;
+import semanticAnalysis.Environment;
+import semanticAnalysis.Label;
+import semanticAnalysis.SemanticError;
 
 public class IfNode implements Node {
 
