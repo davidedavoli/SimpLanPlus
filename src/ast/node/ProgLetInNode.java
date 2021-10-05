@@ -5,10 +5,10 @@ import java.util.HashMap;
 import ast.STentry;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import semanticAnalysis.Label;
-import semanticAnalysis.FuncBodyUtils;
-import semanticAnalysis.Environment;
-import semanticAnalysis.SemanticError;
+import util.Label;
+import util.FuncBodyUtils;
+import util.Environment;
+import util.SemanticError;
 
 public class ProgLetInNode implements Node {
 

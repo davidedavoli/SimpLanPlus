@@ -8,10 +8,10 @@ import ast.node.types.TypeNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import semanticAnalysis.Label;
-import semanticAnalysis.FuncBodyUtils;
-import semanticAnalysis.Environment;
-import semanticAnalysis.SemanticError;
+import util.Label;
+import util.FuncBodyUtils;
+import util.Environment;
+import util.SemanticError;
 
 public class BlockNode implements Node {
 

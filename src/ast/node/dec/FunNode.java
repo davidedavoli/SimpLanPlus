@@ -9,10 +9,10 @@ import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import ast.node.types.VoidTypeNode;
-import semanticAnalysis.Label;
-import semanticAnalysis.FuncBodyUtils;
-import semanticAnalysis.Environment;
-import semanticAnalysis.SemanticError;
+import util.Label;
+import util.FuncBodyUtils;
+import util.Environment;
+import util.SemanticError;
 
 public class FunNode implements Node {
 

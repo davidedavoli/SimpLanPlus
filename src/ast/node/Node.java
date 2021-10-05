@@ -5,9 +5,9 @@ import ast.node.types.TypeNode;
 
 import java.util.ArrayList;
 
-import semanticAnalysis.Environment;
-import semanticAnalysis.Label;
-import semanticAnalysis.SemanticError;
+import util.Environment;
+import util.Label;
+import util.SemanticError;
 
 public interface Node {
   String toPrint(String indent);

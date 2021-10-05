@@ -3,7 +3,7 @@ package del;
 import java.util.HashSet;
 import java.util.Set;
 
-import semanticAnalysis.Pair;
+import util.Pair;
 
 public class DelEnv {
 	

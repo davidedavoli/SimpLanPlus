@@ -1,4 +1,4 @@
-package semanticAnalysis;
+package util;
 
 
 public class FuncBodyUtils {

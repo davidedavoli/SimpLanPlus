@@ -2,9 +2,9 @@ package ast.node.types;
 
 import java.util.ArrayList;
 
-import semanticAnalysis.Environment;
-import semanticAnalysis.Label;
-import semanticAnalysis.SemanticError;
+import util.Environment;
+import util.Label;
+import util.SemanticError;
 
 public class VoidTypeNode implements TypeNode {
   
