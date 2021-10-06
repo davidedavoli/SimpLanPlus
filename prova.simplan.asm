@@ -1,2 +1,2 @@
 push 0
-push 1
+li $a0 1
