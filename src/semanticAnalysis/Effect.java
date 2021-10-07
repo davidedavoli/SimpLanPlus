@@ -2,13 +2,13 @@ package semanticAnalysis;
 
 public class Effect {
     // ⊥
-    private static final int _INITIALIZED = 0;
+    public static final int _INITIALIZED = 0;
     // rw
-    private static final int _READ_WRITE = 1;
+    public static final int _READ_WRITE = 1;
     // d
-    private static final int _DELETE = 2;
+    public static final int _DELETE = 2;
     // ⊤
-    private static final int _ERROR = 3;
+    public static final int _ERROR = 3;
 
     // Actual value representing the status of a variable.
     private final int value;
@@ -19,7 +19,7 @@ public class Effect {
      * @param value can be {@code _INITIALIZED}, {@code _READ_WRITE},
      *              {@code _DELETE}, {@code _ERROR}.
      */
-    private Effect(final int value) {
+    public Effect(int value) {
         this.value = value;
     }
 
@@ -38,6 +38,7 @@ public class Effect {
     public Effect(final Effect e) {
         this(e.value);
     }
+
 
     // Effect operations (max,seq,par)
     /**

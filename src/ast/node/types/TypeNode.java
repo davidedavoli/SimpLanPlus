@@ -16,10 +16,10 @@ public interface TypeNode extends Node{
   //  per una dichiarazione, "null"
   TypeNode typeCheck();
   
-  TypeNode dereference();
+  int getDereferenceLevel();
+  TypeNode getPointedType();
   
   String codeGeneration(Label labelManager);
   
   ArrayList<SemanticError> checkSemantics(Environment env);
-  
-}  
+}

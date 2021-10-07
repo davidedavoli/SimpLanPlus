@@ -131,8 +131,13 @@ public class FunNode implements Node {
   public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  public String codeGeneration(Label labelManager) {
+
+	@Override
+	public ArrayList<SemanticError> checkEffects(Environment env) {
+		return null;
+	}
+
+	public String codeGeneration(Label labelManager) {
 	  
 	    String declCode="";
 	    if (declist!=null) for (Node dec:declist)

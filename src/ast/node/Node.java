@@ -24,5 +24,12 @@ public interface Node {
   //ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl);
   
   RetEffType retTypeCheck();
-  
+
+  /**
+   * Checks the subtree rooted in this node for effects analysis errors.
+   *
+   * @param env the environment at this point in the AST (both environments Γ and Σ)
+   * @return a list of {@code SemanticError}
+   */
+  ArrayList<SemanticError> checkEffects(Environment env);
 }  

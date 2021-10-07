@@ -58,7 +58,7 @@ public class LhsNode implements Node {
   //valore di ritorno non utilizzato
   public TypeNode typeCheck () {
 	if (inner != null) {
-		return inner.typeCheck().dereference();
+		return inner.typeCheck().getPointedType();
 	}
 	else //Questo caso non dovrebbe mai verificarsi per l'implementazione di Visitor.
 		return null;
@@ -67,8 +67,13 @@ public class LhsNode implements Node {
   public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  public String codeGeneration(Label labelManager) {
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    public String codeGeneration(Label labelManager) {
 	  	String precode="";
 	  	String postcode="";
 		return precode+inner.codeGeneration(labelManager)+postcode; //TODO precode e postcode dovrebbero dereferenziare il valore generato da inner

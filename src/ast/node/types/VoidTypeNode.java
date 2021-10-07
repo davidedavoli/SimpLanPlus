@@ -25,12 +25,22 @@ public class VoidTypeNode implements TypeNode {
   public TypeNode typeCheck() {
     return null;
   }
-  
-  public RetEffType retTypeCheck() {
+
+    @Override
+    public int getDereferenceLevel() {
+        return 1;
+    }
+
+    public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  @Override
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    @Override
  	public ArrayList<SemanticError> checkSemantics(Environment env) {
 
  	  return new ArrayList<SemanticError>();

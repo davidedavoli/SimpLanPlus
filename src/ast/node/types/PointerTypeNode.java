@@ -7,32 +7,32 @@ import semanticAnalysis.Label;
 import semanticAnalysis.SemanticError;
 
 public class PointerTypeNode implements TypeNode {
-  private TypeNode type;
+  private TypeNode pointedType;
   
   public PointerTypeNode (TypeNode t) {
-	  type=t;
+	  pointedType =t;
   }
   
   public String toPrint(String s) {
-	return s+"Pointer type\n"+type.toPrint(s+"   ");  
+	return s+"Pointer type\n"+ pointedType.toPrint(s+"   ");
   }
     
   //non utilizzato
   public TypeNode typeCheck() {
     return null; //non bisognerebbe chiamare typecheck su questo nodo
   }
-  
-  public TypeNode dereference() {
-	    return type;
-	  }
-  
-  public int getDerefLevel(){
-	  if (type instanceof PointerTypeNode)
-		  return 1+((PointerTypeNode)type).getDerefLevel();
-	  else
-		  return 0;
-  }
-  
+
+    @Override
+    public int getDereferenceLevel() {
+        return 1 + this.pointedType.getDereferenceLevel();
+    }
+
+    @Override
+    public TypeNode getPointedType() {
+        return this.pointedType;
+    }
+
+
   @Override
  	public ArrayList<SemanticError> checkSemantics(Environment env) {
 
@@ -43,8 +43,13 @@ public class PointerTypeNode implements TypeNode {
   public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  //TODO Generare il codice
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    //TODO Generare il codice
   public String codeGeneration(Label labelManager) {
 		return "";
   }

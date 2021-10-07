@@ -288,4 +288,10 @@ public class BinExpNode implements Node {
     public RetEffType retTypeCheck() {
         return null;
     }
+
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
 }
