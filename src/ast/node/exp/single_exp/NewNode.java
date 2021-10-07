@@ -62,7 +62,7 @@
 //}  
 
 
-package ast.node.dec;
+package ast.node.exp.single_exp;
 
 import java.util.ArrayList;
 
@@ -106,6 +106,8 @@ public class NewNode implements Node {
 	  }
 	  
 	  public String codeGeneration(Label labelManager) {
-			return "";//TODO
+		  StringBuilder cgen = new StringBuilder();
+		  cgen.append("new $a0").append("// put new address in a0\n");
+		  return cgen.toString();
 	  }  
 }  

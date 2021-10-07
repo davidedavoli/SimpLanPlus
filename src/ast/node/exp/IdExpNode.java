@@ -80,13 +80,19 @@ public class IdExpNode extends LhsExpNode {
   }
   
   public String codeGeneration(Label labelManager) {
-      String getAR="";
-	  for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++) 
-	    	 getAR+="lw\n";
-	    return "push "+entry.getOffset()+"\n"+ //metto offset sullo stack
-		       "lfp\n"+getAR+ //risalgo la catena statica
-			   "add\n"+ 
-               "lw\n"; //carico sullo stack il valore all'indirizzo ottenuto
+      /**
+       * Ritorna valore di ID
+       */
 
+      StringBuilder cgen = new StringBuilder();
+
+      cgen.append("lw $a1 0($fp) //put in $a1 (al) actual fp\n");
+
+      for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
+          cgen.append("lw $a1 0($a1) //go up to chain\n");
+
+      cgen.append("lw $a0 ").append(entry.getOffset()).append("($a1) //put in $a0 value of Id\n");
+
+      return cgen.toString();
   }
 }  

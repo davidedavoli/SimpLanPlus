@@ -69,9 +69,17 @@ public class LhsNode implements Node {
   }
   
   public String codeGeneration(Label labelManager) {
-	  	String precode="";
-	  	String postcode="";
-		return precode+inner.codeGeneration(labelManager)+postcode; //TODO precode e postcode dovrebbero dereferenziare il valore generato da inner
-  }  
+      /**
+       * Ritorna indirizzo del puntatore
+       */
+
+      StringBuilder cgen = new StringBuilder();
+      inner.codeGeneration(labelManager);
+      cgen.append("lw $a1 0($a1)");
+
+      return cgen.toString();
+
+
+  }
     
 }  

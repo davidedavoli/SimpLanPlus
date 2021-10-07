@@ -7,7 +7,7 @@ import ast.node.IdNode;
 import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
-import ast.node.dec.NewNode;
+import ast.node.exp.single_exp.NewNode;
 import ast.node.dec.VarNode;
 import ast.node.exp.*;
 import ast.node.exp.single_exp.BoolNode;
@@ -327,9 +327,9 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		return new NotExpNode(visit(ctx.exp()));
 		}
 	
-	/*@Override public Node visitNegExp(SimpLanPlusParser.NegExpContext ctx) {
+	@Override public Node visitNegExp(SimpLanPlusParser.NegExpContext ctx) {
 		return new NegExpNode(visit(ctx.exp())); 
-		}*/
+	}
 	
 	@Override
 	public Node visitBoolExp(BoolExpContext ctx) {

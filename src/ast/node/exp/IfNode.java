@@ -87,9 +87,12 @@ public class IfNode implements Node {
       /**
        * Cgen else
        */
-      String loaded_el = el.codeGeneration(labelManager);
-      cgen.append(loaded_el);
+      if(el != null){
+          String loaded_el = el.codeGeneration(labelManager);
+          cgen.append(loaded_el);
+      }
       cgen.append("b ").append(end_label);
+
 
       /**
        * Cgen then

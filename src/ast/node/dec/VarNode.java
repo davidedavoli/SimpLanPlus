@@ -92,9 +92,20 @@ public class VarNode implements Node {
   }
   
   public String codeGeneration(Label labelManager) {
-	  //TODO 
-	 //	return exp.codeGeneration();
-	  return "";
+      StringBuilder cgen = new StringBuilder();
+      if(exp != null){
+          cgen.append(exp.codeGeneration(labelManager)).append("\n");
+          cgen.append("push $a0\n");
+      }
+      else{
+          /**
+           * Decidere se pushare 0 per dire che non c'è nulla o alzare solamente lo stack pointer
+           */
+          cgen.append("subi $sp $sp 1\n");
+          //cgen.append("push 0\n");
+      }
+
+	  return cgen.toString();
   }  
     
 }  

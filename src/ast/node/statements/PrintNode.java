@@ -36,7 +36,10 @@ public class PrintNode implements Node {
   }
   
   public String codeGeneration(Label labelManager) {
-		return val.codeGeneration(labelManager)+"print\n";
+        StringBuilder cgen = new StringBuilder();
+        cgen.append(val.codeGeneration(labelManager)).append("\n");
+        cgen.append("print $a0\n");
+		return cgen.toString();
   }
     
 }  

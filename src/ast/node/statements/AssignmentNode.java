@@ -17,6 +17,7 @@ public class AssignmentNode implements Node {
 
   private LhsNode lhs;
   private Node exp;
+
   
   public AssignmentNode (LhsNode l, Node e) {
     lhs=l;
@@ -62,7 +63,13 @@ public class AssignmentNode implements Node {
   }
   
   public String codeGeneration(Label labelManager) {
-		return exp.codeGeneration(labelManager);
+      StringBuilder cgen = new StringBuilder();
+      cgen.append(exp.codeGeneration(labelManager)).append("\n");
+      cgen.append(lhs.codeGeneration(labelManager)).append("\n");
+      //$a1 indirizzo di lhs
+      cgen.append("sw $a0 0($a1) // 0($a1) = $a0 id=exp \n");
+
+      return cgen.toString();
   }
 
 //@Override

@@ -46,6 +46,8 @@ public class SVM {
                                 push(regRead(bytecode.getArg1()));
                             else
                                 push(Integer.parseInt(bytecode.getArg1()));
+
+
                             break;
                         case SVMParser.POP:
                             if (bytecode.getArg1() != null && isRegister(bytecode.getArg1()))
@@ -136,7 +138,7 @@ public class SVM {
                             arg1 = bytecode.getArg1();
                             v1 = Integer.parseInt(bytecode.getArg2());
                             arg3 = bytecode.getArg3();
-                            //                regStore(arg1, memory[v1+regRead(arg3)]);
+                            //regStore(arg1, memory[v1+regRead(arg3)]);
                             regStore(arg1, memory.read(v1 + regRead(arg3)));
                             break;
                         case SVMParser.BRANCH:

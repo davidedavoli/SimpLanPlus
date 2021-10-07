@@ -21,12 +21,8 @@ import util.Label;
 import util.SemanticError;
 
 public class Test {
-	private Label labelManager = new Label();
 
-	public Label getlabelManager(){
-		return labelManager;
-	}
-	public void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
 		String fileName = "prova.simplan";
 
@@ -56,9 +52,9 @@ public class Test {
 		TypeNode type = ast.typeCheck(); //type-checking bottom-up
 		System.out.println(type.toPrint("Type checking ok! Type of the program is: "));
 
-		this.labelManager = new Label();
+		Label labelManager = new Label();
 		// CODE GENERATION  prova.SimpLan.asm
-		String code=ast.codeGeneration(this.labelManager);
+		String code=ast.codeGeneration(labelManager);
 		BufferedWriter out = new BufferedWriter(new FileWriter(fileName+".asm"));
 		out.write(code);
 		out.close();

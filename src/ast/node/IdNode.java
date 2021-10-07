@@ -82,6 +82,19 @@ public class IdNode extends LhsNode {
   }
   
   public String codeGeneration(Label labelManager) {
-	  return ""; //TODO capire cosa restituire
+      /**
+       * ritorna indirizzo di ID nel suo frame
+       */
+      StringBuilder cgen = new StringBuilder();
+
+      cgen.append("lw $a1 0($fp) //put in $a1 (al) actual fp\n");
+
+      for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
+          cgen.append("lw $a1 0($a1) //go up to chain\n");
+
+      cgen.append("addi $a1 $a1 ").append(entry.getOffset()).append(" //put in $a1 address of Id\n");
+
+      return cgen.toString();
+
   }
 }  

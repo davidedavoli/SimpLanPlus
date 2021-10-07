@@ -51,7 +51,7 @@ public class NotExpNode implements Node {
   public String codeGeneration(Label labelManager) {
 	  StringBuilder cgen = new StringBuilder();
 	  String loaded_exp = exp.codeGeneration(labelManager);
-	  cgen.append(loaded_exp);
+	  cgen.append(loaded_exp).append("\n");
 	  cgen.append("not $a0 $a0\n");
 
 	  return cgen.toString();

@@ -79,7 +79,14 @@ public class LhsExpNode implements Node {
   }
   
   public String codeGeneration(Label labelManager) {
-		return ""; //TODO capire cosa ci va messo
+      /**
+       * Mette in $a0 quello che c'è nella cella di memoria del puntatore
+       */
+      StringBuilder cgen = new StringBuilder();
+      cgen.append(inner.codeGeneration(labelManager)).append("\n");
+      cgen.append("lw $a0 0($a0)");
+
+      return cgen.toString();
   }  
     
 }  

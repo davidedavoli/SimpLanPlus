@@ -116,14 +116,25 @@ public class BlockNode implements Node {
 //  }
   
   public String codeGeneration(Label labelManager) {
-	  String code="";
-	  for (Node dec:declarations)
-		    code+=dec.codeGeneration(labelManager);
+      StringBuilder cgen = new StringBuilder();
+
+
+    /**
+     * Activation link
+     */
+      cgen.append("push 0\n");
+      cgen.append("subi $fp $sp 1\n");
+      for (Node dec:declarations)
+            cgen.append(dec.codeGeneration(labelManager)).append("\n");
+
+
+
 	  for (Node stat:statements)
-		    code+=stat.codeGeneration(labelManager);
-	  return  "push 0\n"+
-			  code+
-			  FuncBodyUtils.getCode();
+          cgen.append(stat.codeGeneration(labelManager)).append("\n");
+      cgen.append(FuncBodyUtils.getCode()).append("\n");
+
+	  return  cgen.toString();
+
   } 
   
   
