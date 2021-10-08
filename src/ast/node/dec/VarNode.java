@@ -33,7 +33,9 @@ public class VarNode implements Node {
   	  
   		//env.offset = -2;
   		HashMap<String, STentry> hm = env.symTable.get(env.nestingLevel);
-        STentry entry = new STentry(env.nestingLevel,type, env.offset--); //separo introducendo "entry"
+          int new_offset = env.offset--;
+          System.out.println("NEW OFFSET "+new_offset);
+        STentry entry = new STentry(env.nestingLevel,type, new_offset); //separo introducendo "entry"
         
         if (exp!=null)
         	res.addAll(exp.checkSemantics(env));
@@ -96,12 +98,13 @@ public class VarNode implements Node {
       if(exp != null){
           cgen.append(exp.codeGeneration(labelManager)).append("\n");
           cgen.append("push $a0\n");
+
       }
       else{
           /**
            * Decidere se pushare 0 per dire che non c'è nulla o alzare solamente lo stack pointer
            */
-          cgen.append("subi $sp $sp 1\n");
+          cgen.append("subi $sp $sp 1 // non assegnato nulla\n");
           //cgen.append("push 0\n");
       }
 

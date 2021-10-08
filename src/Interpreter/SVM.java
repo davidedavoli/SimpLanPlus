@@ -18,7 +18,7 @@ public class SVM {
     private int ip = 0;             // instruction pointer, internal register, no write nor read
     private int sp = MEMSIZE;       // stack pointer
     private int hp = 0;             // heap pointer read-only
-    private int fp = MEMSIZE;       // frame pointer
+    private int fp = MEMSIZE-1;       // frame pointer
     private int ra;
     private int rv;
 
@@ -36,95 +36,82 @@ public class SVM {
                 return;
             } else {
                 Instruction bytecode = code[ip++]; // fetch
-                int v1, v2;
-                String arg1, arg2, arg3;
+                String arg1 = bytecode.getArg1();
+                String arg2 = bytecode.getArg2();
+                String arg3 = bytecode.getArg3();
+
+                int offset,value;
                 int address;
+                
                 try {
                     switch (bytecode.getCode()) {
                         case SVMParser.PUSH:
-                            if (isRegister(bytecode.getArg1()))
-                                push(regRead(bytecode.getArg1()));
-                            else
-                                push(Integer.parseInt(bytecode.getArg1()));
 
+                            if (isRegister(arg1))
+                                push(regRead(arg1));
+
+                            else
+                                push(Integer.parseInt(arg1));
 
                             break;
                         case SVMParser.POP:
-                            if (bytecode.getArg1() != null && isRegister(bytecode.getArg1()))
-                                regStore(bytecode.getArg1(), pop());
+                            if (arg1 != null && isRegister(arg1)){
+                                regStore(arg1, pop());
+                                System.out.println("VALORE POPPATO "+ regRead(arg1));
+                            }
+
                             else
                                 pop();
                             break;
+
+
                         case SVMParser.ADD:
-                            arg1 = bytecode.getArg1();
-                            arg2 = bytecode.getArg2();
-                            arg3 = bytecode.getArg1();
                             regStore(arg1, regRead(arg2) + regRead(arg3));
                             break;
                         case SVMParser.ADDI:
-                            arg1 = bytecode.getArg1();
-                            arg2 = bytecode.getArg2();
-                            arg3 = bytecode.getArg3();
-                            regStore(arg1, regRead(arg2) + Integer.parseInt(arg3));
+                            value = Integer.parseInt(arg3);
+                            regStore(arg1, regRead(arg2) + value);
                             break;
                         case SVMParser.SUB:
-                            arg1 = bytecode.getArg1();
-                            arg2 = bytecode.getArg2();
-                            arg3 = bytecode.getArg3();
                             regStore(arg1, regRead(arg2) - regRead(arg3));
                             break;
                         case SVMParser.SUBI:
-                            arg1 = bytecode.getArg1();
-                            arg2 = bytecode.getArg2();
-                            arg3 = bytecode.getArg3();
-                            regStore(arg1, regRead(arg2) - Integer.parseInt(arg3));
+                            value = Integer.parseInt(arg3);
+                            regStore(arg1, regRead(arg2) - value);
                             break;
                         case SVMParser.MULT:
-                            arg1 = bytecode.getArg1();
-                            arg2 = bytecode.getArg2();
-                            arg3 = bytecode.getArg3();
                             regStore(arg1, regRead(arg2) * regRead(arg3));
                             break;
                         case SVMParser.MULTI:
-                            arg1 = bytecode.getArg1();
-                            arg2 = bytecode.getArg2();
-                            arg3 = bytecode.getArg3();
-                            regStore(arg1, regRead(arg2) * Integer.parseInt(arg3));
+                            value = Integer.parseInt(arg3);
+                            regStore(arg1, regRead(arg2) * value);
                             break;
                         case SVMParser.DIV:
-                            arg1 = bytecode.getArg1();
-                            arg2 = bytecode.getArg2();
-                            arg3 = bytecode.getArg3();
                             regStore(arg1, regRead(arg2) / regRead(arg3));
                             break;
                         case SVMParser.DIVI:
-                            arg1 = bytecode.getArg1();
-                            arg2 = bytecode.getArg2();
-                            arg3 = bytecode.getArg3();
-                            regStore(arg1, regRead(arg2) / Integer.parseInt(arg3));
+                            value = Integer.parseInt(arg3);
+                            regStore(arg1, regRead(arg2) / value);
                             break;
+
+
                         case SVMParser.NOT:
-                            arg1 = bytecode.getArg1();
-                            arg2 = bytecode.getArg2();
                             regStore(arg1, regRead(arg2) != 0 ? 0 : 1);
                             break;
                         case SVMParser.OR:
-                            arg1 = bytecode.getArg1();
-                            arg2 = bytecode.getArg2();
-                            arg3 = bytecode.getArg3();
                             regStore(arg1, (regRead(arg2)>0 || regRead(arg3)>0) ?1:0);
                             break;
-                        case SVMParser.STOREW: //
-                            arg1 = bytecode.getArg1();
-                            v1 = Integer.parseInt(bytecode.getArg2());
-                            arg3 = bytecode.getArg3();
-                            //                  memory[v1+regRead(arg3)] = regRead(arg1);
-                            memory.write(v1 + regRead(arg3), regRead(arg1));
 
+
+                        case SVMParser.STOREW: //
+                            offset = Integer.parseInt(arg2);
+                            int addr_sw = offset + regRead(arg3);
+                            memory.write(addr_sw, regRead(arg1));
+                            //printStack(5);
                             break;
                         case SVMParser.LOAD:
-                            regStore(bytecode.getArg1(),
-                                    Integer.parseInt(bytecode.getArg2()));
+                            value = Integer.parseInt(arg2);
+                            regStore(arg1,value);
                             break;
                         case SVMParser.LOADW: //
                             // check if object address where we take the method label
@@ -135,37 +122,45 @@ public class SVM {
                         return;
                     }
                      */
-                            arg1 = bytecode.getArg1();
-                            v1 = Integer.parseInt(bytecode.getArg2());
-                            arg3 = bytecode.getArg3();
-                            //regStore(arg1, memory[v1+regRead(arg3)]);
-                            regStore(arg1, memory.read(v1 + regRead(arg3)));
+                            
+                            offset = Integer.parseInt(arg2);
+                            int addr_lw = offset + regRead(arg3);
+                            regStore(arg1, memory.read(addr_lw));
+                            //printStack(5);
                             break;
+
+
                         case SVMParser.BRANCH:
                             address = Integer.parseInt(code[ip].getArg1());
                             ip = address;
                             break;
                         case SVMParser.BCOND: //
-                            address = Integer.parseInt(code[ip].getArg2());
+                            System.out.println("ARG 2 jump "+arg2);
+                            address = Integer.parseInt(arg2);
+                            System.out.println("COND JUMP "+address);
                             ip++;  //aumentiamo ip, in caso non venga effettuato il branch
-                            v1 = regRead(bytecode.getArg1());
-                            if (v1!=0) ip = address;
+                            value = regRead(arg1);
+                            if (value!=0) ip = address;
                             break;
+
+
                         case SVMParser.EQ:
-                            regStore(bytecode.getArg1(), regRead(bytecode.getArg2())==regRead(bytecode.getArg3())?1:0);
+                            regStore(arg1, regRead(arg2)==regRead(arg3)?1:0);
                             break;
                         case SVMParser.LE:
-                            regStore(bytecode.getArg1(), regRead(bytecode.getArg2())<=regRead(bytecode.getArg3())?1:0);
+                            regStore(arg1, regRead(arg2)<=regRead(arg3)?1:0);
                             break;
                         case SVMParser.LT:
-                            regStore(bytecode.getArg1(), regRead(bytecode.getArg2())<regRead(bytecode.getArg3())?1:0);
+                            regStore(arg1, regRead(arg2)<regRead(arg3)?1:0);
                             break;
                         case SVMParser.GE:
-                            regStore(bytecode.getArg1(), regRead(bytecode.getArg2())>=regRead(bytecode.getArg3())?1:0);
+                            regStore(arg1, regRead(arg2)>=regRead(arg3)?1:0);
                             break;
                         case SVMParser.GT:
-                            regStore(bytecode.getArg1(), regRead(bytecode.getArg2())>regRead(bytecode.getArg3())?1:0);
+                            regStore(arg1, regRead(arg2)>regRead(arg3)?1:0);
                             break;
+
+
                         case SVMParser.NEW:
                             address = memory.allocate();
                             if (address >= hp) hp = address + 1;
@@ -173,21 +168,26 @@ public class SVM {
                                 System.out.println("Memory is full!!");
                                 return;
                             }
-                            regStore(bytecode.getArg1(), address);
+                            regStore(arg1, address);
                             break;
                         case SVMParser.FREE:
-                            address = regRead(bytecode.getArg1());
+                            address = regRead(arg1);
                             if (address == hp - 1)
                                 hp--; //se è l'ultimo indirizzo occupato, allora hp viene decrementato
                             memory.free(address);
                             break;
                         case SVMParser.PRINT:
-                            if (bytecode.getArg1()==null)
+                            if (arg1==null)
                                 System.out.println((sp < MEMSIZE) ? memory.read(sp) : "Empty stack!");
-                            else
-                                System.out.println((sp < MEMSIZE) ? regRead(bytecode.getArg1()) : "Empty stack!");
+                            else{
+                                System.out.println( "PRINTO IL VALORE NEL REGISTRO: "+arg1 +" CON VALORE: "+ regRead(arg1));
+                            }
+                            printStack(5);
+                                //System.out.println((sp < MEMSIZE) ? regRead(arg1) : "Empty stack!");
 
                             break;
+
+
                         case SVMParser.HALT:
                             //to print the result
                             System.out.println("\nResult: " + memory.read(sp) + "\n");
@@ -206,29 +206,35 @@ public class SVM {
     }
 
     private int regRead(String reg) {
-        switch (reg.charAt(0)) {
+        switch (reg.charAt(1)) {
             case 'r':
-                return r[Integer.parseInt(reg.substring(1))];
+                return r[Integer.parseInt(reg.substring(2))];
             case 'a':
-                return a[Integer.parseInt(reg.substring(1))];
+                return a[Integer.parseInt(reg.substring(2))];
             default:
-                if (reg.equals("$fp"))
-                    return fp;
-                else if (reg.equals("$sp"))
-                    return sp;
-                else if (reg.equals("$hp")) {
-                    return hp;
+                switch (reg) {
+                    case "$fp":
+                        //System.out.println("RETURN FP "+ fp + " mem: "+ memory.read(fp));
+                        return fp;
+                    case "$sp":
+                        return sp;
+                    case "$hp":
+                        return hp;
                 }
         }
         return 0;
     }
 
     private void regStore(String reg, int v) throws Exception {
-        switch (reg.charAt(0)) {
+        switch (reg.charAt(1)) {
             case 'r':
-                r[Integer.parseInt(reg.substring(1))] = v;
+                r[Integer.parseInt(reg.substring(2))] = v;
+                break;
             case 'a':
-                a[Integer.parseInt(reg.substring(1))] = v;
+                //System.out.println("STORING VALUE: "+v+" FOR REGISTER "+reg);
+                a[Integer.parseInt(reg.substring(2))] = v;
+
+                break;
             default:
                 if (reg.equals("$fp"))
                     fp = v;
@@ -249,5 +255,17 @@ public class SVM {
         Pattern p = Pattern.compile("\\$(([ar][0-9])|(sp)|(fp)|(hp))");
         Matcher m = p.matcher(str);
         return m.matches();
+    }
+    private void printStack(int max){
+        int ind = MEMSIZE-1;
+        int to = ind-max;
+        System.out.println("Inizio print stack");
+
+        while (ind > to){
+            System.out.println("CELL "+ ind + " Value: "+ memory.read(ind));
+            ind--;
+        }
+        System.out.println("Fine print stack");
+
     }
 }

@@ -14,7 +14,7 @@ public class Label {
      */
     public String freshLabel(String label_name) {
         label_count += 1;
-        return "label_"+label_name + "_" + label_count;
+        return "LABEL"+label_name + label_count;
     }
 
 

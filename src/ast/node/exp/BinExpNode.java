@@ -34,40 +34,53 @@ public class BinExpNode implements Node {
     public TypeNode typeCheck() {
         TypeNode lhsType = lhs.typeCheck();
         TypeNode rhsType = rhs.typeCheck();
-        
-        if (lhsType != rhsType) {
-            System.out.println("OPERANDI DI TIPO DIVERSO, LANCIARE ECCEZIONE");
-            return null;
+        System.out.println("LHS " + lhsType);
+        System.out.println("RHS " + rhsType);
+        if(!(lhsType instanceof IntTypeNode && rhsType instanceof IntTypeNode)){
+            System.out.println("NOT INT OPERANT");
+            if(!(lhsType instanceof BoolTypeNode && rhsType instanceof BoolTypeNode)){
+                System.out.println("OPERANDI DI TIPO DIVERSO, LANCIARE ECCEZIONE");
+                return null;
+            }
+            else
+                System.out.println("BOOL OPERAND");
         }
-        
-        
+        else
+            System.out.println("INT OPERAND");
+
+
         /**
         * +, -, *, / <,<=,>,>=: solo int
         * ==,!= : solo o tra int o tra bool
         * &&, ||, ! : solo tra bool
         * */
-        
+
         switch (operator) {
             /**
-             * Math operator
+             * Math operator da cambiare
              */
             case "+":
             case "-":
             case "*":
             case "/":
-            case "<":
-            case "<=":
-            case ">":
-            case ">=":
                 // Both must be integer type
                 if (!(lhsType instanceof IntTypeNode)) {
                     System.out.println("Gli operandi non sono int, lanciare un'eccezione");
                 }
                 return new IntTypeNode();
+
+            case "<":
+            case "<=":
+            case ">":
+            case ">=":
+                if (!(lhsType instanceof IntTypeNode)) {
+                    System.out.println("Gli operandi non sono int, lanciare un'eccezione");
+                }
+                return new BoolTypeNode();
             /**
              * Bool operator
              * These can be done with bool and Int
-             * 
+             *
              */
             case "==":
             case "!=":
@@ -77,7 +90,6 @@ public class BinExpNode implements Node {
                 else {
                     return new IntTypeNode();
                 }
-                
 
             case "&&":
             case "||":
@@ -96,7 +108,8 @@ public class BinExpNode implements Node {
     public String codeGeneration(Label labelManager) {
 
         StringBuilder cgen = new StringBuilder();
-        cgen.append("//Strart codegen of ").append(lhs.toString()).append(operator).append(rhs.toString())
+
+        cgen.append("//Start codegen of ").append(lhs.typeCheck().getClass().getName()).append(operator).append(rhs.typeCheck().getClass().getName())
                 .append("\n");
         /**
          * Cgen for lhs and rhs to push them on the stack
@@ -106,27 +119,27 @@ public class BinExpNode implements Node {
         cgen.append("push $a0 // push e1\n");
         String rhs_generated = rhs.codeGeneration(labelManager);
         cgen.append(rhs_generated);
-        cgen.append("lw $t1 0($sp) take e2 and $t1 take e1\n");
+        cgen.append("lw $a2 0($sp) //take e2 and $a2 take e1\n");
         cgen.append("pop // remove e1 from the stack to preserve stack\n");
 
         /**
-         * $t1(=e1) operation $a0(=e2)
+         * $a2(=e1) operation $a0(=e2)
          */
 
         switch (operator) {
             case "+":{
-                cgen.append("add $a0 $t1 $a0 // a0 = t1+a0\n");
+                cgen.append("add $a0 $a2 $a0 // a0 = t1+a0\n");
             }
             case "-": {
-                cgen.append("sub $a0 $t1 $a0 // a0 = t1-a0\n");
+                cgen.append("sub $a0 $a2 $a0 // a0 = t1-a0\n");
                 break;
             }
             case "*": {
-                cgen.append("mult $a0 $t1 $a0 // a0 = t1+a0\n");
+                cgen.append("mult $a0 $a2 $a0 // a0 = t1+a0\n");
                 break;
             }
             case "/": {
-                cgen.append("div $a0 $t1 $a0 // a0 = t1/a0\n");
+                cgen.append("div $a0 $a2 $a0 // a0 = t1/a0\n");
                 break;
             }
             /*
@@ -137,37 +150,38 @@ public class BinExpNode implements Node {
             * eq
             * */
             case "<=":{
-                cgen.append("le $a0 $t1 $a0 // $a0 = $t1 <= $a0");
+                cgen.append("le $a0 $a2 $a0 // $a0 = $a2 <= $a0");
                 break;
             }
             case "<":{
-                cgen.append("lt $a0 $t1 $a0 // $a0 = $t1 < $a0");
+                cgen.append("lt $a0 $a2 $a0 // $a0 = $a2 < $a0");
                 break;
             }
             case ">":{
-                cgen.append("gt $a0 $t1 $a0 // $a0 = $t1 > $a0");
+                cgen.append("gt $a0 $a2 $a0 // $a0 = $a2 > $a0");
                 break;
             }
             case ">=":{
-                cgen.append("ge $a0 $t1 $a0 // $a0 = $t1 >= $a0");
+                cgen.append("ge $a0 $a2 $a0 // $a0 = $a2 >= $a0");
                 break;
             }
             case "==":{
-                cgen.append("eq $a0 $t1 $a0 // $a0 = $t1 == $a0");
+                cgen.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0");
                 break;
             }
             case "!=":{
-                cgen.append("eq $a0 $t1 $a0 // $a0 = $t1 == $a0");
+                cgen.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0");
                 cgen.append("not $a0 $a0 // $a0 = !$a0");
                 break;
             }
             case "&&":{
-                cgen.append("and $a0 $t1 $a0 // $a0 = $t1 && $a0");
+                //cgen.append("and $a0 $a2 $a0 // $a0 = $a2 && $a0");
+                cgen.append("mult $a0 $a2 $a0 // $a0 = $a2 && $a0 aka $a0 = $a2 * $a0");
                 break;
             }
 
             case "||":{
-                cgen.append("or $a0 $t1 $a0 // $a0 = $t1 || $a0");
+                cgen.append("or $a0 $a2 $a0 // $a0 = $a2 || $a0");
                 break;
             }
            
@@ -198,7 +212,12 @@ public class BinExpNode implements Node {
     */
     @Override
     public ArrayList<SemanticError> checkSemantics(Environment env) {
-        return null;
+        ArrayList<SemanticError> binExpNodeErrors = new ArrayList<>();
+
+        binExpNodeErrors.addAll(lhs.checkSemantics(env));
+        binExpNodeErrors.addAll(rhs.checkSemantics(env));
+
+        return binExpNodeErrors;
     }
 
     @Override

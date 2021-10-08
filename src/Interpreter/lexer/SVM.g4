@@ -66,21 +66,21 @@ instruction:
 
 REGISTER    : '$'((('a'|'r')('0'..'9'))|('sp'|'fp'|'hp'|'rv'|'ra'));
 
-PUSH  : 'push' ;
+PUSH     : 'push' ;
 ADDRESS  : 'address' ;
-POP	 : 'pop' ;
-ADD	 : 'add' ;  	// add two values from two registers in a third
+POP	     : 'pop' ;
+ADD	     : 'add' ;  	// add two values from two registers in a third
 ADDI	 : 'addi' ;  	// add an integer to a value from a register and stores the result in a second register
-SUB	 : 'sub' ;	// as for add
+SUB	     : 'sub' ;	// as for add
 SUBI	 : 'subi' ;	// as for addi
 MULT	 : 'mult' ;	// as for add
 MULTI	 : 'multi' ;	// as for addi
-DIV	 : 'div' ;	// as for add
+DIV	     : 'div' ;	// as for add
 DIVI	 : 'divi' ;	// as for addi
 NOT	     : 'not' ;	// logical negation
 OR	     : 'or' ;	// logical negation
-STOREW	 : 'sw' ; 	// stores the vaue of a register at offset n from the address in a second register
-LOADW	 : 'lw' ;	// loads the value at offset n from the address in a register ans sotres it in a second register
+STOREW	 : 'sw' ; 	// stores the value of a register at offset n from the address in a second register
+LOADW	 : 'lw' ;	// loads the value at offset n from the address in a register and stores it in a second register
 BRANCH	 : 'b' ;	// jump to label
 BCOND    : 'bc' ;	// jump to label if $r1 == top
 LE       : 'le' ;	// r1 = r2 <= r3
@@ -106,7 +106,7 @@ HALT	 : 'halt' ;	// stop execution
 FREE	 : 'free' ;	// frees the address in top
 NEW	     : 'new' ;	// allocates a new cell of memory and pushes the result in top
 
-COL	 : ':' ;
+COL	     : ':' ;
 LPAR	 : '(' ;
 RPAR	 : ')' ;
 LABEL	 : ('a'..'z'|'A'..'Z')('a'..'z' | 'A'..'Z' | '0'..'9')* ;

@@ -41,7 +41,8 @@ public class FunNode implements Node {
 	  
 	  //env.offset = -2;
 	  HashMap<String, STentry> hm = env.symTable.get(env.nestingLevel);
-      STentry entry = new STentry(env.nestingLevel,env.offset--); //separo introducendo "entry"
+	  int new_offset = env.offset--;
+      STentry entry = new STentry(env.nestingLevel,new_offset); //separo introducendo "entry"
       
       if ( hm.put(id,entry) != null )
         res.add(new SemanticError("Fun id "+id+" already declared"));

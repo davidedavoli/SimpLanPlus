@@ -8,7 +8,7 @@ public class FuncBodyUtils {
   private static String funCode=""; 
 
   public static String freshFunLabel() { 
-	return "function_"+(funLabCount++);
+	return "Function"+(funLabCount++);
   } 
   
   public static void putCode(String c) { 

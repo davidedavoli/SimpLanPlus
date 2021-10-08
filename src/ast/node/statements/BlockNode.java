@@ -45,7 +45,7 @@ public class BlockNode implements Node {
       //check semantics in the dec list
       if(declarations.size() > 0){
     	  //FIXME offset messo completamente a caso
-    	  env.offset = -2;
+    	  env.offset = -1;
     	  //if there are children then check semantics for every child and save the results
     	  for(Node n : declarations)
     		  res.addAll(n.checkSemantics(env));
@@ -53,7 +53,7 @@ public class BlockNode implements Node {
       
       if(statements.size() > 0){
     	  //FIXME offset messo completamente a caso
-    	  env.offset = -2;
+    	  env.offset = -1;
     	  //if there are children then check semantics for every child and save the results
     	  for(Node n : statements)
     		  res.addAll(n.checkSemantics(env));
@@ -122,17 +122,25 @@ public class BlockNode implements Node {
     /**
      * Activation link
      */
+/**
+ *
+ * ADD CHECK FOR MAIN BLOCK CAUSE IN SUB BLOCK U HAVE TO PUSH FP
+ */
       cgen.append("push 0\n");
-      cgen.append("subi $fp $sp 1\n");
+      cgen.append("sw $sp 0($fp)\n");
+
+
+      //cgen.append("subi $fp $sp 1\n");
       for (Node dec:declarations)
             cgen.append(dec.codeGeneration(labelManager)).append("\n");
+
 
 
 
 	  for (Node stat:statements)
           cgen.append(stat.codeGeneration(labelManager)).append("\n");
       cgen.append(FuncBodyUtils.getCode()).append("\n");
-
+      cgen.append("halt\n");
 	  return  cgen.toString();
 
   } 

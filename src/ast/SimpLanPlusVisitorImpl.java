@@ -223,9 +223,17 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		Node condExp = visit (ctx.exp());
 		
 		Node thenExp = visit (ctx.statement(0));
-		
-		Node elseExp = visit (ctx.statement(1));
-		
+		Node elseExp = null;
+		if(ctx.statement(1) != null){
+			elseExp = visit (ctx.statement(1));
+		}
+
+		System.out.println("CONDIZIONE");
+		System.out.println(condExp);
+		System.out.println("THEN");
+		System.out.println(thenExp);
+		System.out.println("ELSE");
+		System.out.println(elseExp);
 		//build the @res properly and return it
 		res = new IfNode(condExp, thenExp, elseExp);
 		

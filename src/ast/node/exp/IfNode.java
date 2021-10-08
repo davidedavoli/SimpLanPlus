@@ -25,9 +25,12 @@ public class IfNode implements Node {
   }
   
   public String toPrint(String s) {
-    return s+"If\n" + cond.toPrint(s+"  ") 
-                    + th.toPrint(s+"  ")   
-                    + el.toPrint(s+"  "); 
+      String print = s+"If\n" + cond.toPrint(s+"  ")
+              + th.toPrint(s+"  ");
+      if (el != null)
+          print = print + el.toPrint(s+"  ");
+      return print;
+
   }
   
   @Override
@@ -54,17 +57,27 @@ public class IfNode implements Node {
   }
   
   public TypeNode typeCheck() {
-    if (!(TypeUtils.isSubtype(cond.typeCheck(),new BoolTypeNode()))) {
-      System.out.println("non boolean condition in if");
+    if (
+            !(TypeUtils.isSubtype(cond.typeCheck(),new BoolTypeNode()))
+
+    ) {
+        System.out.println("non boolean condition in if");
+        System.out.println(cond.typeCheck());
       System.exit(0);
     }
     TypeNode t = th.typeCheck();
-    TypeNode e = el.typeCheck();
-    
-    if (TypeUtils.isSubtype(t,e))
-      return e;
-    if (TypeUtils.isSubtype(e,t))
-      return t;
+    if(el == null){
+        return t;
+    }
+    else{
+        TypeNode e = el.typeCheck();
+
+        if (TypeUtils.isSubtype(t,e))
+            return e;
+        if (TypeUtils.isSubtype(e,t))
+            return t;
+    }
+
 //	non più necessari dal momento che l'if-then-esle non è più un'espressione
     
 //    System.out.println("Incompatible types in then else branches");
@@ -76,12 +89,12 @@ public class IfNode implements Node {
 
       StringBuilder cgen = new StringBuilder();
       String then_branch = labelManager.freshLabel("then");
-      String end_label = labelManager.freshLabel("end_if");
+      String end_label = labelManager.freshLabel("endIf");
       /**
        * Cgen condizione
        */
       String loaded_cond = cond.codeGeneration(labelManager);
-      cgen.append(loaded_cond);
+      cgen.append(loaded_cond).append("\n");
       cgen.append("bc $a0 ").append(then_branch).append("\n");
 
       /**
@@ -91,7 +104,7 @@ public class IfNode implements Node {
           String loaded_el = el.codeGeneration(labelManager);
           cgen.append(loaded_el);
       }
-      cgen.append("b ").append(end_label);
+      cgen.append("b ").append(end_label).append("\n");
 
 
       /**
@@ -104,7 +117,7 @@ public class IfNode implements Node {
       /**
        * Append end_if_label_count
        */
-      cgen.append(end_label);
+      cgen.append(end_label).append(":\n");
 
 
       return cgen.toString();

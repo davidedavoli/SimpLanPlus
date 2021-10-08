@@ -65,8 +65,13 @@ public class AssignmentNode implements Node {
   public String codeGeneration(Label labelManager) {
       StringBuilder cgen = new StringBuilder();
       cgen.append(exp.codeGeneration(labelManager)).append("\n");
+      //cgen.append("push $a0 // save exp on stack \n");
+
       cgen.append(lhs.codeGeneration(labelManager)).append("\n");
+      //cgen.append("pop $a0 // put in $a0 top of stack \n");
+
       //$a1 indirizzo di lhs
+
       cgen.append("sw $a0 0($a1) // 0($a1) = $a0 id=exp \n");
 
       return cgen.toString();
