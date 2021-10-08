@@ -10,6 +10,7 @@ import Interpreter.parser.SVMParser;
 import Interpreter.ast.SVMVisitorImpl;
 import ast.node.Node;
 import ast.node.types.TypeNode;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import lexer.SimpLanPlusLexer;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -33,7 +34,8 @@ public class Test {
 
 		SimpLanPlusParser parser = new SimpLanPlusParser(tokens);
 		SimpLanPlusVisitorImpl visitor = new SimpLanPlusVisitorImpl();
-		Node ast = visitor.visit(parser.block()); //generazione AST
+		Boolean isMainBlock = true;
+		Node ast = visitor.visitMainBlock(parser.block(),isMainBlock); //generazione AST
 
 		//SIMPLE CHECK FOR LEXER ERRORS
 		Environment env = new Environment();

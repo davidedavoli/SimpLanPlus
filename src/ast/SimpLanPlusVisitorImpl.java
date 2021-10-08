@@ -352,5 +352,37 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		//there is no need to perform a check here, the lexer ensures this text is a boolean
 		return visit(ctx.call()); 
 	}
-	
+
+	public Node visitMainBlock(BlockContext ctx, Boolean isMainBlock) {
+
+		//resulting node of the right type
+		BlockNode res;
+
+		//list of declarations in @res
+		ArrayList<Node> declarations = new ArrayList<Node>();
+		ArrayList<Node> statements = new ArrayList<Node>();
+
+		//visit all nodes corresponding to declarations inside the let context and store them in @declarations
+		//notice that the ctx.let().dec() method returns a list, this is because of the use of * or + in the grammar
+		//antlr detects this is a group and therefore returns a list
+		if (ctx.declaration()!=null) {
+			for (DeclarationContext dc : ctx.declaration()){
+				declarations.add( visit(dc) );
+			}
+		}
+
+		if (ctx.statement()!= null) {
+			for (StatementContext st : ctx.statement()){
+				statements.add( visit(st) );
+			}
+		}
+
+		//visit exp context
+
+		//build @res accordingly with the result of the visits to its content
+		res = new BlockNode(declarations,  statements,isMainBlock);
+
+		return res;
+	}
+
 }

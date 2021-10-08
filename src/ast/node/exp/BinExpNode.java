@@ -84,12 +84,7 @@ public class BinExpNode implements Node {
              */
             case "==":
             case "!=":
-                if (!(lhsType instanceof IntTypeNode)) {
-                    return new BoolTypeNode();
-                }
-                else {
-                    return new IntTypeNode();
-                }
+                return new BoolTypeNode();
 
             case "&&":
             case "||":

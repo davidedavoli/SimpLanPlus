@@ -15,15 +15,24 @@ import util.SemanticError;
 
 public class BlockNode implements Node {
 
-  private ArrayList<Node> declarations;
-  private ArrayList<Node> statements;
-  
-  public BlockNode (ArrayList<Node> d, ArrayList<Node> e) {
+  private final ArrayList<Node> declarations;
+  private final ArrayList<Node> statements;
+  private final Boolean isMain;
+
+  public BlockNode (ArrayList<Node> d, ArrayList<Node> s) {
     declarations=d;
-    statements=e;
+    statements=s;
+    isMain = false;
+
   }
-  
-  public String toPrint(String s) {
+
+    public BlockNode(ArrayList<Node> d, ArrayList<Node> s, Boolean isMainBlock) {
+        declarations=d;
+        statements=s;
+        isMain = isMainBlock;
+    }
+
+    public String toPrint(String s) {
 	String declstr="";
 	String statstr="";
     for (Node dec:declarations)
@@ -127,7 +136,13 @@ public class BlockNode implements Node {
  * ADD CHECK FOR MAIN BLOCK CAUSE IN SUB BLOCK U HAVE TO PUSH FP
  */
       cgen.append("push 0\n");
-      cgen.append("sw $sp 0($fp)\n");
+
+      if(!isMain){
+          cgen.append("push $fp //loadind new block\n");
+          cgen.append("addi $fp $sp 0 //Load new $fp\n");
+      }else{
+          cgen.append("sw $sp 0($fp)\n");
+      }
 
 
       //cgen.append("subi $fp $sp 1\n");
@@ -135,12 +150,18 @@ public class BlockNode implements Node {
             cgen.append(dec.codeGeneration(labelManager)).append("\n");
 
 
-
-
 	  for (Node stat:statements)
           cgen.append(stat.codeGeneration(labelManager)).append("\n");
       cgen.append(FuncBodyUtils.getCode()).append("\n");
-      cgen.append("halt\n");
+
+      if(isMain){
+          cgen.append("halt\n");
+      }
+      else{
+          cgen.append("lw $fp 1($sp) //Load old $fp pushed \n");
+          cgen.append("addi $sp $sp 2 //Restore stackpointer as before block creation \n");
+      }
+
 	  return  cgen.toString();
 
   } 

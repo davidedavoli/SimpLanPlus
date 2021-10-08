@@ -107,7 +107,7 @@ public class SVM {
                             offset = Integer.parseInt(arg2);
                             int addr_sw = offset + regRead(arg3);
                             memory.write(addr_sw, regRead(arg1));
-                            //printStack(5);
+                            //printStack(8);
                             break;
                         case SVMParser.LOAD:
                             value = Integer.parseInt(arg2);
@@ -197,7 +197,7 @@ public class SVM {
                         case SVMParser.HALT:
                             //to print the result
                             System.out.println("\nResult: " + memory.read(sp) + "\n");
-                            printStack(5);
+                            printStack(10);
                             return;
                     }
                 } catch (Exception e) {
@@ -272,7 +272,7 @@ public class SVM {
             System.out.println("CELL "+ ind + " Value: "+ memory.read(ind));
             ind--;
         }
-        System.out.println("Fine print stack");
+        System.out.println("Fine print stack, current sp_addr: "+sp);
 
     }
 }

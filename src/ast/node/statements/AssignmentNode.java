@@ -51,6 +51,7 @@ public class AssignmentNode implements Node {
   
   //valore di ritorno non utilizzato
   public TypeNode typeCheck () {
+      System.out.println(exp.typeCheck().getClass().getName()+" "+lhs.typeCheck().getClass().getName());
     if (! (TypeUtils.isSubtype(exp.typeCheck(),lhs.typeCheck())) ){
       System.out.println("incompatible value in assignment for variable "+lhs.getID());
       System.exit(0);
@@ -66,7 +67,7 @@ public class AssignmentNode implements Node {
       StringBuilder cgen = new StringBuilder();
       cgen.append(exp.codeGeneration(labelManager)).append("\n");
       //cgen.append("push $a0 // save exp on stack \n");
-
+        cgen.append("//RITORNATO DA CGEN EXP\n");
       cgen.append(lhs.codeGeneration(labelManager)).append("\n");
       //cgen.append("pop $a0 // put in $a0 top of stack \n");
 
