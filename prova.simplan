@@ -5,12 +5,12 @@
 int x = 6;
 bool c = x < 1;
 
-if (true == true) print x;
+if (true == false) print 7;
+else print 6;
  y = x;
- print y;
+
 
 
  x = x -1;
- print x;
- print c;
+
  }

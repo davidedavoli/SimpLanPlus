@@ -135,12 +135,18 @@ public class SVM {
                             ip = address;
                             break;
                         case SVMParser.BCOND: //
-                            System.out.println("ARG 2 jump "+arg2);
-                            address = Integer.parseInt(arg2);
+                            address = Integer.parseInt(code[ip].getArg1());
+                            ip++;  //aumentiamo ip, in caso non venga effettuato il branch
+                            value = regRead(bytecode.getArg1());
+                            if (value!=0) ip = address;
+
+
+                            /*System.out.println("ARG 2 jump "+arg2);
+                            address = Integer.parseInt(code[ip].getArg1());
                             System.out.println("COND JUMP "+address);
                             ip++;  //aumentiamo ip, in caso non venga effettuato il branch
                             value = regRead(arg1);
-                            if (value!=0) ip = address;
+                            if (value!=0) ip = address;*/
                             break;
 
 
@@ -182,7 +188,7 @@ public class SVM {
                             else{
                                 System.out.println( "PRINTO IL VALORE NEL REGISTRO: "+arg1 +" CON VALORE: "+ regRead(arg1));
                             }
-                            printStack(5);
+                            //printStack(5);
                                 //System.out.println((sp < MEMSIZE) ? regRead(arg1) : "Empty stack!");
 
                             break;
@@ -191,6 +197,7 @@ public class SVM {
                         case SVMParser.HALT:
                             //to print the result
                             System.out.println("\nResult: " + memory.read(sp) + "\n");
+                            printStack(5);
                             return;
                     }
                 } catch (Exception e) {
@@ -256,9 +263,9 @@ public class SVM {
         Matcher m = p.matcher(str);
         return m.matches();
     }
-    private void printStack(int max){
+    private void printStack(int numberOfVarToPrint){
         int ind = MEMSIZE-1;
-        int to = ind-max;
+        int to = ind-numberOfVarToPrint;
         System.out.println("Inizio print stack");
 
         while (ind > to){
