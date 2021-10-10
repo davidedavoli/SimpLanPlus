@@ -141,7 +141,7 @@ public class BlockNode implements Node {
           cgen.append("push $fp //loadind new block\n");
           cgen.append("addi $fp $sp 0 //Load new $fp\n");
       }else{
-          cgen.append("sw $sp 0($fp)\n");
+          cgen.append("addi $fp $sp 0\n");
       }
 
 

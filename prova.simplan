@@ -5,7 +5,7 @@
 //print y;
 {
     int c = 4;
-//    print c;
+    print c;
     y = c - 1;
 }
 print y;
