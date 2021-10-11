@@ -5,12 +5,11 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 
 import Interpreter.SVM;
+import Interpreter.ast.SVMVisitorImpl;
 import Interpreter.lexer.SVMLexer;
 import Interpreter.parser.SVMParser;
-import Interpreter.ast.SVMVisitorImpl;
 import ast.node.Node;
 import ast.node.types.TypeNode;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lexer.SimpLanPlusLexer;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;

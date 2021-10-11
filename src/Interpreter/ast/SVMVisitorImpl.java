@@ -81,6 +81,9 @@ public class SVMVisitorImpl extends SVMBaseVisitor<Void> {
 			case SVMLexer.LOADW:
 				code[i++] = new Instruction(SVMParser.LOADW,  ctx.r1.getText(), ctx.o.getText(), ctx.r2.getText());
 				break;
+			case SVMLexer.MOVE:
+				code[i++] = new Instruction(SVMParser.MOVE, ctx.r1.getText(), ctx.r2.getText());
+				break;
 			case SVMLexer.LABEL:
 				labelAdd.put(ctx.l.getText(), i);
 				break;

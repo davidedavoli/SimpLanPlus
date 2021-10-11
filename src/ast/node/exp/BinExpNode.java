@@ -145,38 +145,38 @@ public class BinExpNode implements Node {
             * eq
             * */
             case "<=":{
-                cgen.append("le $a0 $a2 $a0 // $a0 = $a2 <= $a0");
+                cgen.append("le $a0 $a2 $a0 // $a0 = $a2 <= $a0\n");
                 break;
             }
             case "<":{
-                cgen.append("lt $a0 $a2 $a0 // $a0 = $a2 < $a0");
+                cgen.append("lt $a0 $a2 $a0 // $a0 = $a2 < $a0\n");
                 break;
             }
             case ">":{
-                cgen.append("gt $a0 $a2 $a0 // $a0 = $a2 > $a0");
+                cgen.append("gt $a0 $a2 $a0 // $a0 = $a2 > $a0\n");
                 break;
             }
             case ">=":{
-                cgen.append("ge $a0 $a2 $a0 // $a0 = $a2 >= $a0");
+                cgen.append("ge $a0 $a2 $a0 // $a0 = $a2 >= $a0\n");
                 break;
             }
             case "==":{
-                cgen.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0");
+                cgen.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0\n");
                 break;
             }
             case "!=":{
-                cgen.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0");
-                cgen.append("not $a0 $a0 // $a0 = !$a0");
+                cgen.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0\n");
+                cgen.append("not $a0 $a0 // $a0 = !$a0\n");
                 break;
             }
             case "&&":{
-                //cgen.append("and $a0 $a2 $a0 // $a0 = $a2 && $a0");
-                cgen.append("mult $a0 $a2 $a0 // $a0 = $a2 && $a0 aka $a0 = $a2 * $a0");
+                //cgen.append("and $a0 $a2 $a0 // $a0 = $a2 && $a0\n");
+                cgen.append("mult $a0 $a2 $a0 // $a0 = $a2 && $a0 aka $a0 = $a2 * $a0\n");
                 break;
             }
 
             case "||":{
-                cgen.append("or $a0 $a2 $a0 // $a0 = $a2 || $a0");
+                cgen.append("or $a0 $a2 $a0 // $a0 = $a2 || $a0\n");
                 break;
             }
            

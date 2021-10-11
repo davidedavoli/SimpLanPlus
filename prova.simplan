@@ -1,8 +1,28 @@
 //{int f(int x){if (x<5) x=10; else x=4; return new;}}
 //{^^int x ; ^int y = new int; y^ = 1 ; x = new ^int ; x^ = y ; print x^^ ;}
 //{ int y; ^^int x = new int; ^int c = new int; x^^ = 1 ; delete x ; c = x^ ; print c^;}
-{ int y=5;
-//print y;
+/*
+{
+int y = 10;
+{
+    int y = 5;
+    int z = 1;
+    print z;
+    {
+    int y = 6;
+    print y;
+    z = y;
+    }
+
+    print y;
+    print z;
+}
+print y;
+}
+
+{
+ int y=5;
+
 {
     int c = 4;
     print c;
@@ -14,30 +34,32 @@ print y;
     int z = 1;
     {
         int x = z;
-        print x;
         int z = 2;
+        print x;
         print z;
+        z = 3;
     }
     print z;
 }
+}*/
 
+{
+int y = 4;
 
-
-
-
-/*if(y != 3){
+print y;
+if(y != 3){
     int c = 5;
-    print c;
     int y = 3;
+    print c;
     print y;
 }
 else{
     int c = 0;
-    print c;
     int y = 1;
+    print c;
     print y;
 }
+
 print y;
 
-*/
- }
+}

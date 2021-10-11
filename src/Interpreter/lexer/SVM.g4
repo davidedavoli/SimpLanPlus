@@ -33,6 +33,7 @@ instruction:
 	  | STOREW r1=REGISTER o=NUMBER LPAR r2=REGISTER RPAR
 	  | LOADW r1=REGISTER o=NUMBER LPAR r2=REGISTER RPAR
 	  | LOAD r1=REGISTER n=NUMBER
+	  | MOVE r1=REGISTER r2=REGISTER
 	  | BRANCH l=LABEL
 	  | BCOND r1=REGISTER l=LABEL
 	  | EQ r1=REGISTER r2=REGISTER r3=REGISTER
@@ -81,6 +82,7 @@ NOT	     : 'not' ;	// logical negation
 OR	     : 'or' ;	// logical negation
 STOREW	 : 'sw' ; 	// stores the value of a register at offset n from the address in a second register
 LOADW	 : 'lw' ;	// loads the value at offset n from the address in a register and stores it in a second register
+MOVE	 : 'mv' ;	// move value from first register to second register
 BRANCH	 : 'b' ;	// jump to label
 BCOND    : 'bc' ;	// jump to label if $r1 == top
 LE       : 'le' ;	// r1 = r2 <= r3

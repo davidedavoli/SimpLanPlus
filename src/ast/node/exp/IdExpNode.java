@@ -86,7 +86,7 @@ public class IdExpNode extends LhsExpNode {
 
       StringBuilder cgen = new StringBuilder();
 
-      cgen.append("addi $a1 $fp 0 //put in $a1 (al) actual fp\n");
+      cgen.append("mv $fp $a1 //put in $a1 (al) actual fp\n");
 
       for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
           cgen.append("lw $a1 0($a1) //go up to chain\n");

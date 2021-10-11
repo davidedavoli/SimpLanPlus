@@ -96,6 +96,7 @@ public class SVM {
 
 
                         case SVMParser.NOT:
+                            System.out.println("RESULT NOT "+ regRead(arg2) );
                             regStore(arg1, regRead(arg2) != 0 ? 0 : 1);
                             break;
                         case SVMParser.OR:
@@ -125,11 +126,17 @@ public class SVM {
                             
                             offset = Integer.parseInt(arg2);
                             int addr_lw = offset + regRead(arg3);
+                            //System.out.println("ADDRESS "+ offset);
+                            //System.out.println("arg "+ regRead(arg3));
                             regStore(arg1, memory.read(addr_lw));
-                            //printStack(5);
+                           //printStack(8);
                             break;
+                        case SVMParser.MOVE:
+                            value = regRead(arg1);
+                            //System.out.println("VALUE TO MOVE: "+value);
+                            regStore(arg2, value);
 
-
+                            break;
                         case SVMParser.BRANCH:
                             address = Integer.parseInt(code[ip].getArg1());
                             ip = address;
@@ -243,8 +250,11 @@ public class SVM {
 
                 break;
             default:
-                if (reg.equals("$fp"))
+                if (reg.equals("$fp")){
+                   // System.out.println("NUOVO VALORE FP: "+v);
                     fp = v;
+                }
+
                 else if (reg.equals("$sp")) {
                     sp = v;
                     if (sp <= hp) {

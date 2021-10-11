@@ -18,10 +18,10 @@ public class SVMParser extends Parser {
 		new PredictionContextCache();
 	public static final int
 		REGISTER=1, PUSH=2, ADDRESS=3, POP=4, ADD=5, ADDI=6, SUB=7, SUBI=8, MULT=9, 
-		MULTI=10, DIV=11, DIVI=12, NOT=13, OR=14, STOREW=15, LOADW=16, BRANCH=17, 
-		BCOND=18, LE=19, LT=20, EQ=21, GE=22, GT=23, PRINT=24, LOAD=25, HALT=26, 
-		FREE=27, NEW=28, COL=29, LPAR=30, RPAR=31, LABEL=32, NUMBER=33, WHITESP=34, 
-		LINECOMMENTS=35, BLOCKCOMMENTS=36, ERR=37;
+		MULTI=10, DIV=11, DIVI=12, NOT=13, OR=14, STOREW=15, LOADW=16, MOVE=17, 
+		BRANCH=18, BCOND=19, LE=20, LT=21, EQ=22, GE=23, GT=24, PRINT=25, LOAD=26, 
+		HALT=27, FREE=28, NEW=29, COL=30, LPAR=31, RPAR=32, LABEL=33, NUMBER=34, 
+		WHITESP=35, LINECOMMENTS=36, BLOCKCOMMENTS=37, ERR=38;
 	public static final int
 		RULE_assembly = 0, RULE_instruction = 1;
 	private static String[] makeRuleNames() {
@@ -35,17 +35,17 @@ public class SVMParser extends Parser {
 		return new String[] {
 			null, null, "'push'", "'address'", "'pop'", "'add'", "'addi'", "'sub'", 
 			"'subi'", "'mult'", "'multi'", "'div'", "'divi'", "'not'", "'or'", "'sw'", 
-			"'lw'", "'b'", "'bc'", "'le'", "'lt'", "'eq'", "'ge'", "'gt'", "'print'", 
-			"'li'", "'halt'", "'free'", "'new'", "':'", "'('", "')'"
+			"'lw'", "'mv'", "'b'", "'bc'", "'le'", "'lt'", "'eq'", "'ge'", "'gt'", 
+			"'print'", "'li'", "'halt'", "'free'", "'new'", "':'", "'('", "')'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, "REGISTER", "PUSH", "ADDRESS", "POP", "ADD", "ADDI", "SUB", "SUBI", 
-			"MULT", "MULTI", "DIV", "DIVI", "NOT", "OR", "STOREW", "LOADW", "BRANCH", 
-			"BCOND", "LE", "LT", "EQ", "GE", "GT", "PRINT", "LOAD", "HALT", "FREE", 
-			"NEW", "COL", "LPAR", "RPAR", "LABEL", "NUMBER", "WHITESP", "LINECOMMENTS", 
+			"MULT", "MULTI", "DIV", "DIVI", "NOT", "OR", "STOREW", "LOADW", "MOVE", 
+			"BRANCH", "BCOND", "LE", "LT", "EQ", "GE", "GT", "PRINT", "LOAD", "HALT", 
+			"FREE", "NEW", "COL", "LPAR", "RPAR", "LABEL", "NUMBER", "WHITESP", "LINECOMMENTS", 
 			"BLOCKCOMMENTS", "ERR"
 		};
 	}
@@ -136,7 +136,7 @@ public class SVMParser extends Parser {
 			setState(7);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << PUSH) | (1L << ADDRESS) | (1L << POP) | (1L << ADD) | (1L << ADDI) | (1L << SUB) | (1L << SUBI) | (1L << MULT) | (1L << MULTI) | (1L << DIV) | (1L << DIVI) | (1L << NOT) | (1L << OR) | (1L << STOREW) | (1L << LOADW) | (1L << BRANCH) | (1L << BCOND) | (1L << LE) | (1L << LT) | (1L << EQ) | (1L << GE) | (1L << GT) | (1L << PRINT) | (1L << LOAD) | (1L << HALT) | (1L << FREE) | (1L << NEW) | (1L << LABEL))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << PUSH) | (1L << ADDRESS) | (1L << POP) | (1L << ADD) | (1L << ADDI) | (1L << SUB) | (1L << SUBI) | (1L << MULT) | (1L << MULTI) | (1L << DIV) | (1L << DIVI) | (1L << NOT) | (1L << OR) | (1L << STOREW) | (1L << LOADW) | (1L << MOVE) | (1L << BRANCH) | (1L << BCOND) | (1L << LE) | (1L << LT) | (1L << EQ) | (1L << GE) | (1L << GT) | (1L << PRINT) | (1L << LOAD) | (1L << HALT) | (1L << FREE) | (1L << NEW) | (1L << LABEL))) != 0)) {
 				{
 				{
 				setState(4);
@@ -184,6 +184,7 @@ public class SVMParser extends Parser {
 		public TerminalNode RPAR() { return getToken(SVMParser.RPAR, 0); }
 		public TerminalNode LOADW() { return getToken(SVMParser.LOADW, 0); }
 		public TerminalNode LOAD() { return getToken(SVMParser.LOAD, 0); }
+		public TerminalNode MOVE() { return getToken(SVMParser.MOVE, 0); }
 		public TerminalNode BRANCH() { return getToken(SVMParser.BRANCH, 0); }
 		public TerminalNode BCOND() { return getToken(SVMParser.BCOND, 0); }
 		public TerminalNode EQ() { return getToken(SVMParser.EQ, 0); }
@@ -228,7 +229,7 @@ public class SVMParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(107);
+			setState(110);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
 			case 1:
@@ -424,17 +425,17 @@ public class SVMParser extends Parser {
 			case 18:
 				{
 				setState(71);
-				match(BRANCH);
+				match(MOVE);
 				setState(72);
-				((InstructionContext)_localctx).l = match(LABEL);
+				((InstructionContext)_localctx).r1 = match(REGISTER);
+				setState(73);
+				((InstructionContext)_localctx).r2 = match(REGISTER);
 				}
 				break;
 			case 19:
 				{
-				setState(73);
-				match(BCOND);
 				setState(74);
-				((InstructionContext)_localctx).r1 = match(REGISTER);
+				match(BRANCH);
 				setState(75);
 				((InstructionContext)_localctx).l = match(LABEL);
 				}
@@ -442,110 +443,120 @@ public class SVMParser extends Parser {
 			case 20:
 				{
 				setState(76);
-				match(EQ);
+				match(BCOND);
 				setState(77);
 				((InstructionContext)_localctx).r1 = match(REGISTER);
 				setState(78);
-				((InstructionContext)_localctx).r2 = match(REGISTER);
-				setState(79);
-				((InstructionContext)_localctx).r3 = match(REGISTER);
+				((InstructionContext)_localctx).l = match(LABEL);
 				}
 				break;
 			case 21:
 				{
+				setState(79);
+				match(EQ);
 				setState(80);
-				match(LE);
-				setState(81);
 				((InstructionContext)_localctx).r1 = match(REGISTER);
-				setState(82);
+				setState(81);
 				((InstructionContext)_localctx).r2 = match(REGISTER);
-				setState(83);
+				setState(82);
 				((InstructionContext)_localctx).r3 = match(REGISTER);
 				}
 				break;
 			case 22:
 				{
+				setState(83);
+				match(LE);
 				setState(84);
-				match(LT);
-				setState(85);
 				((InstructionContext)_localctx).r1 = match(REGISTER);
-				setState(86);
+				setState(85);
 				((InstructionContext)_localctx).r2 = match(REGISTER);
-				setState(87);
+				setState(86);
 				((InstructionContext)_localctx).r3 = match(REGISTER);
 				}
 				break;
 			case 23:
 				{
+				setState(87);
+				match(LT);
 				setState(88);
-				match(GT);
-				setState(89);
 				((InstructionContext)_localctx).r1 = match(REGISTER);
-				setState(90);
+				setState(89);
 				((InstructionContext)_localctx).r2 = match(REGISTER);
-				setState(91);
+				setState(90);
 				((InstructionContext)_localctx).r3 = match(REGISTER);
 				}
 				break;
 			case 24:
 				{
+				setState(91);
+				match(GT);
 				setState(92);
-				match(GE);
-				setState(93);
 				((InstructionContext)_localctx).r1 = match(REGISTER);
-				setState(94);
+				setState(93);
 				((InstructionContext)_localctx).r2 = match(REGISTER);
-				setState(95);
+				setState(94);
 				((InstructionContext)_localctx).r3 = match(REGISTER);
 				}
 				break;
 			case 25:
 				{
+				setState(95);
+				match(GE);
 				setState(96);
-				match(FREE);
-				setState(97);
 				((InstructionContext)_localctx).r1 = match(REGISTER);
+				setState(97);
+				((InstructionContext)_localctx).r2 = match(REGISTER);
+				setState(98);
+				((InstructionContext)_localctx).r3 = match(REGISTER);
 				}
 				break;
 			case 26:
 				{
-				setState(98);
-				match(NEW);
 				setState(99);
+				match(FREE);
+				setState(100);
 				((InstructionContext)_localctx).r1 = match(REGISTER);
 				}
 				break;
 			case 27:
 				{
-				setState(100);
-				match(PRINT);
 				setState(101);
+				match(NEW);
+				setState(102);
 				((InstructionContext)_localctx).r1 = match(REGISTER);
 				}
 				break;
 			case 28:
 				{
-				setState(102);
+				setState(103);
 				match(PRINT);
+				setState(104);
+				((InstructionContext)_localctx).r1 = match(REGISTER);
 				}
 				break;
 			case 29:
 				{
-				setState(103);
-				match(HALT);
+				setState(105);
+				match(PRINT);
 				}
 				break;
 			case 30:
 				{
-				setState(104);
-				match(ADDRESS);
+				setState(106);
+				match(HALT);
 				}
 				break;
 			case 31:
 				{
-				setState(105);
+				setState(107);
+				match(ADDRESS);
+				}
+				break;
+			case 32:
+				{
+				setState(108);
 				((InstructionContext)_localctx).l = match(LABEL);
-				setState(106);
+				setState(109);
 				match(COL);
 				}
 				break;
@@ -564,36 +575,37 @@ public class SVMParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\'p\4\2\t\2\4\3\t"+
-		"\3\3\2\7\2\b\n\2\f\2\16\2\13\13\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3(s\4\2\t\2\4\3\t\3"+
+		"\3\2\7\2\b\n\2\f\2\16\2\13\13\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
 		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
 		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
 		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
 		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
 		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
-		"\3\5\3n\n\3\3\3\2\2\4\2\4\2\2\2\u008c\2\t\3\2\2\2\4m\3\2\2\2\6\b\5\4\3"+
-		"\2\7\6\3\2\2\2\b\13\3\2\2\2\t\7\3\2\2\2\t\n\3\2\2\2\n\3\3\2\2\2\13\t\3"+
-		"\2\2\2\f\r\7\4\2\2\rn\7#\2\2\16\17\7\4\2\2\17n\7\3\2\2\20n\7\6\2\2\21"+
-		"\22\7\6\2\2\22n\7\3\2\2\23\24\7\7\2\2\24\25\7\3\2\2\25\26\7\3\2\2\26n"+
-		"\7\3\2\2\27\30\7\b\2\2\30\31\7\3\2\2\31\32\7\3\2\2\32n\7#\2\2\33\34\7"+
-		"\t\2\2\34\35\7\3\2\2\35\36\7\3\2\2\36n\7\3\2\2\37 \7\n\2\2 !\7\3\2\2!"+
-		"\"\7\3\2\2\"n\7#\2\2#$\7\13\2\2$%\7\3\2\2%&\7\3\2\2&n\7\3\2\2\'(\7\f\2"+
-		"\2()\7\3\2\2)*\7\3\2\2*n\7#\2\2+,\7\r\2\2,-\7\3\2\2-.\7\3\2\2.n\7\3\2"+
-		"\2/\60\7\16\2\2\60\61\7\3\2\2\61\62\7\3\2\2\62n\7#\2\2\63\64\7\20\2\2"+
-		"\64\65\7\3\2\2\65\66\7\3\2\2\66n\7\3\2\2\678\7\17\2\289\7\3\2\29n\7\3"+
-		"\2\2:;\7\21\2\2;<\7\3\2\2<=\7#\2\2=>\7 \2\2>?\7\3\2\2?n\7!\2\2@A\7\22"+
-		"\2\2AB\7\3\2\2BC\7#\2\2CD\7 \2\2DE\7\3\2\2En\7!\2\2FG\7\33\2\2GH\7\3\2"+
-		"\2Hn\7#\2\2IJ\7\23\2\2Jn\7\"\2\2KL\7\24\2\2LM\7\3\2\2Mn\7\"\2\2NO\7\27"+
-		"\2\2OP\7\3\2\2PQ\7\3\2\2Qn\7\3\2\2RS\7\25\2\2ST\7\3\2\2TU\7\3\2\2Un\7"+
-		"\3\2\2VW\7\26\2\2WX\7\3\2\2XY\7\3\2\2Yn\7\3\2\2Z[\7\31\2\2[\\\7\3\2\2"+
-		"\\]\7\3\2\2]n\7\3\2\2^_\7\30\2\2_`\7\3\2\2`a\7\3\2\2an\7\3\2\2bc\7\35"+
-		"\2\2cn\7\3\2\2de\7\36\2\2en\7\3\2\2fg\7\32\2\2gn\7\3\2\2hn\7\32\2\2in"+
-		"\7\34\2\2jn\7\5\2\2kl\7\"\2\2ln\7\37\2\2m\f\3\2\2\2m\16\3\2\2\2m\20\3"+
-		"\2\2\2m\21\3\2\2\2m\23\3\2\2\2m\27\3\2\2\2m\33\3\2\2\2m\37\3\2\2\2m#\3"+
-		"\2\2\2m\'\3\2\2\2m+\3\2\2\2m/\3\2\2\2m\63\3\2\2\2m\67\3\2\2\2m:\3\2\2"+
-		"\2m@\3\2\2\2mF\3\2\2\2mI\3\2\2\2mK\3\2\2\2mN\3\2\2\2mR\3\2\2\2mV\3\2\2"+
-		"\2mZ\3\2\2\2m^\3\2\2\2mb\3\2\2\2md\3\2\2\2mf\3\2\2\2mh\3\2\2\2mi\3\2\2"+
-		"\2mj\3\2\2\2mk\3\2\2\2n\5\3\2\2\2\4\tm";
+		"\3\3\3\3\3\3\5\3q\n\3\3\3\2\2\4\2\4\2\2\2\u0090\2\t\3\2\2\2\4p\3\2\2\2"+
+		"\6\b\5\4\3\2\7\6\3\2\2\2\b\13\3\2\2\2\t\7\3\2\2\2\t\n\3\2\2\2\n\3\3\2"+
+		"\2\2\13\t\3\2\2\2\f\r\7\4\2\2\rq\7$\2\2\16\17\7\4\2\2\17q\7\3\2\2\20q"+
+		"\7\6\2\2\21\22\7\6\2\2\22q\7\3\2\2\23\24\7\7\2\2\24\25\7\3\2\2\25\26\7"+
+		"\3\2\2\26q\7\3\2\2\27\30\7\b\2\2\30\31\7\3\2\2\31\32\7\3\2\2\32q\7$\2"+
+		"\2\33\34\7\t\2\2\34\35\7\3\2\2\35\36\7\3\2\2\36q\7\3\2\2\37 \7\n\2\2 "+
+		"!\7\3\2\2!\"\7\3\2\2\"q\7$\2\2#$\7\13\2\2$%\7\3\2\2%&\7\3\2\2&q\7\3\2"+
+		"\2\'(\7\f\2\2()\7\3\2\2)*\7\3\2\2*q\7$\2\2+,\7\r\2\2,-\7\3\2\2-.\7\3\2"+
+		"\2.q\7\3\2\2/\60\7\16\2\2\60\61\7\3\2\2\61\62\7\3\2\2\62q\7$\2\2\63\64"+
+		"\7\20\2\2\64\65\7\3\2\2\65\66\7\3\2\2\66q\7\3\2\2\678\7\17\2\289\7\3\2"+
+		"\29q\7\3\2\2:;\7\21\2\2;<\7\3\2\2<=\7$\2\2=>\7!\2\2>?\7\3\2\2?q\7\"\2"+
+		"\2@A\7\22\2\2AB\7\3\2\2BC\7$\2\2CD\7!\2\2DE\7\3\2\2Eq\7\"\2\2FG\7\34\2"+
+		"\2GH\7\3\2\2Hq\7$\2\2IJ\7\23\2\2JK\7\3\2\2Kq\7\3\2\2LM\7\24\2\2Mq\7#\2"+
+		"\2NO\7\25\2\2OP\7\3\2\2Pq\7#\2\2QR\7\30\2\2RS\7\3\2\2ST\7\3\2\2Tq\7\3"+
+		"\2\2UV\7\26\2\2VW\7\3\2\2WX\7\3\2\2Xq\7\3\2\2YZ\7\27\2\2Z[\7\3\2\2[\\"+
+		"\7\3\2\2\\q\7\3\2\2]^\7\32\2\2^_\7\3\2\2_`\7\3\2\2`q\7\3\2\2ab\7\31\2"+
+		"\2bc\7\3\2\2cd\7\3\2\2dq\7\3\2\2ef\7\36\2\2fq\7\3\2\2gh\7\37\2\2hq\7\3"+
+		"\2\2ij\7\33\2\2jq\7\3\2\2kq\7\33\2\2lq\7\35\2\2mq\7\5\2\2no\7#\2\2oq\7"+
+		" \2\2p\f\3\2\2\2p\16\3\2\2\2p\20\3\2\2\2p\21\3\2\2\2p\23\3\2\2\2p\27\3"+
+		"\2\2\2p\33\3\2\2\2p\37\3\2\2\2p#\3\2\2\2p\'\3\2\2\2p+\3\2\2\2p/\3\2\2"+
+		"\2p\63\3\2\2\2p\67\3\2\2\2p:\3\2\2\2p@\3\2\2\2pF\3\2\2\2pI\3\2\2\2pL\3"+
+		"\2\2\2pN\3\2\2\2pQ\3\2\2\2pU\3\2\2\2pY\3\2\2\2p]\3\2\2\2pa\3\2\2\2pe\3"+
+		"\2\2\2pg\3\2\2\2pi\3\2\2\2pk\3\2\2\2pl\3\2\2\2pm\3\2\2\2pn\3\2\2\2q\5"+
+		"\3\2\2\2\4\tp";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

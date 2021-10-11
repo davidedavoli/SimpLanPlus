@@ -139,13 +139,13 @@ public class BlockNode implements Node {
 
       if(!isMain){
           cgen.append("push $fp //loadind new block\n");
-          cgen.append("addi $fp $sp 0 //Load new $fp\n");
+          //cgen.append("addi $fp $sp 0 //Load new $fp\n");
       }else{
-          cgen.append("addi $fp $sp 0\n");
+          //cgen.append("addi $fp $sp 0\n");
       }
+      cgen.append("mv $sp $fp //Load new $fp\n");
 
 
-      //cgen.append("subi $fp $sp 1\n");
       for (Node dec:declarations)
             cgen.append(dec.codeGeneration(labelManager)).append("\n");
 
@@ -158,8 +158,8 @@ public class BlockNode implements Node {
           cgen.append("halt\n");
       }
       else{
-          cgen.append("lw $fp 1($sp) //Load old $fp pushed \n");
-          cgen.append("addi $sp $sp 2 //Restore stackpointer as before block creation \n");
+          cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation \n");
+          cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
       }
 
 	  return  cgen.toString();
