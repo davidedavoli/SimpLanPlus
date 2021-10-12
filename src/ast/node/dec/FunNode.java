@@ -22,16 +22,29 @@ public class FunNode implements Node {
   private ArrayList<Node> parlist = new ArrayList<Node>(); 
   private ArrayList<Node> declist; 
   private Node body;
-  
+  private String beginFuncLabel = "";
+  private String endFuncLabel = "";
+
   public FunNode (String i, TypeNode t) {
     id=i;
     type=t;
+	beginFuncLabel = FuncBodyUtils.freshFunLabel();
+	endFuncLabel = FuncBodyUtils.endFreshFunLabel();
+	System.out.println("NUOVA FUNZIONE "+id);
   }
   
   public void addDecBody (ArrayList<Node> d, Node b) {
     declist=d;
     body=b;
   }
+  public String get_start_fun_label(){
+	  return beginFuncLabel;
+  }
+
+	public String get_end_fun_label(){
+		return endFuncLabel;
+	}
+
   
   @Override
 	public ArrayList<SemanticError> checkSemantics(Environment env) {
@@ -42,7 +55,7 @@ public class FunNode implements Node {
 	  //env.offset = -2;
 	  HashMap<String, STentry> hm = env.symTable.get(env.nestingLevel);
 	  int new_offset = env.offset--;
-      STentry entry = new STentry(env.nestingLevel,new_offset); //separo introducendo "entry"
+      STentry entry = new STentry(env.nestingLevel,new_offset,beginFuncLabel,endFuncLabel); //separo introducendo "entry"
       
       if ( hm.put(id,entry) != null )
         res.add(new SemanticError("Fun id "+id+" already declared"));
@@ -72,6 +85,7 @@ public class FunNode implements Node {
 	      
 	    //check semantics in the dec list
 	      if(declist.size() > 0){
+			  //Forse -2 per il return address
 	    	  env.offset = -2;
 	    	  //if there are children then check semantics for every child and save the results
 	    	  for(Node n : declist)
@@ -90,12 +104,12 @@ public class FunNode implements Node {
       RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
       
       
-      if (!(type instanceof VoidTypeNode) && body.retTypeCheck().leq(abs)) {
+      if (!(type instanceof VoidTypeNode) && body.retTypeCheck(this).leq(abs)) {
     	  res.add(new SemanticError("Possible absence of return value"));
       }
-      if ((type instanceof VoidTypeNode) && pres.leq(body.retTypeCheck())) {
+      /*if ((type instanceof VoidTypeNode) && pres.leq(body.retTypeCheck())) {
     	  res.add(new SemanticError("Return statement in void function"));
-      }
+      }*/
 
       
       return res;
@@ -129,24 +143,48 @@ public class FunNode implements Node {
     return new ArrowTypeNode(partypes, type);
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
   public String codeGeneration(Label labelManager) {
+	  int declaration_size = 0;
+	  int parameter_size = parlist.size();
+
+
+	  StringBuilder cgen = new StringBuilder();
+
+	  cgen.append("//BEGIN FUNCTION ").append(beginFuncLabel).append("\n");
+	  cgen.append(beginFuncLabel).append(":\n");
+	  cgen.append("sw $ra -1($bsp) //save ra before old sp\n");
+
+	  if (declist!=null) {
+			declaration_size = declist.size();
+			for (Node dec:declist)
+				cgen.append(dec.codeGeneration(labelManager));
+	  }
+
+
+	  cgen.append(body.codeGeneration(labelManager)).append("\n");
+
+
+	  //FINE FUNZIONE
+	  cgen.append(endFuncLabel).append(":\n");
+	  //Here in $a0 = Return value
+	  cgen.append("addi $sp $sp ").append(declaration_size).append("\n");
+	  cgen.append("addi $sp $sp ").append(parameter_size).append("\n");
+	  cgen.append("lw $ra -1($bsp) // load ra\n");
+
+	  cgen.append("lw $fp 1($bsp)\n");
+	  cgen.append("lw $sp 0($bsp)\n"); // Restore old stack pointer.
+	  cgen.append("addi $bsp $fp 2\n"); // Restore address of old base stack pointer.
+	  cgen.append("jr $ra\n");
+	  cgen.append("// END OF ").append(id).append("\n");
+
 	  
-	    String declCode="";
-	    if (declist!=null) for (Node dec:declist)
-		    declCode+=dec.codeGeneration(labelManager);
-	    
-	    String popDecl="";
-	    if (declist!=null) 
-	    		for (Node dec:declist) popDecl+="pop\n";
-	    
-	    String popParl="";
-	    for (Node dec:parlist) popParl+="pop\n";
-	    
-	    String funl= FuncBodyUtils.freshFunLabel();
+
+	  return cgen.toString();
+/*
 		String body_fun = funl+":\n"+
 				"cfp\n"+ 		// setta $fp a $sp
 				"lra\n"+ 		// inserimento return address
@@ -175,7 +213,7 @@ public class FunNode implements Node {
 	    		"lra\n"+"js\n"  // salta a $ra
 	    		);
 	    
-		return "push "+ funl +"\n";
+		return "push "+ funl +"\n";*/
   }
   
 }  

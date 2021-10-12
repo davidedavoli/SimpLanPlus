@@ -1,5 +1,6 @@
 package ast.node;
 
+import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 
@@ -22,7 +23,6 @@ public interface Node {
   ArrayList<SemanticError> checkSemantics(Environment env);
   
   //ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl);
-  
-  RetEffType retTypeCheck();
-  
-}  
+
+  RetEffType retTypeCheck(FunNode funNode);
+}

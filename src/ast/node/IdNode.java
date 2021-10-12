@@ -3,6 +3,7 @@ package ast.node;
 import java.util.ArrayList;
 
 import ast.STentry;
+import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -77,7 +78,7 @@ public class IdNode extends LhsNode {
     return entry.getType();
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
@@ -85,14 +86,15 @@ public class IdNode extends LhsNode {
       /**
        * ritorna indirizzo di ID nel suo frame
        */
+
       StringBuilder cgen = new StringBuilder();
 
-      cgen.append("mv $fp $a1 //put in $a1 (al) actual fp\n");
+      cgen.append("mv $fp $al //put in $a1 (al) actual fp\n");
 
       for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
-          cgen.append("lw $a1 0($a1) //go up to chain\n");
+          cgen.append("lw $al 0($al) //go up to chain\n");
 
-      cgen.append("addi $a1 $a1 ").append(entry.getOffset()).append(" //put in $a1 address of Id\n");
+      cgen.append("addi $al $al ").append(entry.getOffset()).append(" //put in $al address of Id\n");
 
       return cgen.toString();
 

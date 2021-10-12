@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import ast.STentry;
 import ast.node.LhsNode;
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
-import util.FuncBodyUtils;
 
 public class AssignmentNode implements Node {
 
@@ -59,21 +59,24 @@ public class AssignmentNode implements Node {
     return lhs.typeCheck();
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
   public String codeGeneration(Label labelManager) {
       StringBuilder cgen = new StringBuilder();
       cgen.append(exp.codeGeneration(labelManager)).append("\n");
+
+
       //cgen.append("push $a0 // save exp on stack \n");
         cgen.append("//RITORNATO DA CGEN EXP\n");
       cgen.append(lhs.codeGeneration(labelManager)).append("\n");
       //cgen.append("pop $a0 // put in $a0 top of stack \n");
 
       //$a1 indirizzo di lhs
+      //cgen.append("print $a0\n");
 
-      cgen.append("sw $a0 0($a1) // 0($a1) = $a0 id=exp \n");
+      cgen.append("sw $a0 0($al) // 0($a1) = $a0 id=exp \n");
 
       return cgen.toString();
   }

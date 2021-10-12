@@ -186,7 +186,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	
 	@Override
 	public Node visitDeletion(DeletionContext ctx) {
-		return new DeletionNode(ctx.ID().getText());
+		return new DeletionNode(new IdExpNode(ctx.ID().getText()));
 	}
 	
 	@Override

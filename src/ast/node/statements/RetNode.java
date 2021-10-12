@@ -3,20 +3,21 @@ package ast.node.statements;
 import java.util.ArrayList;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
-import util.FuncBodyUtils;
 
 public class RetNode implements Node {
 
   private Node val;
   private TypeNode etype;// expected type
-  
-  public RetNode (Node v, TypeNode e) {
+  private String endFunction;
+
+    public RetNode (Node v, TypeNode e) {
     val=v;
     etype=e;
   }
@@ -52,12 +53,17 @@ public class RetNode implements Node {
     }
   }  
   
-  public RetEffType retTypeCheck() {
-	  return new RetEffType(RetEffType.RetT.PRES);
+  public RetEffType retTypeCheck(FunNode funNode) {
+        endFunction = funNode.get_end_fun_label();
+	    return new RetEffType(RetEffType.RetT.PRES);
   }
+
     
   public String codeGeneration(Label labelManager) {
-		return val.codeGeneration(labelManager)+"";//TODO Codice
+        StringBuilder cgen = new StringBuilder();
+        cgen.append(val.codeGeneration(labelManager)).append("\n");
+        cgen.append("b ").append(endFunction).append("\n");
+		return cgen.toString();
   }
     
 }  

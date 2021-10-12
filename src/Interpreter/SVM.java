@@ -20,7 +20,8 @@ public class SVM {
     private int hp = 0;             // heap pointer read-only
     private int fp = MEMSIZE-1;       // frame pointer
     private int ra;
-    private int rv;
+    private int al;
+    private int bsp = MEMSIZE;
 
     private int[] a = new int[10];
     private int[] r = new int[10];
@@ -107,6 +108,7 @@ public class SVM {
                         case SVMParser.STOREW: //
                             offset = Integer.parseInt(arg2);
                             int addr_sw = offset + regRead(arg3);
+                            System.out.println("ARG1 "+arg1+" ARG2 "+arg2 +" ARG3 " + arg3);
                             memory.write(addr_sw, regRead(arg1));
                             //printStack(8);
                             break;
@@ -147,7 +149,6 @@ public class SVM {
                             value = regRead(bytecode.getArg1());
                             if (value!=0) ip = address;
 
-
                             /*System.out.println("ARG 2 jump "+arg2);
                             address = Integer.parseInt(code[ip].getArg1());
                             System.out.println("COND JUMP "+address);
@@ -172,7 +173,15 @@ public class SVM {
                         case SVMParser.GT:
                             regStore(arg1, regRead(arg2)>regRead(arg3)?1:0);
                             break;
-
+                        case SVMParser.JAL:
+                            regStore("$ra", ip);
+                            address = Integer.parseInt(code[ip].getArg1());
+                            System.out.println("ADDRESS OF RA "+ip);
+                            ip = address;
+                            break;
+                        case SVMParser.JR:
+                            ip = regRead(arg1);
+                            break;
 
                         case SVMParser.NEW:
                             address = memory.allocate();
@@ -188,6 +197,7 @@ public class SVM {
                             if (address == hp - 1)
                                 hp--; //se è l'ultimo indirizzo occupato, allora hp viene decrementato
                             memory.free(address);
+
                             break;
                         case SVMParser.PRINT:
                             if (arg1==null)
@@ -220,48 +230,70 @@ public class SVM {
     }
 
     private int regRead(String reg) {
-        switch (reg.charAt(1)) {
-            case 'r':
-                return r[Integer.parseInt(reg.substring(2))];
-            case 'a':
-                return a[Integer.parseInt(reg.substring(2))];
-            default:
-                switch (reg) {
-                    case "$fp":
-                        //System.out.println("RETURN FP "+ fp + " mem: "+ memory.read(fp));
-                        return fp;
-                    case "$sp":
-                        return sp;
-                    case "$hp":
-                        return hp;
-                }
+
+        if (reg.equals("$fp")){
+            // System.out.println("NUOVO VALORE FP: "+v);
+            return fp;
+        }
+        else if(reg.equals("$bsp")){
+            return bsp;
+        }
+        else if (reg.equals("$al")){
+            return al;
+        }
+        else if (reg.equals("$sp")) {
+            return sp;
+        }
+        else if (reg.equals("$ra")) {
+            return ra;
+
+        }
+        else{
+            switch (reg.charAt(1)) {
+                case 'r':
+                    return r[Integer.parseInt(reg.substring(2))];
+                case 'a':
+                    return a[Integer.parseInt(reg.substring(2))];
+
+            }
         }
         return 0;
     }
 
     private void regStore(String reg, int v) throws Exception {
-        switch (reg.charAt(1)) {
-            case 'r':
-                r[Integer.parseInt(reg.substring(2))] = v;
-                break;
-            case 'a':
-                //System.out.println("STORING VALUE: "+v+" FOR REGISTER "+reg);
-                a[Integer.parseInt(reg.substring(2))] = v;
-
-                break;
-            default:
-                if (reg.equals("$fp")){
-                   // System.out.println("NUOVO VALORE FP: "+v);
-                    fp = v;
-                }
-
-                else if (reg.equals("$sp")) {
-                    sp = v;
-                    if (sp <= hp) {
-                        throw new Exception("Stack overflow!");
-                    }
-                }
+        if (reg.equals("$fp")){
+            // System.out.println("NUOVO VALORE FP: "+v);
+            fp = v;
         }
+        else if(reg.equals("$bsp")){
+            bsp = v;
+        }
+        else if (reg.equals("$al")){
+            al = v;
+        }
+        else if (reg.equals("$sp")) {
+            sp = v;
+            if (sp <= hp) {
+                throw new Exception("Stack overflow!");
+            }
+        }
+        else if (reg.equals("$ra")) {
+            ra = v;
+
+        }
+        else{
+            switch (reg.charAt(1)) {
+                case 'r':
+                    r[Integer.parseInt(reg.substring(2))] = v;
+                    break;
+                case 'a':
+                    //System.out.println("STORING VALUE: "+v+" FOR REGISTER "+reg);
+                    a[Integer.parseInt(reg.substring(2))] = v;
+
+                    break;
+            }
+        }
+
     }
 
     private void push(int v) {
@@ -269,7 +301,7 @@ public class SVM {
     }
 
     private boolean isRegister(String str) {
-        Pattern p = Pattern.compile("\\$(([ar][0-9])|(sp)|(fp)|(hp))");
+        Pattern p = Pattern.compile("\\$(([ar][0-9])|(sp)|(fp)|(hp)|(al)|(ra)|(bsp))");
         Matcher m = p.matcher(str);
         return m.matches();
     }

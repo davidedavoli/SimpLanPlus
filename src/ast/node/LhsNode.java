@@ -3,6 +3,7 @@ package ast.node;
 import java.util.ArrayList;
 
 import ast.STentry;
+import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import util.Environment;
@@ -64,7 +65,7 @@ public class LhsNode implements Node {
 		return null;
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
@@ -75,7 +76,7 @@ public class LhsNode implements Node {
 
       StringBuilder cgen = new StringBuilder();
       inner.codeGeneration(labelManager);
-      cgen.append("lw $a1 0($a1)");
+      cgen.append("lw $al 0($al)");
 
       return cgen.toString();
 

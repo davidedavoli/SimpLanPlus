@@ -1,6 +1,7 @@
 package ast.node.exp;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.IntTypeNode;
 import ast.node.types.RetEffType;
@@ -111,9 +112,12 @@ public class BinExpNode implements Node {
          */
         String lhs_generated = lhs.codeGeneration(labelManager);
         cgen.append(lhs_generated);
+
         cgen.append("push $a0 // push e1\n");
         String rhs_generated = rhs.codeGeneration(labelManager);
+
         cgen.append(rhs_generated);
+
         cgen.append("lw $a2 0($sp) //take e2 and $a2 take e1\n");
         cgen.append("pop // remove e1 from the stack to preserve stack\n");
 
@@ -124,6 +128,8 @@ public class BinExpNode implements Node {
         switch (operator) {
             case "+":{
                 cgen.append("add $a0 $a2 $a0 // a0 = t1+a0\n");
+
+                break;
             }
             case "-": {
                 cgen.append("sub $a0 $a2 $a0 // a0 = t1-a0\n");
@@ -216,7 +222,7 @@ public class BinExpNode implements Node {
     }
 
     @Override
-    public RetEffType retTypeCheck() {
+    public RetEffType retTypeCheck(FunNode funNode) {
         return null;
     }
 }

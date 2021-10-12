@@ -7,6 +7,17 @@ public class STentry {
   private int nl;
   private TypeNode type;
   private int offset;
+
+  public String getBeginFuncLabel() {
+    return beginFuncLabel;
+  }
+
+  public String getEndFuncLabel() {
+    return endFuncLabel;
+  }
+
+  private String beginFuncLabel = "";
+  private String endFuncLabel = "";
   
   public STentry (int n, int os)
   {nl=n;
@@ -16,6 +27,13 @@ public class STentry {
   {nl=n;
    type=t;
    offset=os;}
+
+  public STentry (int n, int os, String bFL, String eFL) {
+    nl=n;
+    offset=os;
+    beginFuncLabel= bFL;
+    endFuncLabel = eFL;
+  }
   
   public void addType (TypeNode t)
   {type=t;}

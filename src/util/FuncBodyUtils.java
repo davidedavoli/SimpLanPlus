@@ -8,9 +8,12 @@ public class FuncBodyUtils {
   private static String funCode=""; 
 
   public static String freshFunLabel() { 
-	return "Function"+(funLabCount++);
-  } 
-  
+	return "Function"+(funLabCount);
+  }
+  public static String endFreshFunLabel() {
+    return "endFunction"+(funLabCount++);
+  }
+
   public static void putCode(String c) { 
     funCode+="\n"+c; //aggiunge una linea vuota di separazione prima di funzione
   } 

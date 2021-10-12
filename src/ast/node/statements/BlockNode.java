@@ -2,11 +2,15 @@ package ast.node.statements;
 
 import ast.STentry;
 import ast.node.Node;
+import ast.node.dec.FunNode;
+import ast.node.dec.VarNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import util.Label;
 import util.FuncBodyUtils;
@@ -99,10 +103,10 @@ public class BlockNode implements Node {
       return res;
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  RetEffType tmp = new RetEffType(RetEffType.RetT.ABS);
 	  for (Node s:statements) {
-			  tmp= RetEffType.max(tmp, s.retTypeCheck());
+			  tmp= RetEffType.max(tmp, s.retTypeCheck(funNode));
 	  }
 	  return tmp;
   }
@@ -131,28 +135,25 @@ public class BlockNode implements Node {
     /**
      * Activation link
      */
-/**
- *
- * ADD CHECK FOR MAIN BLOCK CAUSE IN SUB BLOCK U HAVE TO PUSH FP
- */
+
       cgen.append("push 0\n");
 
       if(!isMain){
           cgen.append("push $fp //loadind new block\n");
-          //cgen.append("addi $fp $sp 0 //Load new $fp\n");
-      }else{
-          //cgen.append("addi $fp $sp 0\n");
       }
+
       cgen.append("mv $sp $fp //Load new $fp\n");
 
+      Collection<Node> varDec = declarations.stream().filter(dec -> dec instanceof VarNode).collect(Collectors.toList());
+      Collection<Node> funDec = declarations.stream().filter(dec -> dec instanceof FunNode).collect(Collectors.toList());
 
-      for (Node dec:declarations)
+      for (Node dec:varDec)
             cgen.append(dec.codeGeneration(labelManager)).append("\n");
 
 
 	  for (Node stat:statements)
           cgen.append(stat.codeGeneration(labelManager)).append("\n");
-      cgen.append(FuncBodyUtils.getCode()).append("\n");
+
 
       if(isMain){
           cgen.append("halt\n");
@@ -160,6 +161,11 @@ public class BlockNode implements Node {
       else{
           cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation \n");
           cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
+      }
+      cgen.append("//CREO FUNZIONI\n");
+      for (Node fun:funDec){
+          cgen.append(fun.codeGeneration(labelManager)).append("\n");
+          System.out.println("CREO UNA FUNZIONE "+ fun.toPrint(""));
       }
 
 	  return  cgen.toString();

@@ -67,6 +67,7 @@ package ast.node.exp.single_exp;
 import java.util.ArrayList;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.PointerTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -101,7 +102,7 @@ public class NewNode implements Node {
 	    return new PointerTypeNode(type);
 	  }
 	  
-	  public RetEffType retTypeCheck() {
+	  public RetEffType retTypeCheck(FunNode funNode) {
 		  return new RetEffType(RetEffType.RetT.ABS);
 	  }
 	  

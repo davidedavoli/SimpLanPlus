@@ -12,7 +12,6 @@ import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
-import util.FuncBodyUtils;
 
 public class VarNode implements Node {
 
@@ -80,7 +79,7 @@ public class VarNode implements Node {
          +((exp==null)?"":exp.toPrint(s+"  ")); 
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   

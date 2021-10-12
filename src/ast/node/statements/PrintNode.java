@@ -3,6 +3,7 @@ package ast.node.statements;
 import java.util.ArrayList;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import util.Environment;
@@ -31,7 +32,7 @@ public class PrintNode implements Node {
  	  return val.checkSemantics(env);
  	}
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   

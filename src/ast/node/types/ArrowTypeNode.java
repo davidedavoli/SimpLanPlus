@@ -2,6 +2,7 @@ package ast.node.types;
 import java.util.ArrayList;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
@@ -48,7 +49,7 @@ public class ArrowTypeNode implements TypeNode {
     return null;
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

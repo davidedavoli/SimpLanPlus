@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 import ast.STentry;
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -10,7 +11,6 @@ import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
-import util.FuncBodyUtils;
 
 public class CallNode implements Node {
 
@@ -18,6 +18,7 @@ public class CallNode implements Node {
   private STentry entry;
   private ArrayList<Node> parlist; 
   private int nestinglevel;
+  private String endFunction;
 
   
   public CallNode (String i, STentry e, ArrayList<Node> p, int nl) {
@@ -41,7 +42,8 @@ public String toPrint(String s) {  //
            +parlstr;        
   }
 
-public RetEffType retTypeCheck() {
+public RetEffType retTypeCheck(FunNode funNode) {
+
 	  return new RetEffType(RetEffType.RetT.ABS);
 }
 
@@ -87,15 +89,37 @@ public RetEffType retTypeCheck() {
   }
   
   public String codeGeneration(Label labelManager) {
-	    String parCode="";
+      StringBuilder cgen = new StringBuilder();
+
+
+      cgen.append("push $fp // save fp before call function\n");
+      cgen.append("push $sp // save sp before call function\n");
+      cgen.append("mv $sp $bsp\n");
+      cgen.append("addi $a0 $bsp 2\n");
+      cgen.append("sw $a0 0($bsp)\n");
+
+      cgen.append("subi $sp $sp 1 //RA\n");
+
+      cgen.append("mv $fp $al //put in $al actual fp\n");
+      for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
+          cgen.append("lw $al 0($al) //go up to chain\n");
+
 	    for (int i=parlist.size()-1; i>=0; i--)
-	    	parCode+=parlist.get(i).codeGeneration(labelManager);
-	    
-	    String getAR="";
-		  for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++) 
-		    	 getAR+="lw\n";
-		  					// formato AR: control_link+parameters+access_link+dich_locali
-		return "lfp\n"+ 				// CL
+            cgen.append(parlist.get(i).codeGeneration(labelManager)).append("\n");
+
+
+
+      cgen.append("push $al // save access link\n");
+
+      cgen.append("mv $sp $fp //update $fp\n");
+      cgen.append("addi $fp $fp ").append(parlist.size()).append(" // $fp at beginning of param\n");
+
+
+      cgen.append("jal  ").append(entry.getBeginFuncLabel()).append("// jump to start of function and put in $ra next istruction\n");
+
+      return cgen.toString();
+      // formato AR: control_link+parameters+access_link+dich_locali
+	/*	return "lfp\n"+ 				// CL
                parCode+
                "lfp\n"+getAR+ 		// setto AL risalendo la catena statica
                						// ora recupero l'indirizzo a cui saltare e lo metto sullo stack
@@ -104,6 +128,7 @@ public RetEffType retTypeCheck() {
 			   "add\n"+ 
                "lw\n"+ 				// carico sullo stack il valore all'indirizzo ottenuto
 		       "js\n";
+*/
   }
 
     

@@ -3,6 +3,7 @@ package ast.node.exp;
 import java.util.ArrayList;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -10,7 +11,6 @@ import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
-import util.FuncBodyUtils;
 
 public class IfNode implements Node {
 
@@ -49,9 +49,9 @@ public class IfNode implements Node {
 	  return res;
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  if (el!=null)
-		  return RetEffType.min(th.retTypeCheck(), el.retTypeCheck());
+		  return RetEffType.min(th.retTypeCheck(funNode), el.retTypeCheck(funNode));
 	  else
 		  return new RetEffType(RetEffType.RetT.ABS);
   }

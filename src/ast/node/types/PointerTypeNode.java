@@ -2,6 +2,7 @@ package ast.node.types;
 
 import java.util.ArrayList;
 
+import ast.node.dec.FunNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
@@ -40,7 +41,7 @@ public class PointerTypeNode implements TypeNode {
  	}
   
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   

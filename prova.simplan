@@ -1,6 +1,6 @@
 //{int f(int x){if (x<5) x=10; else x=4; return new;}}
 //{^^int x ; ^int y = new int; y^ = 1 ; x = new ^int ; x^ = y ; print x^^ ;}
-//{ int y; ^^int x = new int; ^int c = new int; x^^ = 1 ; delete x ; c = x^ ; print c^;}
+//{ int y; ^^int x = new ^int; ^int c = new int; x^^ = 1 ; delete x ; c = x^ ; print c^;}
 /*
 {
 int y = 10;
@@ -41,25 +41,42 @@ print y;
     }
     print z;
 }
-}*/
+}
 
 {
-int y = 4;
-
+^^int  y = new ^int;
+y^ = new int;
+y^^ = 5;
 print y;
-if(y != 3){
-    int c = 5;
-    int y = 3;
-    print c;
-    print y;
+print y^;
+print y^^;
+print y^;
+delete y;
+//print y^;
 }
-else{
-    int c = 0;
-    int y = 1;
-    print c;
-    print y;
+*/
+
+
+{
+int prova(){
+    int x = 5;
+
+    int c = 4;
+int f(){
+        int x = 8;
+        return x;
+    }
+    x = 7;
+    return x;
 }
 
+int y = prova();
 print y;
 
+
 }
+
+
+
+
+

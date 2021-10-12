@@ -41,6 +41,8 @@ instruction:
 	  | LT r1=REGISTER r2=REGISTER r3=REGISTER
 	  | GT r1=REGISTER r2=REGISTER r3=REGISTER
       | GE r1=REGISTER r2=REGISTER r3=REGISTER
+      | JAL l=LABEL
+      | JR r1=REGISTER
 /*	  | JS
 	  | LOADRA
 	  | STORERA
@@ -65,7 +67,7 @@ instruction:
  * LEXER RULES
  *------------------------------------------------------------------*/
 
-REGISTER    : '$'((('a'|'r')('0'..'9'))|('sp'|'fp'|'hp'|'rv'|'ra'));
+REGISTER    : '$'((('a'|'r')('0'..'9'))|('sp'|'fp'|'hp'|'bsp'|'al'|'ra'));
 
 PUSH     : 'push' ;
 ADDRESS  : 'address' ;
@@ -90,8 +92,10 @@ LT       : 'lt' ;	//
 EQ       : 'eq' ;	//
 GE       : 'ge' ;	//
 GT       : 'gt' ;	//
+JAL	     : 'jal' ;	// jump to label, store next instruction in ra
+JR	     : 'jr' ;	// jump to ra
+
 /*
-JS	 : 'js' ;	// jump to instruction pointed by top of stack and store next instruction in ra
 LOADRA	 : 'lra' ;	// load from ra
 STORERA  : 'sra' ;	// store top into ra
 LOADRV	 : 'lrv' ;	// load from rv
@@ -105,7 +109,7 @@ STOREHP	 : 'shp' ;	// store top into heap pointer
 PRINT	 : 'print' ;	// print top of stack
 LOAD	 : 'li' ;	// loads an integer in the register
 HALT	 : 'halt' ;	// stop execution
-FREE	 : 'free' ;	// frees the address in top
+FREE	 : 'free' ;	// frees the address in register
 NEW	     : 'new' ;	// allocates a new cell of memory and pushes the result in top
 
 COL	     : ':' ;

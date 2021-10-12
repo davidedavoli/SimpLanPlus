@@ -3,6 +3,7 @@ package ast.node.exp;
 import java.util.ArrayList;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.IntTypeNode;
 import ast.node.types.TypeUtils;
 import ast.node.types.RetEffType;
@@ -54,7 +55,7 @@ public class NegExpNode implements Node {
 		return cgen.toString();
 	}
 
-	public RetEffType retTypeCheck() {
+	public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

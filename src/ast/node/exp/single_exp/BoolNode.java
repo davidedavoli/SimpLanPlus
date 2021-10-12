@@ -3,6 +3,7 @@ package ast.node.exp.single_exp;
 import java.util.ArrayList;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -27,7 +28,7 @@ public class BoolNode implements Node {
     return new BoolTypeNode();
   }    
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   

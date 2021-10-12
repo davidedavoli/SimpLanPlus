@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import ast.STentry;
 import ast.node.Node;
+import ast.node.dec.FunNode;
+import ast.node.exp.IdExpNode;
 import ast.node.types.PointerTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -15,29 +17,22 @@ import util.SemanticError;
 
 public class DeletionNode implements Node {
 
-  private String id;
+  private IdExpNode id;
   private TypeNode type;
+  private STentry entry;
   
-  public DeletionNode (String i) {
+  public DeletionNode (IdExpNode i) {
     id=i;
     type=null;
+    entry=null;
   }
   
   @Override
   public ArrayList<SemanticError> checkSemantics(Environment env) {
 	  //create result list
-	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-  	  int j = 0;
-  		//env.offset = -2;
-  	  STentry tmp=null;
-  	  while (j>=0 && tmp==null)
-  		  tmp=(env.symTable.get(j--)).get(id);
-  	  
-  	  if (tmp==null)
-  		  res.add(new SemanticError("Id "+id+" not declared"));
-  	  
-  	  type = tmp.getType();
-        
+      ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+      res = id.checkSemantics(env);
+      type = id.typeCheck();
       return res;
   }
   
@@ -51,15 +46,20 @@ public class DeletionNode implements Node {
       System.out.println("attempted deletion of a non-pointer variable");
       System.exit(0);
     }     
-    return null;
+    return id.typeCheck();
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
   public String codeGeneration(Label labelManager) {
-		return "";//TODO
+      StringBuilder cgen = new StringBuilder();
+      System.out.println("DELETE NODE "+id.getID()+" NODO_ "+id);
+      cgen.append(id.codeGeneration(labelManager)).append("\n");
+      cgen.append("free $a0 //free address in $a0\n");
+
+      return cgen.toString();
   }  
     
 }  
