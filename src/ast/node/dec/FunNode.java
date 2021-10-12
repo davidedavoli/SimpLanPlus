@@ -1,6 +1,7 @@
 package ast.node.dec;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 import ast.STentry;
 import ast.node.ArgNode;
@@ -66,8 +67,9 @@ public class FunNode implements Node {
     	  //creare una nuova hashmap per la symTable
 	      env.nestingLevel++;
 	      HashMap<String,STentry> hmn = new HashMap<String,STentry> ();
-	      env.symTable.add(hmn);
-	      
+
+		  env.symTable.add(hmn);
+
 	      ArrayList<TypeNode> parTypes = new ArrayList<TypeNode>();
 	      int paroffset=1;
 	      
@@ -75,41 +77,21 @@ public class FunNode implements Node {
 	      for(Node a : parlist){
 	    	  ArgNode arg = (ArgNode) a;
 	    	  parTypes.add(arg.getType());
-	    	  if ( hmn.put(arg.getId(),new STentry(env.nestingLevel,arg.getType(),paroffset++)) != null  )
-	    		  System.out.println("Parameter id '"+arg.getId()+"' already declared");
-              
+
+				  if ( hmn.put(arg.getId(),new STentry(env.nestingLevel,arg.getType(),paroffset++)) != null  )
+	    		  	System.out.println("Parameter id '"+arg.getId()+"' already declared");
 	      }
-	      
+
 	      //set func type
 	      
 	      partypes= parTypes;
 	      
 	      entry.addType( new ArrowTypeNode(parTypes, type) );
 	      
-	    //check semantics in the dec list
-	      /*if(declist.size() > 0){
-			  //Forse -2 per il return address
-	    	  env.offset = -2;
-	    	  //if there are children then check semantics for every child and save the results
-	    	  for(Node dec : declist){
-				  System.out.println("CREO DEC  "+id+" "+dec);
 
-				  res.addAll(dec.checkSemantics(env));
-			  }
-
-	      }
-	     
-	      //check body
-		  body.setIsFunction(true);
-		  for(Node stm : body.getStatements()){
-			  System.out.println("CREO STM  "+id+" "+stm);
-			  res.addAll(stm.checkSemantics(env));
-
-		  }*/
 		  res.addAll(body.checkSemantics(env));
 
-
-			  //close scope
+		  //close scope
 	      env.symTable.remove(env.nestingLevel--);
 	      
       }

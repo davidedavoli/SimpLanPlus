@@ -60,12 +60,14 @@ public class BlockNode implements Node {
   
   @Override
 	public ArrayList<SemanticError> checkSemantics(Environment env) {
+      HashMap<String, STentry> hm = new HashMap<String,STentry> ();
+
       if (!isFunction) {
           env.nestingLevel++;
+          env.symTable.add(hm);
       }
 
-      HashMap<String, STentry> hm = new HashMap<String,STentry> ();
-      env.symTable.add(hm);
+
       
       //declare resulting list
       ArrayList<SemanticError> res = new ArrayList<SemanticError>();

@@ -32,6 +32,7 @@ public class VarNode implements Node {
   	  
   		//env.offset = -2;
   		HashMap<String, STentry> hm = env.symTable.get(env.nestingLevel);
+
           int new_offset = env.offset--;
           //System.out.println("NEW OFFSET "+new_offset);
         STentry entry = new STentry(env.nestingLevel,type, new_offset); //separo introducendo "entry"

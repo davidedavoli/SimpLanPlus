@@ -221,7 +221,7 @@ public class SVM {
                         case SVMParser.HALT:
                             //to print the result
                             System.out.println("\nResult: " + memory.read(sp) + "\n");
-                            printStack(10);
+                            printStack(20);
                             return;
                     }
                 } catch (Exception e) {

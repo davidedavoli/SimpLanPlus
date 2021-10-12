@@ -123,11 +123,11 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		
 		//check whether there are actually nested decs
 		//FIXME forse serve per le regole di shading dei parametri, ma sembra un po' a caso, per ora lo lasciamo
-		if(ctx.block().declaration() != null){
+		/*if(ctx.block().declaration() != null){
 			//if there are visit each dec and add it to the @innerDec list
 			for(DeclarationContext dc : ctx.block().declaration())
 				innerDec.add(visit(dc));
-		}
+		}*/
 		
 		//get the exp body
 		BlockNode block = (BlockNode) visitBlock(ctx.block());
