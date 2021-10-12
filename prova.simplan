@@ -61,15 +61,17 @@ int p = 1;
 int global = 4;
 int z = 10;
 int easy (int c,int z,int f){
-    int dentro(){
+    /*int dentro(){
         return 3 + 2;
     }
-    c = dentro();
-    print p;
+    c = dentro();*/
+
+    if (c < 4)
+        c = easy(c+1,z+1,f+1)
     return c+z+f;
 }
 
-p = easy(1,2,z);
+p = easy(1,1,1);
 print p;
 }
 
