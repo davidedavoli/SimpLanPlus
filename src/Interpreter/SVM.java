@@ -3,9 +3,17 @@ package Interpreter;
 import Interpreter.ast.Instruction;
 import Interpreter.memory.Memory;
 import Interpreter.parser.SVMParser;
+import ast.STentry;
+import ast.node.Node;
+import ast.node.dec.VarNode;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class SVM {
 
@@ -149,14 +157,21 @@ public class SVM {
                             value = regRead(bytecode.getArg1());
                             if (value!=0) ip = address;
 
-                            /*System.out.println("ARG 2 jump "+arg2);
-                            address = Integer.parseInt(code[ip].getArg1());
-                            System.out.println("COND JUMP "+address);
-                            ip++;  //aumentiamo ip, in caso non venga effettuato il branch
-                            value = regRead(arg1);
-                            if (value!=0) ip = address;*/
                             break;
 
+                        case SVMParser.JAL:
+                            /**
+                             * Maybe cause bug because go to previous line instead directly on the label
+                             */
+                            regStore("$ra", ip);
+                            //System.out.println("ARG1 JAL "+code[ip].getArg1());
+                            address = Integer.parseInt(code[ip].getArg1());
+                            //System.out.println("ADDRESS OF RA "+ip);
+                            ip = address;
+                            break;
+                        case SVMParser.JR:
+                            ip = regRead(arg1);
+                            break;
 
                         case SVMParser.EQ:
                             regStore(arg1, regRead(arg2)==regRead(arg3)?1:0);
@@ -173,15 +188,7 @@ public class SVM {
                         case SVMParser.GT:
                             regStore(arg1, regRead(arg2)>regRead(arg3)?1:0);
                             break;
-                        case SVMParser.JAL:
-                            regStore("$ra", ip);
-                            address = Integer.parseInt(code[ip].getArg1());
-                            System.out.println("ADDRESS OF RA "+ip);
-                            ip = address;
-                            break;
-                        case SVMParser.JR:
-                            ip = regRead(arg1);
-                            break;
+
 
                         case SVMParser.NEW:
                             address = memory.allocate();
@@ -218,7 +225,27 @@ public class SVM {
                             return;
                     }
                 } catch (Exception e) {
+                    System.out.println("PROGRAMM STOPPED AT "+ip);
+                    //Map<String, STentry > hm = env.symTable.get(env.nestingLevel)
+                    String toPrint = "";
+                    int cont = 0;
+                    for (Instruction ins:code){
+                        if(ins == null)
+                            break;
+                        else{
+                            String literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
+                            String str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
+                            toPrint += cont+": "+ str +"\n";
+                        }
+                        if(cont == ip)
+                            break;
+                        cont++;
+
+                    }
+
                     e.printStackTrace();
+                    System.out.println(toPrint);
+                    printStack(20);
                     return;
                 }
             }

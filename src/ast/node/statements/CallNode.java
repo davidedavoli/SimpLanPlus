@@ -91,12 +91,12 @@ public RetEffType retTypeCheck(FunNode funNode) {
   public String codeGeneration(Label labelManager) {
       StringBuilder cgen = new StringBuilder();
 
-
+/*
       cgen.append("push $fp // save fp before call function\n");
       cgen.append("push $sp // save sp before call function\n");
       cgen.append("mv $sp $bsp\n");
       cgen.append("addi $a0 $bsp 2\n");
-      cgen.append("sw $a0 0($bsp)\n");
+      cgen.append("sw $a0 0($bsp)\n"); // link al bsp il punto dello stack prima di push $fp
 
       cgen.append("subi $sp $sp 1 //RA\n");
 
@@ -104,17 +104,36 @@ public RetEffType retTypeCheck(FunNode funNode) {
       for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
           cgen.append("lw $al 0($al) //go up to chain\n");
 
-	    for (int i=parlist.size()-1; i>=0; i--)
-            cgen.append(parlist.get(i).codeGeneration(labelManager)).append("\n");
+      for (Node par:parlist){
+          cgen.append(par.codeGeneration(labelManager)).append("\n");
+          cgen.append("push $a0\n");
 
-
+      }
 
       cgen.append("push $al // save access link\n");
 
-      cgen.append("mv $sp $fp //update $fp\n");
-      cgen.append("addi $fp $fp ").append(parlist.size()).append(" // $fp at beginning of param\n");
+      //cgen.append("mv $sp $fp //update $fp\n");
+      cgen.append("addi $fp $sp ").append(parlist.size()).append(" // $fp at beginning of param\n");*/
+
+      cgen.append("push $fp\n");
+
+     // cgen.append("mv $sp $fp //put in $fp parameter frame\n");
+      for (int i=parlist.size()-1; i>=0; i--){
+          cgen.append(parlist.get(i).codeGeneration(labelManager)).append("\n");
+          cgen.append("push $a0\n");
+      }
+       /*   for (Node par:parlist) {
+          cgen.append(par.codeGeneration(labelManager)).append("\n");
+          cgen.append("push $a0\n");
+      }*/
+
+      cgen.append("mv $fp $al //put in $al actual fp\n");
 
 
+      for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
+          cgen.append("lw $al 0($al) //go up to chain\n");
+
+      cgen.append("push $al\n");
       cgen.append("jal  ").append(entry.getBeginFuncLabel()).append("// jump to start of function and put in $ra next istruction\n");
 
       return cgen.toString();

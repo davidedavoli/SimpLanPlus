@@ -62,6 +62,8 @@ public class RetNode implements Node {
   public String codeGeneration(Label labelManager) {
         StringBuilder cgen = new StringBuilder();
         cgen.append(val.codeGeneration(labelManager)).append("\n");
+        cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation \n");
+        cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
         cgen.append("b ").append(endFunction).append("\n");
 		return cgen.toString();
   }

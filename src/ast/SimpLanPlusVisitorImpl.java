@@ -55,8 +55,9 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		//visit exp context
 		
 		//build @res accordingly with the result of the visits to its content
-		res = new BlockNode(declarations,  statements);
-		
+		res = new BlockNode(declarations,  statements,false);
+
+
 		return res;
 	}
 	
@@ -104,7 +105,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	public Node visitDecFun(DecFunContext ctx) {
 		//initialize @res with the visits to the type and its ID
 		FunNode res =null;
-		
+		System.out.println("VISITOR "+ctx.ID().getText());
 		if (ctx.type()!=null)
 			res = new FunNode(ctx.ID().getText(), (TypeNode) visit(ctx.type()));//WARNING casting
 		else
@@ -129,7 +130,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		}
 		
 		//get the exp body
-		Node block = visitBlock(ctx.block());
+		BlockNode block = (BlockNode) visitBlock(ctx.block());
 		
 		//add the body and the inner declarations to the function
 		res.addDecBody(innerDec, block);

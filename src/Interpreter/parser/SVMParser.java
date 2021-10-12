@@ -40,7 +40,7 @@ public class SVMParser extends Parser {
 			"'('", "')'"
 		};
 	}
-	private static final String[] _LITERAL_NAMES = makeLiteralNames();
+	public static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, "REGISTER", "PUSH", "ADDRESS", "POP", "ADD", "ADDI", "SUB", "SUBI", 

@@ -56,24 +56,21 @@ delete y;
 }
 */
 
-
 {
-int prova(){
-    int x = 5;
-
-    int c = 4;
-int f(){
-        int x = 8;
-        return x;
+int p = 1;
+int global = 4;
+int z = 10;
+int easy (int c,int z,int f){
+    int dentro(){
+        return 3 + 2;
     }
-    x = 7;
-    return x;
+    c = dentro();
+    print p;
+    return c+z+f;
 }
 
-int y = prova();
-print y;
-
-
+p = easy(1,2,z);
+print p;
 }
 
 

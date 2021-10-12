@@ -11,7 +11,10 @@ public class FuncBodyUtils {
 	return "Function"+(funLabCount);
   }
   public static String endFreshFunLabel() {
-    return "endFunction"+(funLabCount++);
+    String endLabel = "endFunction"+funLabCount;
+    funLabCount = funLabCount + 1;
+    return endLabel;
+
   }
 
   public static void putCode(String c) { 

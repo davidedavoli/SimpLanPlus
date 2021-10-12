@@ -13,27 +13,39 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import util.Label;
-import util.FuncBodyUtils;
 import util.Environment;
 import util.SemanticError;
 
 public class BlockNode implements Node {
 
   private final ArrayList<Node> declarations;
-  private final ArrayList<Node> statements;
+
+    public ArrayList<Node> getStatements() {
+        return statements;
+    }
+
+    private final ArrayList<Node> statements;
   private final Boolean isMain;
+  private Boolean isFunction;
+
 
   public BlockNode (ArrayList<Node> d, ArrayList<Node> s) {
     declarations=d;
     statements=s;
     isMain = false;
+    isFunction = false;
 
   }
+
 
     public BlockNode(ArrayList<Node> d, ArrayList<Node> s, Boolean isMainBlock) {
         declarations=d;
         statements=s;
         isMain = isMainBlock;
+        isFunction = false;
+    }
+    public void setIsFunction(Boolean isFunctionBlock){
+      isFunction = isFunctionBlock;
     }
 
     public String toPrint(String s) {
@@ -48,7 +60,10 @@ public class BlockNode implements Node {
   
   @Override
 	public ArrayList<SemanticError> checkSemantics(Environment env) {
-	  env.nestingLevel++;
+      if (!isFunction) {
+          env.nestingLevel++;
+      }
+
       HashMap<String, STentry> hm = new HashMap<String,STentry> ();
       env.symTable.add(hm);
       
@@ -74,7 +89,10 @@ public class BlockNode implements Node {
 
       //check semantics in the exp body      
       //clean the scope, we are leaving a let scope
-      env.symTable.remove(env.nestingLevel--);
+      if(!isFunction){
+          env.symTable.remove(env.nestingLevel--);
+      }
+
       
       //return the result
       return res;
@@ -132,20 +150,22 @@ public class BlockNode implements Node {
       StringBuilder cgen = new StringBuilder();
 
 
-    /**
-     * Activation link
-     */
+      /**
+       * Activation link
+       */
+        if (!isFunction){
+            cgen.append("push 0\n");
 
-      cgen.append("push 0\n");
+            if (!isMain) {
+              cgen.append("push $fp //loadind new block\n");
+            }
 
-      if(!isMain){
-          cgen.append("push $fp //loadind new block\n");
-      }
+            cgen.append("mv $sp $fp //Load new $fp\n");
 
-      cgen.append("mv $sp $fp //Load new $fp\n");
+        }
 
       Collection<Node> varDec = declarations.stream().filter(dec -> dec instanceof VarNode).collect(Collectors.toList());
-      Collection<Node> funDec = declarations.stream().filter(dec -> dec instanceof FunNode).collect(Collectors.toList());
+      Collection<Node> funDec = declarations.stream().filter(fun -> fun instanceof FunNode).collect(Collectors.toList());
 
       for (Node dec:varDec)
             cgen.append(dec.codeGeneration(labelManager)).append("\n");
@@ -154,20 +174,24 @@ public class BlockNode implements Node {
 	  for (Node stat:statements)
           cgen.append(stat.codeGeneration(labelManager)).append("\n");
 
+      if(!isFunction){
+           if(isMain){
+               cgen.append("halt\n");
+           }
+           else{
+                cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation \n");
+                cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
+            }
+      }
 
-      if(isMain){
-          cgen.append("halt\n");
-      }
-      else{
-          cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation \n");
-          cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
-      }
-      cgen.append("//CREO FUNZIONI\n");
+      if (funDec.size() > 0)
+         cgen.append("//CREO FUNZIONI\n");
       for (Node fun:funDec){
           cgen.append(fun.codeGeneration(labelManager)).append("\n");
           System.out.println("CREO UNA FUNZIONE "+ fun.toPrint(""));
       }
-
+      if (funDec.size() > 0)
+          cgen.append("//FINE FUNZIONI\n");
 	  return  cgen.toString();
 
   } 

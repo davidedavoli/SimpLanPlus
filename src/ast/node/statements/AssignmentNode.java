@@ -74,7 +74,6 @@ public class AssignmentNode implements Node {
       //cgen.append("pop $a0 // put in $a0 top of stack \n");
 
       //$a1 indirizzo di lhs
-      //cgen.append("print $a0\n");
 
       cgen.append("sw $a0 0($al) // 0($a1) = $a0 id=exp \n");
 

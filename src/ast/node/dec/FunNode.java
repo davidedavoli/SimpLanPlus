@@ -5,6 +5,7 @@ import java.util.HashMap;
 import ast.STentry;
 import ast.node.ArgNode;
 import ast.node.Node;
+import ast.node.statements.BlockNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -21,7 +22,7 @@ public class FunNode implements Node {
   private ArrayList<TypeNode> partypes;
   private ArrayList<Node> parlist = new ArrayList<Node>(); 
   private ArrayList<Node> declist; 
-  private Node body;
+  private BlockNode body;
   private String beginFuncLabel = "";
   private String endFuncLabel = "";
 
@@ -30,12 +31,14 @@ public class FunNode implements Node {
     type=t;
 	beginFuncLabel = FuncBodyUtils.freshFunLabel();
 	endFuncLabel = FuncBodyUtils.endFreshFunLabel();
-	System.out.println("NUOVA FUNZIONE "+id);
+	System.out.println("CREO FUNZIONE " +id);
   }
   
-  public void addDecBody (ArrayList<Node> d, Node b) {
+  public void addDecBody (ArrayList<Node> d, BlockNode b) {
     declist=d;
     body=b;
+	body.setIsFunction(true);
+
   }
   public String get_start_fun_label(){
 	  return beginFuncLabel;
@@ -58,7 +61,7 @@ public class FunNode implements Node {
       STentry entry = new STentry(env.nestingLevel,new_offset,beginFuncLabel,endFuncLabel); //separo introducendo "entry"
       
       if ( hm.put(id,entry) != null )
-        res.add(new SemanticError("Fun id "+id+" already declared"));
+        res.add(new SemanticError("Fun id '"+id+"' already declared"));
       else{
     	  //creare una nuova hashmap per la symTable
 	      env.nestingLevel++;
@@ -73,7 +76,7 @@ public class FunNode implements Node {
 	    	  ArgNode arg = (ArgNode) a;
 	    	  parTypes.add(arg.getType());
 	    	  if ( hmn.put(arg.getId(),new STentry(env.nestingLevel,arg.getType(),paroffset++)) != null  )
-	    		  System.out.println("Parameter id "+arg.getId()+" already declared");
+	    		  System.out.println("Parameter id '"+arg.getId()+"' already declared");
               
 	      }
 	      
@@ -84,18 +87,29 @@ public class FunNode implements Node {
 	      entry.addType( new ArrowTypeNode(parTypes, type) );
 	      
 	    //check semantics in the dec list
-	      if(declist.size() > 0){
+	      /*if(declist.size() > 0){
 			  //Forse -2 per il return address
 	    	  env.offset = -2;
 	    	  //if there are children then check semantics for every child and save the results
-	    	  for(Node n : declist)
-	    		  res.addAll(n.checkSemantics(env));
+	    	  for(Node dec : declist){
+				  System.out.println("CREO DEC  "+id+" "+dec);
+
+				  res.addAll(dec.checkSemantics(env));
+			  }
+
 	      }
 	     
 	      //check body
-	      res.addAll(body.checkSemantics(env));
-	      
-	      //close scope
+		  body.setIsFunction(true);
+		  for(Node stm : body.getStatements()){
+			  System.out.println("CREO STM  "+id+" "+stm);
+			  res.addAll(stm.checkSemantics(env));
+
+		  }*/
+		  res.addAll(body.checkSemantics(env));
+
+
+			  //close scope
 	      env.symTable.remove(env.nestingLevel--);
 	      
       }
@@ -156,6 +170,33 @@ public class FunNode implements Node {
 
 	  cgen.append("//BEGIN FUNCTION ").append(beginFuncLabel).append("\n");
 	  cgen.append(beginFuncLabel).append(":\n");
+	  //cgen.append("sw $fp 0($sp)\n");
+	  cgen.append("mv $sp $fp\n");
+	  cgen.append("push $ra\n");
+
+	  /*if (declist!=null) {
+		  declaration_size = declist.size();
+		  for (Node dec:declist)
+			  cgen.append(dec.codeGeneration(labelManager));
+	  }
+	  cgen.append(body.codeGeneration(labelManager)).append("\n");*/
+	  cgen.append(body.codeGeneration(labelManager)).append("\n");
+	  cgen.append(endFuncLabel).append(":\n");
+
+	  cgen.append("lw $ra 0($sp)\n");
+	  cgen.append("pop\n");
+
+
+	  cgen.append("addi $sp $sp ").append(declaration_size).append("//pop declaration ").append(declaration_size).append("\n");
+	  cgen.append("addi $sp $sp ").append(parameter_size).append("// pop parameters").append(parameter_size).append("\n");
+	  cgen.append("pop\n");
+	  cgen.append("lw $fp 0($sp)\n");
+
+
+	  //cgen.append("sw $fp 0($fp)\n");
+
+	  cgen.append("jr $ra\n");
+	  /*
 	  cgen.append("sw $ra -1($bsp) //save ra before old sp\n");
 
 	  if (declist!=null) {
@@ -178,7 +219,7 @@ public class FunNode implements Node {
 	  cgen.append("lw $fp 1($bsp)\n");
 	  cgen.append("lw $sp 0($bsp)\n"); // Restore old stack pointer.
 	  cgen.append("addi $bsp $fp 2\n"); // Restore address of old base stack pointer.
-	  cgen.append("jr $ra\n");
+	  cgen.append("jr $ra\n");*/
 	  cgen.append("// END OF ").append(id).append("\n");
 
 	  
