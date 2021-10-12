@@ -75,7 +75,10 @@ public class BlockNode implements Node {
       //check semantics in the dec list
       if(declarations.size() > 0){
     	  //FIXME offset messo completamente a caso
-    	  env.offset = -1;
+          if(isFunction)
+              env.offset = -2;
+          else
+              env.offset = -1;
     	  //if there are children then check semantics for every child and save the results
     	  for(Node n : declarations)
     		  res.addAll(n.checkSemantics(env));
@@ -83,7 +86,10 @@ public class BlockNode implements Node {
       
       if(statements.size() > 0){
     	  //FIXME offset messo completamente a caso
-    	  env.offset = -1;
+          if(isFunction)
+              env.offset = -2;
+          else
+              env.offset = -1;
     	  //if there are children then check semantics for every child and save the results
     	  for(Node n : statements)
     		  res.addAll(n.checkSemantics(env));

@@ -23,6 +23,7 @@ import ast.node.types.TypeNode;
 import ast.node.types.VoidTypeNode;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	
@@ -202,7 +203,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		ParserRuleContext fct=ctx.getParent();
 		while (fct !=null && !(fct instanceof DecFunContext))
 			fct=fct.getParent();
-		
+
 		if (fct==null)
 			return new RetNode(visit(ctx.exp()), null);//in caso in cui il ret non sia in una funzione
 		else if (((DecFunContext)fct).type()!= null)
@@ -384,6 +385,10 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		res = new BlockNode(declarations,  statements,isMainBlock);
 
 		return res;
+	}
+	@Override
+	public Node visit(ParseTree tree){
+		return tree != null ? super.visit(tree) : null;
 	}
 
 }

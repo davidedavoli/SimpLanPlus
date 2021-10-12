@@ -99,8 +99,8 @@ public class FunNode implements Node {
       RetEffType abs = new RetEffType(RetEffType.RetT.ABS);
       RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
       
-      
-      if (!(type instanceof VoidTypeNode) && body.retTypeCheck(this).leq(abs)) {
+      //!(type instanceof VoidTypeNode) &&
+      if ( body.retTypeCheck(this).leq(abs)) {
     	  res.add(new SemanticError("Possible absence of return value"));
       }
       /*if ((type instanceof VoidTypeNode) && pres.leq(body.retTypeCheck())) {

@@ -117,7 +117,6 @@ public RetEffType retTypeCheck(FunNode funNode) {
 
       cgen.append("push $fp\n");
 
-     // cgen.append("mv $sp $fp //put in $fp parameter frame\n");
       for (int i=parlist.size()-1; i>=0; i--){
           cgen.append(parlist.get(i).codeGeneration(labelManager)).append("\n");
           cgen.append("push $a0\n");

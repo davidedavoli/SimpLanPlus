@@ -55,7 +55,7 @@ delete y;
 //print y^;
 }
 */
-
+/*
 {
 int p = 1;
 int global = 4;
@@ -68,7 +68,7 @@ int easy (int c,int z,int f){
         print fd;
         print h;
         print p;
-        return fd;
+        return fd+h+p;
     }
     int var = 1000;
     print var;
@@ -82,9 +82,35 @@ int easy (int c,int z,int f){
 
 p = easy(1,1,1);
 print p;
+}*/
+
+/*
+{
+int prova(int par){
+    int interno = 1;
+    print par;
+    print interno;
+    return par+ interno +1;
+}
+int c = prova(2);
+print c;
+}*/
+{
+int succ(int par){
+    int x = 1;
+    print x + par;
+    return x + par;
+}
+int res = succ(1);
+print res;
 }
 
 
 
 
 
+
+
+{
+
+}

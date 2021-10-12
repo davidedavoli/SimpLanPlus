@@ -212,7 +212,7 @@ public class SVM {
                             else{
                                 System.out.println( "PRINTO IL VALORE NEL REGISTRO: "+arg1 +" CON VALORE: "+ regRead(arg1));
                             }
-                            //printStack(5);
+                            //printStack(10);
                                 //System.out.println((sp < MEMSIZE) ? regRead(arg1) : "Empty stack!");
 
                             break;

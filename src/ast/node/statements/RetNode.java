@@ -7,6 +7,7 @@ import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
+import ast.node.types.VoidTypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
@@ -28,7 +29,7 @@ public class RetNode implements Node {
   }
 
   public String toPrint(String s) {
-    return s+"Return\n" + val.toPrint(s+"  ") ;
+    return s+"Return\n" + (val!= null ? val.toPrint(s+"  ") : "");
   }
 
   @Override
@@ -37,20 +38,25 @@ public class RetNode implements Node {
 
 	  if (! (etype instanceof TypeNode))
           res.add(new SemanticError("Return expression out of a function"));
+      if(val != null){
+          res.addAll(val.checkSemantics(env));
+      }
 
-	  res.addAll(val.checkSemantics(env));
 	  return res;
  	}
 
   
   public TypeNode typeCheck() {
-    if (TypeUtils.isSubtype(val.typeCheck(), etype))
-    	return etype;
-    else{
-        System.out.println("Wrong return type for function");
-        System.exit(0);
-    	return null;
-    }
+        if(val == null){
+            return new VoidTypeNode();
+        }
+        else if (TypeUtils.isSubtype(val.typeCheck(), etype))
+            return etype;
+        else{
+            System.out.println("Wrong return type for function");
+            System.exit(0);
+            return null;
+        }
   }  
   
   public RetEffType retTypeCheck(FunNode funNode) {
@@ -61,7 +67,10 @@ public class RetNode implements Node {
     
   public String codeGeneration(Label labelManager) {
         StringBuilder cgen = new StringBuilder();
-        cgen.append(val.codeGeneration(labelManager)).append("\n");
+        if( val != null){
+            cgen.append(val.codeGeneration(labelManager)).append("\n");
+        }
+
         cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation \n");
         cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
         cgen.append("b ").append(endFunction).append("\n");
