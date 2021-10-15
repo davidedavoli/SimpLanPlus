@@ -70,9 +70,8 @@ public class BlockNode implements Node {
 
       //declare resulting list
       ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-      if(isFunction){
+      if(isFunction)
           env.offset = -2;
-      }
       else
           env.offset = -1;
           //check semantics in the dec list

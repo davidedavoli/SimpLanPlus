@@ -103,7 +103,7 @@ int succ(int par){
 int res = succ(1);
 print res;
 }*/
-
+/*
 {
 int fib(int n){
     if(n <= 1)
@@ -114,7 +114,7 @@ int fib(int n){
 
 }
 print fib(20);
-}
+}*/
 /*
 {
     int prova(){
@@ -140,3 +140,20 @@ print fib(20);
 
     print prova();
 }*/
+{
+    int provaif(bool test){
+        if(test){
+            int c = 1;
+            print c;
+            return c;
+        }
+        else{
+            int c = 0;
+            print c;
+            return c;
+        }
+    }
+    print provaif(true);
+    print provaif(false);
+
+}
