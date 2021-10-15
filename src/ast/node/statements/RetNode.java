@@ -16,7 +16,8 @@ public class RetNode implements Node {
 
   private Node val;
   private TypeNode etype;// expected type
-  private String endFunction;
+  private FunNode parent_f;
+  private int current_nl;
 
     public RetNode (Node v, TypeNode e) {
     val=v;
@@ -41,7 +42,7 @@ public class RetNode implements Node {
       if(val != null){
           res.addAll(val.checkSemantics(env));
       }
-
+      current_nl=env.nestingLevel;
 	  return res;
  	}
 
@@ -60,7 +61,7 @@ public class RetNode implements Node {
   }  
   
   public RetEffType retTypeCheck(FunNode funNode) {
-        endFunction = funNode.get_end_fun_label();
+        parent_f = funNode;
 	    return new RetEffType(RetEffType.RetT.PRES);
   }
 
@@ -70,10 +71,14 @@ public class RetNode implements Node {
         if( val != null){
             cgen.append(val.codeGeneration(labelManager)).append("\n");
         }
+
+        for (int i = 0; i < current_nl-parent_f.getBody().getCurrent_nl(); i++)
+            cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
+
         cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation in return \n");
         cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
 
-        cgen.append("b ").append(endFunction).append("\n");
+        cgen.append("b ").append(parent_f.get_end_fun_label()).append("\n");
 		return cgen.toString();
   }
     

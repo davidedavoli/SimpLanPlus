@@ -141,19 +141,25 @@ print fib(20);
     print prova();
 }*/
 {
-    int provaif(bool test){
-        if(test){
-            int c = 1;
-            print c;
-            return c;
+    int fibonacci(int n){
+        int sum(int a, int b){
+            if (a==0){
+                return b;
+            }
+            else{
+                return 1 + sum (a-1, b);
+            }
+        }
+        if (n==0){
+            return 0;
+        }
+        if (n==1){
+            return 1;
         }
         else{
-            int c = 0;
-            print c;
-            return c;
+            return sum(fibonacci(n-1),fibonacci(n-2));
         }
     }
-    print provaif(true);
-    print provaif(false);
 
+    print fibonacci(8);
 }

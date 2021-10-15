@@ -22,7 +22,7 @@ public class FunNode implements Node {
   private TypeNode type; 
   private ArrayList<TypeNode> partypes;
   private ArrayList<Node> parlist = new ArrayList<Node>(); 
-  private ArrayList<Node> declist; 
+  private ArrayList<Node> declist;
   private BlockNode body;
   private String beginFuncLabel = "";
   private String endFuncLabel = "";
@@ -113,9 +113,14 @@ public class FunNode implements Node {
   
   public void addPar (Node p) {
     parlist.add(p);
-  }  
-  
-  public String toPrint(String s) {
+  }
+
+  public BlockNode getBody() {
+		return body;
+	}
+
+
+	public String toPrint(String s) {
 	String parlstr="";
 	for (Node par:parlist)
 	  parlstr+=par.toPrint(s+"  ");

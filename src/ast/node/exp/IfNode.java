@@ -51,8 +51,11 @@ public class IfNode implements Node {
   }
   
   public RetEffType retTypeCheck(FunNode funNode) {
+      RetEffType th_v=th.retTypeCheck(funNode);
+      RetEffType el_v=(el!=null)?el.retTypeCheck(funNode):new RetEffType(RetEffType.RetT.ABS);
+      //do not remove these lines: retTypeCheck has a side-effect;
 	  if (el!=null)
-		  return RetEffType.min(th.retTypeCheck(funNode), el.retTypeCheck(funNode));
+		  return RetEffType.min(th_v, el_v);
 	  else
 		  return new RetEffType(RetEffType.RetT.ABS);
   }

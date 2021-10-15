@@ -29,6 +29,12 @@ public class BlockNode implements Node {
   private final Boolean isMain;
   private Boolean isFunction;
 
+    public int getCurrent_nl() {
+        return current_nl;
+    }
+
+    private int current_nl;
+
 
   public BlockNode (ArrayList<Node> d, ArrayList<Node> s) {
     declarations=d;
@@ -67,6 +73,8 @@ public class BlockNode implements Node {
           env.nestingLevel++;
           env.symTable.add(hm);
       }
+      current_nl = env.nestingLevel;
+
 
       //declare resulting list
       ArrayList<SemanticError> res = new ArrayList<SemanticError>();
