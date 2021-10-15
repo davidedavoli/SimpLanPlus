@@ -103,18 +103,18 @@ int succ(int par){
 int res = succ(1);
 print res;
 }*/
-/*
+
 {
 int fib(int n){
-    if(n <= 1){
+    if(n <= 1)
         return n;
-        }
-    else{
+
+    else
         return  fib(n-1) + fib(n-2);
-        }
+
 }
 print fib(20);
-}*/
+}
 /*
 {
     int prova(){
