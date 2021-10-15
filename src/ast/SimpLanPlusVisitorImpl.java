@@ -105,7 +105,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	public Node visitDecFun(DecFunContext ctx) {
 		//initialize @res with the visits to the type and its ID
 		FunNode res =null;
-		System.out.println("VISITOR "+ctx.ID().getText());
+		//System.out.println("VISITOR "+ctx.ID().getText());
 		if (ctx.type()!=null)
 			res = new FunNode(ctx.ID().getText(), (TypeNode) visit(ctx.type()));//WARNING casting
 		else
@@ -118,22 +118,10 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 			res.addPar( new ArgNode(arg.ID().getText(), (TypeNode)visit( arg.type() )) );//WARNING casting
 		
 		//add body
-		//create a list for the nested declarations
-		ArrayList<Node> innerDec = new ArrayList<Node>();
-		
-		//check whether there are actually nested decs
-		//FIXME forse serve per le regole di shading dei parametri, ma sembra un po' a caso, per ora lo lasciamo
-		/*if(ctx.block().declaration() != null){
-			//if there are visit each dec and add it to the @innerDec list
-			for(DeclarationContext dc : ctx.block().declaration())
-				innerDec.add(visit(dc));
-		}*/
-		
-		//get the exp body
 		BlockNode block = (BlockNode) visitBlock(ctx.block());
 		
 		//add the body and the inner declarations to the function
-		res.addDecBody(innerDec, block);
+		res.addFunBlock( block);
 		
 		return res;		
 	}
@@ -228,13 +216,6 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		if(ctx.statement(1) != null){
 			elseExp = visit (ctx.statement(1));
 		}
-
-		System.out.println("CONDIZIONE");
-		System.out.println(condExp);
-		System.out.println("THEN");
-		System.out.println(thenExp);
-		System.out.println("ELSE");
-		System.out.println(elseExp);
 		//build the @res properly and return it
 		res = new IfNode(condExp, thenExp, elseExp);
 		

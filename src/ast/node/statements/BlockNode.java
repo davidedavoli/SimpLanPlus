@@ -20,30 +20,14 @@ import util.SemanticError;
 public class BlockNode implements Node {
 
   private final ArrayList<Node> declarations;
-
-    public ArrayList<Node> getStatements() {
-        return statements;
-    }
-
-    private final ArrayList<Node> statements;
+  private final ArrayList<Node> statements;
   private final Boolean isMain;
   private Boolean isFunction;
+  private int current_nl;
 
     public int getCurrent_nl() {
         return current_nl;
     }
-
-    private int current_nl;
-
-
-  public BlockNode (ArrayList<Node> d, ArrayList<Node> s) {
-    declarations=d;
-    statements=s;
-    isMain = false;
-    isFunction = false;
-
-  }
-
 
     public BlockNode(ArrayList<Node> d, ArrayList<Node> s, Boolean isMainBlock) {
         declarations=d;

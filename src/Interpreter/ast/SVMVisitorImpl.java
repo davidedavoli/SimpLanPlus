@@ -8,10 +8,16 @@ import Interpreter.parser.SVMParser;
 
 public class SVMVisitorImpl extends SVMBaseVisitor<Void> {
 
-	public Instruction[] code = new Instruction[SVM.CODESIZE];
+
+
+	private Instruction[] code = new Instruction[SVM.CODESIZE];
 	private int i = 0;
 	private HashMap<String,Integer> labelAdd = new HashMap<String,Integer>();
 	private HashMap<Integer,String> labelRef = new HashMap<Integer,String>();
+
+	public Instruction[] getCode() {
+		return code;
+	}
 
 	@Override
 	public Void visitAssembly(SVMParser.AssemblyContext ctx) {

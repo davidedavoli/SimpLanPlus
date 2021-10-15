@@ -22,7 +22,7 @@ public class FunNode implements Node {
   private TypeNode type; 
   private ArrayList<TypeNode> partypes;
   private ArrayList<Node> parlist = new ArrayList<Node>(); 
-  private ArrayList<Node> declist;
+  //private ArrayList<Node> declist;
   private BlockNode body;
   private String beginFuncLabel = "";
   private String endFuncLabel = "";
@@ -32,11 +32,10 @@ public class FunNode implements Node {
     type=t;
 	beginFuncLabel = FuncBodyUtils.freshFunLabel();
 	endFuncLabel = FuncBodyUtils.endFreshFunLabel();
-	System.out.println("CREO FUNZIONE " +id);
+	//System.out.println("CREO FUNZIONE " +id);
   }
   
-  public void addDecBody (ArrayList<Node> d, BlockNode b) {
-    declist=d;
+  public void addFunBlock(BlockNode b) {
     body=b;
 	body.setIsFunction(true);
 
@@ -124,22 +123,22 @@ public class FunNode implements Node {
 	String parlstr="";
 	for (Node par:parlist)
 	  parlstr+=par.toPrint(s+"  ");
-	String declstr="";
-	if (declist!=null) 
+	/*String declstr="";
+	if (declist!=null)
 	  for (Node dec:declist)
-	    declstr+=dec.toPrint(s+"  ");
+	    declstr+=dec.toPrint(s+"  ");*/
     return s+"Fun:" + id +"\n"
 		   +type.toPrint(s+"  ")
 		   +parlstr
-	   	   +declstr
+	   	   //+declstr
            +body.toPrint(s+"  ") ; 
   }
   
   //valore di ritorno non utilizzato
   public TypeNode typeCheck () {
-	if (declist!=null) 
+	/*if (declist!=null)
 	  for (Node dec:declist)
-		dec.typeCheck();
+		dec.typeCheck();*/
 	body.typeCheck();
     return new ArrowTypeNode(partypes, type);
   }

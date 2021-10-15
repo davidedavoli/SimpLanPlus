@@ -28,7 +28,7 @@ public class TestVM {
         if (lexerASM.lexicalErrors>0 || parserASM.getNumberOfSyntaxErrors()>0) System.exit(1);
 
         System.out.println("Starting Virtual Machine...");
-        SVM vm = new SVM(visitorSVM.code);
+        SVM vm = new SVM(visitorSVM.getCode());
         vm.cpu();
 
     }
