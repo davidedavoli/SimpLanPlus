@@ -67,14 +67,11 @@ public class BlockNode implements Node {
           env.symTable.add(hm);
       }
 
-
-      
       //declare resulting list
       ArrayList<SemanticError> res = new ArrayList<SemanticError>();
       
       //check semantics in the dec list
       if(declarations.size() > 0){
-    	  //FIXME offset messo completamente a caso
           if(isFunction)
               env.offset = -2;
           else
@@ -85,7 +82,6 @@ public class BlockNode implements Node {
       }
       
       if(statements.size() > 0){
-    	  //FIXME offset messo completamente a caso
           if(isFunction)
               env.offset = -2;
           else
@@ -187,7 +183,7 @@ public class BlockNode implements Node {
                cgen.append("halt\n");
            }
            else{
-                cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation \n");
+                cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode\n");
                 cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
             }
       }
@@ -196,7 +192,6 @@ public class BlockNode implements Node {
          cgen.append("//CREO FUNZIONI\n");
       for (Node fun:funDec){
           cgen.append(fun.codeGeneration(labelManager)).append("\n");
-          System.out.println("CREO UNA FUNZIONE "+ fun.toPrint(""));
       }
       if (funDec.size() > 0)
           cgen.append("//FINE FUNZIONI\n");

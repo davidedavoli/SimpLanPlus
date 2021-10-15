@@ -33,7 +33,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		
 		//resulting node of the right type
 		BlockNode res;
-		
+
 		//list of declarations in @res
 		ArrayList<Node> declarations = new ArrayList<Node>();
 		ArrayList<Node> statements = new ArrayList<Node>();
@@ -57,7 +57,6 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		
 		//build @res accordingly with the result of the visits to its content
 		res = new BlockNode(declarations,  statements,false);
-
 
 		return res;
 	}

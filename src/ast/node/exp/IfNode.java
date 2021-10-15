@@ -22,6 +22,7 @@ public class IfNode implements Node {
     cond=c;
     th=t;
     el=e;
+
   }
   
   public String toPrint(String s) {

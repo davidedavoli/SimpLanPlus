@@ -20,8 +20,8 @@ public class SVM {
     public static final int CODESIZE = 10000;
     public static final int MEMSIZE = 10000;
 
-    private Instruction[] code;
-    private Memory memory = new Memory(MEMSIZE);
+    private final Instruction[] code;
+    private final Memory memory = new Memory(MEMSIZE);
 
     private int ip = 0;             // instruction pointer, internal register, no write nor read
     private int sp = MEMSIZE;       // stack pointer
@@ -64,11 +64,8 @@ public class SVM {
 
                             break;
                         case SVMParser.POP:
-                            if (arg1 != null && isRegister(arg1)){
+                            if (arg1 != null && isRegister(arg1))
                                 regStore(arg1, pop());
-                                System.out.println("VALORE POPPATO "+ regRead(arg1));
-                            }
-
                             else
                                 pop();
                             break;
@@ -105,7 +102,6 @@ public class SVM {
 
 
                         case SVMParser.NOT:
-                            System.out.println("RESULT NOT "+ regRead(arg2) );
                             regStore(arg1, regRead(arg2) != 0 ? 0 : 1);
                             break;
                         case SVMParser.OR:

@@ -20,6 +20,35 @@ public class SVMVisitorImpl extends SVMBaseVisitor<Void> {
 		for (Integer refAdd: labelRef.keySet()) {
 			code[refAdd] = new Instruction(SVMParser.ADDRESS, Integer.toString(labelAdd.get(labelRef.get(refAdd))));
 		}
+
+		/*System.out.println("LABEL REF");
+		System.out.println(labelRef);
+		System.out.println("LABEL ADD");
+		System.out.println(labelAdd);
+		System.out.println("CODE GEN");
+		String toPrint = "";
+
+		for (int i = 0;i<10000;i++){
+			Instruction ins = code[i];
+			if(ins != null){
+				String literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
+				String str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
+				toPrint += i+": "+ str +"\n";
+			}
+		}
+
+		//System.out.println(toPrint);
+		for (Integer refAdd: labelRef.keySet()) {
+			Instruction ins = code[refAdd];
+			String literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
+			String str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
+			System.out.println("ReF STR " + str);
+			ins = code[Integer.parseInt(ins.getArg1())];
+			literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
+			str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
+
+			System.out.println("ADDR ARRIVING " + str);
+		}*/
 		return null;
 	}
 

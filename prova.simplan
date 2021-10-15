@@ -57,31 +57,29 @@ delete y;
 */
 /*
 {
-int p = 1;
-int global = 4;
-int z = 10;
-int easy (int c,int z,int f){
+    int p = 1;
+    int global = 4;
+    int z = 10;
+    int easy (int c,int z,int f){
 
-    int dentro(int h,int p){
-        int fd = 1;
+        int dentro(int h,int p){
+            int fd = 1;
 
-        print fd;
-        print h;
-        print p;
-        return fd+h+p;
+            print fd;
+            print h;
+            print p;
+            return fd+h+p;
+        }
+        print c;
+        if (c < 4)
+            c = easy(c+1,z+1,f+1);
+       /* else
+            c = dentro(1,0);*/
+        return c+z+f;
     }
-    int var = 1000;
-    print var;
-    print c;
-    c = dentro(1,3);
 
-    /*if (c < 4)
-        c = easy(c+1,z+1,f+1)*/
-    return c+z+f;
-}
-
-p = easy(1,1,1);
-print p;
+    p = easy(1,1,1);
+    print p;
 }*/
 
 /*
@@ -95,6 +93,7 @@ int prova(int par){
 int c = prova(2);
 print c;
 }*/
+/*
 {
 int succ(int par){
     int x = 1;
@@ -103,14 +102,41 @@ int succ(int par){
 }
 int res = succ(1);
 print res;
-}
-
-
-
-
-
-
-
+}*/
+/*
 {
-
+int fib(int n){
+    if(n <= 1){
+        return n;
+        }
+    else{
+        return  fib(n-1) + fib(n-2);
+        }
 }
+print fib(20);
+}*/
+/*
+{
+    int prova(){
+        int sum(int c){
+            return c+1;
+        }
+        int c = sum(1);
+        int d = sum(2);
+        int e = sum(3);
+        int f = sum(4);
+        print c;
+        print d;
+        print e;
+        print f;
+
+        return 1000;
+        //return sum(1) + sum(2)+sum(3)+sum(4)+sum(5);
+    }
+    /*int printc(int c){
+        //print c;
+        return c;
+    }*/
+
+    print prova();
+}*/

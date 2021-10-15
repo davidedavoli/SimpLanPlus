@@ -35,8 +35,8 @@ public class BinExpNode implements Node {
     public TypeNode typeCheck() {
         TypeNode lhsType = lhs.typeCheck();
         TypeNode rhsType = rhs.typeCheck();
-        System.out.println("LHS " + lhsType);
-        System.out.println("RHS " + rhsType);
+        //System.out.println("LHS " + lhsType);
+        //System.out.println("RHS " + rhsType);
         if(!(lhsType instanceof IntTypeNode && rhsType instanceof IntTypeNode)){
             System.out.println("NOT INT OPERANT");
             if(!(lhsType instanceof BoolTypeNode && rhsType instanceof BoolTypeNode)){

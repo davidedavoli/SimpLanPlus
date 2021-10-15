@@ -147,96 +147,32 @@ public class FunNode implements Node {
 	  int declaration_size = 0;
 	  int parameter_size = parlist.size();
 
-
 	  StringBuilder cgen = new StringBuilder();
 
 	  cgen.append("//BEGIN FUNCTION ").append(beginFuncLabel).append("\n");
 	  cgen.append(beginFuncLabel).append(":\n");
-	  //cgen.append("sw $fp 0($sp)\n");
+
 	  cgen.append("mv $sp $fp\n");
 	  cgen.append("push $ra\n");
 
-	  /*if (declist!=null) {
-		  declaration_size = declist.size();
-		  for (Node dec:declist)
-			  cgen.append(dec.codeGeneration(labelManager));
-	  }
-	  cgen.append(body.codeGeneration(labelManager)).append("\n");*/
 	  cgen.append(body.codeGeneration(labelManager)).append("\n");
 	  cgen.append(endFuncLabel).append(":\n");
 
 	  cgen.append("lw $ra 0($sp)\n");
-	  cgen.append("pop\n");
 
+	  cgen.append("pop\n");
 
 	  cgen.append("addi $sp $sp ").append(declaration_size).append("//pop declaration ").append(declaration_size).append("\n");
 	  cgen.append("addi $sp $sp ").append(parameter_size).append("// pop parameters").append(parameter_size).append("\n");
 	  cgen.append("pop\n");
 	  cgen.append("lw $fp 0($sp)\n");
-
-
-	  //cgen.append("sw $fp 0($fp)\n");
-
+	  cgen.append("pop\n");
 	  cgen.append("jr $ra\n");
-	  /*
-	  cgen.append("sw $ra -1($bsp) //save ra before old sp\n");
 
-	  if (declist!=null) {
-			declaration_size = declist.size();
-			for (Node dec:declist)
-				cgen.append(dec.codeGeneration(labelManager));
-	  }
-
-
-	  cgen.append(body.codeGeneration(labelManager)).append("\n");
-
-
-	  //FINE FUNZIONE
-	  cgen.append(endFuncLabel).append(":\n");
-	  //Here in $a0 = Return value
-	  cgen.append("addi $sp $sp ").append(declaration_size).append("\n");
-	  cgen.append("addi $sp $sp ").append(parameter_size).append("\n");
-	  cgen.append("lw $ra -1($bsp) // load ra\n");
-
-	  cgen.append("lw $fp 1($bsp)\n");
-	  cgen.append("lw $sp 0($bsp)\n"); // Restore old stack pointer.
-	  cgen.append("addi $bsp $fp 2\n"); // Restore address of old base stack pointer.
-	  cgen.append("jr $ra\n");*/
 	  cgen.append("// END OF ").append(id).append("\n");
 
-	  
 
 	  return cgen.toString();
-/*
-		String body_fun = funl+":\n"+
-				"cfp\n"+ 		// setta $fp a $sp
-				"lra\n"+ 		// inserimento return address
-				declCode+ 		// inserimento dichiarazioni locali
-				body.codeGeneration(labelManager)+
-				"srv\n"+ 		// pop del return value
-				popDecl+
-				"sra\n"+ 		// pop del return address
-				"pop\n"+ 		// pop di AL
-				popParl+
-				"sfp\n"+  		// setto $fp a valore del CL
-				"lrv\n"+ 		// risultato della funzione sullo stack
-				"lra\n"+"js\n";  // salta a $ra
-	    FuncBodyUtils.putCode(funl+":\n"+
-	        "cfp\n"+ 		// setta $fp a $sp				
-	        "lra\n"+ 		// inserimento return address
-	    		declCode+ 		// inserimento dichiarazioni locali
-	    		body.codeGeneration(labelManager)+
-	    		"srv\n"+ 		// pop del return value
-	    		popDecl+
-	    		"sra\n"+ 		// pop del return address
-	    		"pop\n"+ 		// pop di AL
-	    		popParl+
-	    		"sfp\n"+  		// setto $fp a valore del CL
-	    		"lrv\n"+ 		// risultato della funzione sullo stack
-	    		"lra\n"+"js\n"  // salta a $ra
-	    		);
-	    
-		return "push "+ funl +"\n";*/
   }
   
 }  
