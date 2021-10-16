@@ -8,9 +8,7 @@ import ast.node.exp.IfNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import util.Label;
@@ -58,9 +56,9 @@ public class BlockNode implements Node {
           env.symTable.add(hm);
       }
       current_nl = env.nestingLevel;
-      System.out.println("CURRENT NESTING LEVEL IN BLOCK AND IS FUNCTION");
+      /*System.out.println("CURRENT NESTING LEVEL IN BLOCK AND IS FUNCTION");
       System.out.println(current_nl);
-      System.out.println(isFunction);
+      System.out.println(isFunction);*/
 
 
       //declare resulting list
@@ -69,7 +67,7 @@ public class BlockNode implements Node {
           env.offset = -2;
       else
           env.offset = -1;
-      System.out.println("OFFSET PRIMA DEC "+env.offset);
+      //System.out.println("OFFSET PRIMA DEC "+env.offset);
 
       //check semantics in the dec list
       if(declarations.size() > 0){
@@ -78,7 +76,7 @@ public class BlockNode implements Node {
     		  res.addAll(n.checkSemantics(env));
       }
 
-      System.out.println("OFFSET DOPO DEC "+env.offset);
+      //System.out.println("OFFSET DOPO DEC &isfun: "+isFunction+" "+env.offset);
 
       if(statements.size() > 0){
     	  //if there are children then check semantics for every child and save the results
@@ -91,6 +89,7 @@ public class BlockNode implements Node {
       if(!isFunction){
           env.symTable.remove(env.nestingLevel--);
       }
+
       //return the result
       return res;
 	}

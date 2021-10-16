@@ -4,8 +4,13 @@ Simple function, calculated the successor
 {
    int successivo(int param){
         int x = 1;
-        print x + param;
-        return x + param;
+        int uno(){
+            int c = 0;
+            int x = 1;
+            return c + x;
+        }
+        print x + uno();
+        return x + uno();
    }
    int x = successivo(1);
    print x;
@@ -15,8 +20,4 @@ Simple function, calculated the successor
 Should print:
 ;2
 ;2
-It print:
-;2
-;9999
-
 */

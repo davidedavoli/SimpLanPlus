@@ -10,7 +10,8 @@ Normal fibonacci
             return  fib(n-1) + fib(n-2);
 
     }
-    print fib(20);
+    int x = fib(20);
+    print x;
 }
 /*
 Should print:

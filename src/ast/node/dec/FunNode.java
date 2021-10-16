@@ -1,7 +1,5 @@
 package ast.node.dec;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 import ast.STentry;
 import ast.node.ArgNode;
@@ -88,7 +86,15 @@ public class FunNode implements Node {
 		  res.addAll(body.checkSemantics(env));
 
 		  //close scope
+
 	      env.symTable.remove(env.nestingLevel--);
+		  if(env.nestingLevel >= 0){
+			  Optional<STentry> stEntry = env.symTable.get(env.nestingLevel).values().stream().min(Comparator.comparing(STentry::getOffset));
+			  int offset = stEntry.map(STentry::getOffset).orElse(-1);
+			  //System.out.println("NEW OFFSET HAS TO BE " + offset);
+			  env.offset = offset ;
+		  }
+
 	      
       }
       

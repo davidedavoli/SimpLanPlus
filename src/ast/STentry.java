@@ -4,9 +4,9 @@ import ast.node.types.TypeNode;
 
 public class STentry {
  
-  private int nl;
+  private final int nl;
   private TypeNode type;
-  private int offset;
+  private final int offset;
 
   public String getBeginFuncLabel() {
     return beginFuncLabel;
