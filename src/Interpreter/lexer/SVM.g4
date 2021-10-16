@@ -29,6 +29,7 @@ instruction:
 	  | DIV r1=REGISTER r2=REGISTER r3=REGISTER
 	  | DIVI r1=REGISTER r2=REGISTER n=NUMBER
 	  | OR r1=REGISTER r2=REGISTER r3=REGISTER
+	  | AND r1=REGISTER r2=REGISTER r3=REGISTER
 	  | NOT r1=REGISTER r2=REGISTER
 	  | STOREW r1=REGISTER o=NUMBER LPAR r2=REGISTER RPAR
 	  | LOADW r1=REGISTER o=NUMBER LPAR r2=REGISTER RPAR
@@ -81,7 +82,8 @@ MULTI	 : 'multi' ;	// as for addi
 DIV	     : 'div' ;	// as for add
 DIVI	 : 'divi' ;	// as for addi
 NOT	     : 'not' ;	// logical negation
-OR	     : 'or' ;	// logical negation
+OR	     : 'or' ;	// logical or
+AND	     : 'and' ;	// logical and
 STOREW	 : 'sw' ; 	// stores the value of a register at offset n from the address in a second register
 LOADW	 : 'lw' ;	// loads the value at offset n from the address in a register and stores it in a second register
 MOVE	 : 'mv' ;	// move value from first register to second register

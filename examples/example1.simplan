@@ -1,0 +1,48 @@
+/*
+Example of annidate recursive function from collegues project that not worked for them
+*/
+{
+    int a = 10;
+    void f() {
+        int b = 20;
+        void g(int x){
+            if (x == 0){
+                print x;
+                print a;
+                print b;
+                return;
+            }
+            else {
+                print x;
+                print a;
+                print b;
+                print 999;
+                a = a - 1;
+                b = b - 1;
+                g(x - 1);
+                return;
+            }
+        }
+
+        g(2);
+        return;
+    }
+
+    f();
+}
+
+/*
+Should print:
+;2
+;10
+;20
+;999
+;1
+;9
+;19
+;999
+;0
+;8
+    ;18
+
+*/

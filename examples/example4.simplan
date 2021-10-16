@@ -1,0 +1,23 @@
+/*
+Simple function, calculated the successor
+*/
+{
+    int succ(int par){
+        int x = 1;
+        print x + par;
+        return x + par;
+    }
+    int res = 1;
+    res = succ(1);
+    print res;
+}
+
+/*
+Should print:
+;2
+;2
+It print:
+;2
+;9999
+
+*/

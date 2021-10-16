@@ -54,14 +54,12 @@ public class SVM {
                 
                 try {
                     switch (bytecode.getCode()) {
-                        case SVMParser.PUSH:
 
+                        case SVMParser.PUSH:
                             if (isRegister(arg1))
                                 push(regRead(arg1));
-
                             else
                                 push(Integer.parseInt(arg1));
-
                             break;
                         case SVMParser.POP:
                             if (arg1 != null && isRegister(arg1))
@@ -70,7 +68,6 @@ public class SVM {
                                 pop();
                             break;
 
-
                         case SVMParser.ADD:
                             regStore(arg1, regRead(arg2) + regRead(arg3));
                             break;
@@ -78,6 +75,7 @@ public class SVM {
                             value = Integer.parseInt(arg3);
                             regStore(arg1, regRead(arg2) + value);
                             break;
+
                         case SVMParser.SUB:
                             regStore(arg1, regRead(arg2) - regRead(arg3));
                             break;
@@ -85,13 +83,15 @@ public class SVM {
                             value = Integer.parseInt(arg3);
                             regStore(arg1, regRead(arg2) - value);
                             break;
+
                         case SVMParser.MULT:
                             regStore(arg1, regRead(arg2) * regRead(arg3));
                             break;
-                        case SVMParser.MULTI:
+                        case SVMParser.MULTI: //Also used for negate (*-1)
                             value = Integer.parseInt(arg3);
                             regStore(arg1, regRead(arg2) * value);
                             break;
+
                         case SVMParser.DIV:
                             regStore(arg1, regRead(arg2) / regRead(arg3));
                             break;
@@ -100,27 +100,16 @@ public class SVM {
                             regStore(arg1, regRead(arg2) / value);
                             break;
 
-
-                        case SVMParser.NOT:
-                            regStore(arg1, regRead(arg2) != 0 ? 0 : 1);
-                            break;
-                        case SVMParser.OR:
-                            regStore(arg1, (regRead(arg2)>0 || regRead(arg3)>0) ?1:0);
-                            break;
-
-
-                        case SVMParser.STOREW: //
+                        case SVMParser.STOREW:
                             offset = Integer.parseInt(arg2);
                             int addr_sw = offset + regRead(arg3);
-                            System.out.println("ARG1 "+arg1+" ARG2 "+arg2 +" ARG3 " + arg3);
                             memory.write(addr_sw, regRead(arg1));
-                            //printStack(8);
                             break;
                         case SVMParser.LOAD:
                             value = Integer.parseInt(arg2);
                             regStore(arg1,value);
                             break;
-                        case SVMParser.LOADW: //
+                        case SVMParser.LOADW:
                             // check if object address where we take the method label
                             // is null value (-10000) //TODO l'if è un fossile del codice di Simplan, si valuti se tenerlo o rimuoverlo
                     /*
@@ -129,49 +118,40 @@ public class SVM {
                         return;
                     }
                      */
-                            
                             offset = Integer.parseInt(arg2);
-                            int addr_lw = offset + regRead(arg3);
-                            //System.out.println("ADDRESS "+ offset);
-                            //System.out.println("arg "+ regRead(arg3));
-                            regStore(arg1, memory.read(addr_lw));
-                           //printStack(8);
+                            address = offset + regRead(arg3);
+                            regStore(arg1, memory.read(address));
                             break;
                         case SVMParser.MOVE:
                             value = regRead(arg1);
-                            //System.out.println("VALUE TO MOVE: "+value);
                             regStore(arg2, value);
-
                             break;
+
                         case SVMParser.BRANCH:
                             address = Integer.parseInt(code[ip].getArg1());
                             ip = address;
                             break;
-                        case SVMParser.BCOND: //
+                        case SVMParser.BCOND:
                             address = Integer.parseInt(code[ip].getArg1());
                             ip++;  //aumentiamo ip, in caso non venga effettuato il branch
                             value = regRead(bytecode.getArg1());
                             if (value!=0) ip = address;
-
                             break;
 
                         case SVMParser.JAL:
-                            /**
-                             * Maybe cause bug because go to previous line instead directly on the label
-                             */
                             regStore("$ra", ip);
-                            //System.out.println("ARG1 JAL "+code[ip].getArg1());
                             address = Integer.parseInt(code[ip].getArg1());
-                            //System.out.println("ADDRESS OF RA "+ip);
                             ip = address;
                             break;
                         case SVMParser.JR:
                             ip = regRead(arg1);
                             break;
 
+
                         case SVMParser.EQ:
                             regStore(arg1, regRead(arg2)==regRead(arg3)?1:0);
                             break;
+
                         case SVMParser.LE:
                             regStore(arg1, regRead(arg2)<=regRead(arg3)?1:0);
                             break;
@@ -185,6 +165,15 @@ public class SVM {
                             regStore(arg1, regRead(arg2)>regRead(arg3)?1:0);
                             break;
 
+                        case SVMParser.NOT:
+                            regStore(arg1, regRead(arg2) != 0 ? 0 : 1);
+                            break;
+                        case SVMParser.OR:
+                            regStore(arg1, (regRead(arg2)>0 || regRead(arg3)>0) ?1:0);
+                            break;
+                        case SVMParser.AND:
+                            regStore(arg1, (regRead(arg2)>0 && regRead(arg3)>0) ?1:0);
+                            break;
 
                         case SVMParser.NEW:
                             address = memory.allocate();
@@ -200,19 +189,17 @@ public class SVM {
                             if (address == hp - 1)
                                 hp--; //se è l'ultimo indirizzo occupato, allora hp viene decrementato
                             memory.free(address);
-
                             break;
+
                         case SVMParser.PRINT:
                             if (arg1==null)
                                 System.out.println((sp < MEMSIZE) ? memory.read(sp) : "Empty stack!");
                             else{
                                 System.out.println( "PRINTO IL VALORE NEL REGISTRO: "+arg1 +" CON VALORE: "+ regRead(arg1));
                             }
-                            //printStack(10);
-                                //System.out.println((sp < MEMSIZE) ? regRead(arg1) : "Empty stack!");
+                            //System.out.println((sp < MEMSIZE) ? regRead(arg1) : "Empty stack!");
 
                             break;
-
 
                         case SVMParser.HALT:
                             //to print the result
@@ -255,7 +242,6 @@ public class SVM {
     private int regRead(String reg) {
 
         if (reg.equals("$fp")){
-            // System.out.println("NUOVO VALORE FP: "+v);
             return fp;
         }
         else if(reg.equals("$bsp")){
@@ -285,7 +271,6 @@ public class SVM {
 
     private void regStore(String reg, int v) throws Exception {
         if (reg.equals("$fp")){
-            // System.out.println("NUOVO VALORE FP: "+v);
             fp = v;
         }
         else if(reg.equals("$bsp")){
@@ -310,7 +295,6 @@ public class SVM {
                     r[Integer.parseInt(reg.substring(2))] = v;
                     break;
                 case 'a':
-                    //System.out.println("STORING VALUE: "+v+" FOR REGISTER "+reg);
                     a[Integer.parseInt(reg.substring(2))] = v;
 
                     break;

@@ -35,8 +35,7 @@ public class BinExpNode implements Node {
     public TypeNode typeCheck() {
         TypeNode lhsType = lhs.typeCheck();
         TypeNode rhsType = rhs.typeCheck();
-        //System.out.println("LHS " + lhsType);
-        //System.out.println("RHS " + rhsType);
+
         if(!(lhsType instanceof IntTypeNode && rhsType instanceof IntTypeNode)){
             System.out.println("NOT INT OPERANT");
             if(!(lhsType instanceof BoolTypeNode && rhsType instanceof BoolTypeNode)){
@@ -176,8 +175,8 @@ public class BinExpNode implements Node {
                 break;
             }
             case "&&":{
-                //cgen.append("and $a0 $a2 $a0 // $a0 = $a2 && $a0\n");
-                cgen.append("mult $a0 $a2 $a0 // $a0 = $a2 && $a0 aka $a0 = $a2 * $a0\n");
+                cgen.append("and $a0 $a2 $a0 // $a0 = $a2 && $a0\n");
+                //cgen.append("mult $a0 $a2 $a0 // $a0 = $a2 && $a0 aka $a0 = $a2 * $a0\n");
                 break;
             }
 

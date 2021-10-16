@@ -107,6 +107,9 @@ public class SVMVisitorImpl extends SVMBaseVisitor<Void> {
 			case SVMLexer.OR:
 				code[i++] = new Instruction(SVMParser.OR,  ctx.r1.getText(), ctx.r2.getText(), ctx.r3.getText());
 				break;
+			case SVMLexer.AND:
+				code[i++] = new Instruction(SVMParser.AND,  ctx.r1.getText(), ctx.r2.getText(), ctx.r3.getText());
+				break;
 			case SVMLexer.LOAD:
 				code[i++] = new Instruction(SVMParser.LOAD,  ctx.r1.getText(), ctx.n.getText());
 				break;
