@@ -10,6 +10,7 @@ import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class PointerNode implements Node {
 
@@ -38,7 +39,7 @@ public class PointerNode implements Node {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
 
       return "push "+val+"\n";
   }

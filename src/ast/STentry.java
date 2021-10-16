@@ -1,6 +1,7 @@
 package ast;
 
 import ast.node.types.TypeNode;
+import util.SimplanPlusException;
 
 public class STentry {
  
@@ -47,7 +48,7 @@ public class STentry {
   public int getNestinglevel ()
   {return nl;}
   
-  public String toPrint(String s) { //
+  public String toPrint(String s) throws SimplanPlusException { //
 	   return s+"STentry: nestlev " + Integer.toString(nl) +"\n"+
 			  s+"STentry: type\n" + 
 			  type.toPrint(s+"  ") + 

@@ -9,6 +9,8 @@ import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
+
 import java.util.ArrayList;
 
 /**
@@ -27,26 +29,18 @@ public class BinExpNode implements Node {
     }
 
     @Override
-    public String toPrint(String indent) {
+    public String toPrint(String indent) throws SimplanPlusException {
         return indent + lhs + " " + operator + " " + rhs.toPrint(indent);
     }
 
     @Override
-    public TypeNode typeCheck() {
+    public TypeNode typeCheck() throws SimplanPlusException {
         TypeNode lhsType = lhs.typeCheck();
         TypeNode rhsType = rhs.typeCheck();
 
-        if(!(lhsType instanceof IntTypeNode && rhsType instanceof IntTypeNode)){
-            System.out.println("NOT INT OPERANT");
-            if(!(lhsType instanceof BoolTypeNode && rhsType instanceof BoolTypeNode)){
-                System.out.println("OPERANDI DI TIPO DIVERSO, LANCIARE ECCEZIONE");
-                return null;
-            }
-            else
-                System.out.println("BOOL OPERAND");
-        }
-        else
-            System.out.println("INT OPERAND");
+        if(!(lhsType instanceof IntTypeNode && rhsType instanceof IntTypeNode))
+            if(!(lhsType instanceof BoolTypeNode && rhsType instanceof BoolTypeNode))
+                throw new SimplanPlusException("Operands are of different type");
 
 
         /**
@@ -100,11 +94,11 @@ public class BinExpNode implements Node {
     }
 
     @Override
-    public String codeGeneration(Label labelManager) {
+    public String codeGeneration(Label labelManager) throws SimplanPlusException {
 
         StringBuilder cgen = new StringBuilder();
 
-        cgen.append("//Start codegen of ").append(lhs.typeCheck().getClass().getName()).append(operator).append(rhs.typeCheck().getClass().getName())
+        cgen.append("//Start codegen of ").append(lhs.getClass().getName()).append(operator).append(rhs.getClass().getName())
                 .append("\n");
         /**
          * Cgen for lhs and rhs to push them on the stack
@@ -211,7 +205,7 @@ public class BinExpNode implements Node {
     }
     */
     @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) {
+    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
         ArrayList<SemanticError> binExpNodeErrors = new ArrayList<>();
 
         binExpNodeErrors.addAll(lhs.checkSemantics(env));

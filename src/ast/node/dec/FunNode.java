@@ -9,10 +9,7 @@ import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import ast.node.types.VoidTypeNode;
-import util.Label;
-import util.FuncBodyUtils;
-import util.Environment;
-import util.SemanticError;
+import util.*;
 
 public class FunNode implements Node {
 
@@ -45,7 +42,7 @@ public class FunNode implements Node {
 
   
   @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) {
+	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 	  
 	  //create result list
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
@@ -122,7 +119,7 @@ public class FunNode implements Node {
 	}
 
 
-	public String toPrint(String s) {
+	public String toPrint(String s) throws SimplanPlusException {
 	String parlstr="";
 	for (Node par:parlist)
 	  parlstr+=par.toPrint(s+"  ");
@@ -134,7 +131,7 @@ public class FunNode implements Node {
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck () throws SimplanPlusException {
 	body.typeCheck();
     return new ArrowTypeNode(partypes, type);
   }
@@ -143,7 +140,7 @@ public class FunNode implements Node {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
 	  int declaration_size = 0;
 	  int parameter_size = parlist.size();
 

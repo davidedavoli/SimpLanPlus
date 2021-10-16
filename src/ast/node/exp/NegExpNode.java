@@ -11,6 +11,7 @@ import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class NegExpNode implements Node {
 
@@ -21,7 +22,7 @@ public class NegExpNode implements Node {
   }
   
   @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
+ 	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 	  //create the result
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
 	  
@@ -32,22 +33,18 @@ public class NegExpNode implements Node {
  	  return res;
  	}
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
     return "neg " + exp.toPrint(s);
     }
   
-  public TypeNode typeCheck() {
-	  TypeNode toret=null;
-	  if (! TypeUtils.isSubtype(exp.typeCheck(),new IntTypeNode())) {
-		  	  System.out.println("Non int opposite");
-			  System.exit(0);
-			  toret=new IntTypeNode();
-			}
-	  return toret;  
+  public TypeNode typeCheck() throws SimplanPlusException {
+	  if (! TypeUtils.isSubtype(exp.typeCheck(),new IntTypeNode())) 
+		  	  throw new SimplanPlusException("Non int negate");
+	  return new IntTypeNode();
   }
 
 	@Override
-	public String codeGeneration(Label labelManager) {
+	public String codeGeneration(Label labelManager) throws SimplanPlusException {
 		StringBuilder cgen = new StringBuilder();
 		String loaded_exp = exp.codeGeneration(labelManager);
 		cgen.append(loaded_exp).append("\n");

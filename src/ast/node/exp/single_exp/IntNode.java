@@ -37,7 +37,7 @@ public class IntNode implements Node {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager){
 
       StringBuilder cgen = new StringBuilder();
       cgen.append("li $a0 ").append(val).append("\n");

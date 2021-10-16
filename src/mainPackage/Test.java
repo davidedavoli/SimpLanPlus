@@ -22,6 +22,7 @@ import parser.SimpLanPlusParser;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 import static org.antlr.v4.codegen.DefaultOutputModelFactory.list;
 
@@ -47,7 +48,7 @@ public class Test {
 		Node ast = visitor.visitMainBlock(parser.block(), true); //generazione AST
 		return ast;
 	}
-	private static ArrayList<SemanticError> checkErrorAst(Node ast){
+	private static ArrayList<SemanticError> checkErrorAst(Node ast) throws SimplanPlusException {
 		//SIMPLE CHECK FOR LEXER ERRORS
 		Environment env = new Environment();
 		ArrayList<SemanticError> err = ast.checkSemantics(env);
@@ -64,12 +65,12 @@ public class Test {
 		return err;
 	}
 
-	private static void typeCheck(Node ast){
+	private static void typeCheck(Node ast) throws SimplanPlusException {
 		TypeNode type = ast.typeCheck(); //type-checking bottom-up
 		System.out.println(type.toPrint("Type checking ok! Type of the program is: "));
 	}
 
-	private static void codeGeneration(String fileAsm,Node ast) throws IOException {
+	private static void codeGeneration(String fileAsm,Node ast) throws IOException, SimplanPlusException {
 
 		Label labelManager = new Label();
 		String code=ast.codeGeneration(labelManager);
@@ -105,7 +106,7 @@ public class Test {
 		return visitorSVM;
 	}
 
-	private static void compileFile(String fileAbsName,String fileName) throws IOException {
+	private static void compileFile(String fileAbsName,String fileName) throws IOException, SimplanPlusException {
 		System.out.println("COMPILING "+fileAbsName);
 		String fileAsm = asmDir+fileName+".asm";
 		CommonTokenStream tokens = lexer(fileAbsName);
@@ -139,7 +140,7 @@ public class Test {
 
 		int numberOfTest = Objects.requireNonNull(new File("examples/").list()).length;
 		System.out.println("NUMBER OF TEST IS " + numberOfTest);
-		for(int number = 1; number<=numberOfTest;number++){
+		for(int number = 2; number<=2;number++){
 			String fileAbsName = dir + baseName + number + ext;
 			String fileName = baseName + number + ext;
 			compileFile(fileAbsName,fileName);

@@ -10,6 +10,7 @@ import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class IdNode extends LhsNode {
 
@@ -44,7 +45,7 @@ public class IdNode extends LhsNode {
 	  return entry;
   }
 
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"Id:" + id + " at nestlev " + nestinglevel +"\n" + entry.toPrint(s+"  ") ;  
   }
   
@@ -82,7 +83,7 @@ public class IdNode extends LhsNode {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager){
       /**
        * ritorna indirizzo di ID nel suo frame
        */

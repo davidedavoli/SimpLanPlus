@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import util.Label;
 import util.Environment;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class BlockNode implements Node {
 
@@ -37,7 +38,7 @@ public class BlockNode implements Node {
       isFunction = isFunctionBlock;
     }
 
-    public String toPrint(String s) {
+    public String toPrint(String s) throws SimplanPlusException {
 	String declstr="";
 	String statstr="";
     for (Node dec:declarations)
@@ -48,7 +49,7 @@ public class BlockNode implements Node {
   }
   
   @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) {
+	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
       HashMap<String, STentry> hm = new HashMap<String,STentry> ();
 
       if (!isFunction) {
@@ -94,7 +95,7 @@ public class BlockNode implements Node {
       return res;
 	}
   
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck () throws SimplanPlusException {
 	  //ne siamo sicuri?
 	TypeNode last =null;
     for (Node dec:declarations)
@@ -104,7 +105,7 @@ public class BlockNode implements Node {
     return last;
  }
   
-  public ArrayList<TypeNode> getReturnList(){
+  public ArrayList<TypeNode> getReturnList() throws SimplanPlusException {
       ArrayList<TypeNode> res = new ArrayList<TypeNode>();
       for (Node s: statements) {
     	  if (s instanceof BlockNode)
@@ -142,7 +143,7 @@ public class BlockNode implements Node {
 //	  return err;
 //  }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
       StringBuilder cgen = new StringBuilder();
 
 

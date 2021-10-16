@@ -12,6 +12,7 @@ import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class AssignmentNode implements Node {
 
@@ -25,7 +26,7 @@ public class AssignmentNode implements Node {
   }	  
 
   @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
+  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 
 	  //create result list
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
@@ -43,19 +44,17 @@ public class AssignmentNode implements Node {
         return res;
   }
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"Var:" + lhs.getID() +"\n"
 	  	   +lhs.typeCheck().toPrint(s+"  ")  
            +exp.toPrint(s+"  "); 
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () {
-      System.out.println(exp.typeCheck().getClass().getName()+" "+lhs.typeCheck().getClass().getName());
-    if (! (TypeUtils.isSubtype(exp.typeCheck(),lhs.typeCheck())) ){
-      System.out.println("incompatible value in assignment for variable "+lhs.getID());
-      System.exit(0);
-    }     
+  public TypeNode typeCheck () throws SimplanPlusException {
+    if (! (TypeUtils.isSubtype(exp.typeCheck(),lhs.typeCheck())) )
+        throw new SimplanPlusException("incompatible value in assignment for variable "+lhs.getID());
+    
     return lhs.typeCheck();
   }
   
@@ -63,7 +62,7 @@ public class AssignmentNode implements Node {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
       StringBuilder cgen = new StringBuilder();
       cgen.append(exp.codeGeneration(labelManager)).append("\n");
 

@@ -11,6 +11,7 @@ import ast.node.types.VoidTypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class RetNode implements Node {
 
@@ -29,12 +30,12 @@ public class RetNode implements Node {
 	  return etype;
   }
 
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
     return s+"Return\n" + (val!= null ? val.toPrint(s+"  ") : "");
   }
 
   @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
+ 	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError> ();
 
 	  if (! (etype instanceof TypeNode))
@@ -47,17 +48,14 @@ public class RetNode implements Node {
  	}
 
   
-  public TypeNode typeCheck() {
+  public TypeNode typeCheck() throws SimplanPlusException {
         if(val == null){
             return new VoidTypeNode();
         }
         else if (TypeUtils.isSubtype(val.typeCheck(), etype))
             return etype;
-        else{
-            System.out.println("Wrong return type for function");
-            System.exit(0);
-            return null;
-        }
+        else
+            throw new SimplanPlusException("Wrong return type for function");
   }  
   
   public RetEffType retTypeCheck(FunNode funNode) {
@@ -66,7 +64,7 @@ public class RetNode implements Node {
   }
 
     
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
         StringBuilder cgen = new StringBuilder();
         if( val != null){
             cgen.append(val.codeGeneration(labelManager)).append("\n");

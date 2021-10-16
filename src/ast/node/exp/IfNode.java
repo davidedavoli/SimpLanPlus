@@ -11,6 +11,7 @@ import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class IfNode implements Node {
 
@@ -25,7 +26,7 @@ public class IfNode implements Node {
 
   }
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
       String print = s+"If\n" + cond.toPrint(s+"  ")
               + th.toPrint(s+"  ");
       if (el != null)
@@ -35,7 +36,7 @@ public class IfNode implements Node {
   }
   
   @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
+  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 	  //create the result
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
 	  
@@ -60,14 +61,12 @@ public class IfNode implements Node {
 		  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public TypeNode typeCheck() {
+  public TypeNode typeCheck() throws SimplanPlusException {
     if (
             !(TypeUtils.isSubtype(cond.typeCheck(),new BoolTypeNode()))
 
     ) {
-        System.out.println("non boolean condition in if");
-        System.out.println(cond.typeCheck());
-      System.exit(0);
+        throw new SimplanPlusException("non boolean condition in if");
     }
     TypeNode t = th.typeCheck();
     if(el == null){
@@ -89,7 +88,7 @@ public class IfNode implements Node {
     return null;
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
 
       StringBuilder cgen = new StringBuilder();
       String then_branch = labelManager.freshLabel("then");

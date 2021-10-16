@@ -21,7 +21,7 @@ halt
 Function2:
 mv $sp $fp
 push $ra
-//Start codegen of ast.node.types.IntTypeNode==ast.node.types.IntTypeNode
+//Start codegen of ast.node.exp.IdExpNode==ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
 lw $a0 1($al) //put in $a0 value of Id
 push $a0 // push e1
@@ -31,7 +31,7 @@ pop // remove e1 from the stack to preserve stack
 eq $a0 $a2 $a0 // $a0 = $a2 == $a0
 
 bc $a0 LABELthen3
-//Start codegen of ast.node.types.IntTypeNode==ast.node.types.IntTypeNode
+//Start codegen of ast.node.exp.IdExpNode==ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
 lw $a0 1($al) //put in $a0 value of Id
 push $a0 // push e1
@@ -46,7 +46,7 @@ push $fp //loadind new block
 mv $sp $fp //Load new $fp
 push $fp
 push $fp
-//Start codegen of ast.node.types.IntTypeNode-ast.node.types.IntTypeNode
+//Start codegen of ast.node.exp.IdExpNode-ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
 lw $a0 1($al) //put in $a0 value of Id
@@ -65,7 +65,7 @@ jal  Function2// jump to start of function and put in $ra next istruction
 
 push $a0
 push $fp
-//Start codegen of ast.node.types.IntTypeNode-ast.node.types.IntTypeNode
+//Start codegen of ast.node.exp.IdExpNode-ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
 lw $a0 1($al) //put in $a0 value of Id
@@ -133,7 +133,7 @@ LABELendIf4:
 Function3:
 mv $sp $fp
 push $ra
-//Start codegen of ast.node.types.IntTypeNode==ast.node.types.IntTypeNode
+//Start codegen of ast.node.exp.IdExpNode==ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
 lw $a0 1($al) //put in $a0 value of Id
 push $a0 // push e1
@@ -146,7 +146,7 @@ bc $a0 LABELthen7
 push 0
 push $fp //loadind new block
 mv $sp $fp //Load new $fp
-//Start codegen of ast.node.types.IntTypeNode+ast.node.types.IntTypeNode
+//Start codegen of ast.node.exp.single_exp.IntNode+ast.node.statements.CallNode
 li $a0 1
 push $a0 // push e1
 push $fp
@@ -155,7 +155,7 @@ lw $al 0($al) //go up to chain
 lw $a0 2($al) //put in $a0 value of Id
 
 push $a0
-//Start codegen of ast.node.types.IntTypeNode-ast.node.types.IntTypeNode
+//Start codegen of ast.node.exp.IdExpNode-ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
 lw $a0 1($al) //put in $a0 value of Id

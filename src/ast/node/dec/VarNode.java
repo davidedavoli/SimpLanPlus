@@ -12,6 +12,7 @@ import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class VarNode implements Node {
 
@@ -26,7 +27,7 @@ public class VarNode implements Node {
   }
   
   @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
+  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
   		//create result list
   		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
   	  
@@ -74,7 +75,7 @@ public class VarNode implements Node {
 //	  return res;
 //  }
 
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"Var:" + id +"\n"
 	  	   +type.toPrint(s+"  ")
          +((exp==null)?"":exp.toPrint(s+"  ")); 
@@ -85,7 +86,7 @@ public class VarNode implements Node {
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck () throws SimplanPlusException {
     if (exp != null && ! (TypeUtils.isSubtype(exp.typeCheck(),type)) ){
       System.out.println("incompatible value for variable "+id);
       System.exit(0);
@@ -93,7 +94,7 @@ public class VarNode implements Node {
     return type;
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
       StringBuilder cgen = new StringBuilder();
       if(exp != null){
           cgen.append(exp.codeGeneration(labelManager)).append("\n");

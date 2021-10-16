@@ -25,7 +25,7 @@ li $a0 1
 
 push $a0
 
-//Start codegen of ast.node.types.IntTypeNode+ast.node.types.IntTypeNode
+//Start codegen of ast.node.exp.IdExpNode+ast.node.statements.CallNode
 mv $fp $al //put in $al actual fp
 lw $a0 -2($al) //put in $a0 value of Id
 push $a0 // push e1
@@ -39,7 +39,7 @@ add $a0 $a2 $a0 // a0 = t1+a0
 
 print $a0
 
-//Start codegen of ast.node.types.IntTypeNode+ast.node.types.IntTypeNode
+//Start codegen of ast.node.exp.IdExpNode+ast.node.statements.CallNode
 mv $fp $al //put in $al actual fp
 lw $a0 -2($al) //put in $a0 value of Id
 push $a0 // push e1
@@ -68,7 +68,7 @@ li $a0 1
 
 push $a0
 
-//Start codegen of ast.node.types.IntTypeNode+ast.node.types.IntTypeNode
+//Start codegen of ast.node.exp.IdExpNode+ast.node.exp.IdExpNode
 mv $fp $al //put in $al actual fp
 lw $a0 -2($al) //put in $a0 value of Id
 push $a0 // push e1

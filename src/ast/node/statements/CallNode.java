@@ -11,6 +11,7 @@ import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class CallNode implements Node {
 
@@ -33,7 +34,7 @@ public class CallNode implements Node {
     parlist = args;
 }
 
-public String toPrint(String s) {  //
+public String toPrint(String s) throws SimplanPlusException {  //
     String parlstr="";
 	for (Node par:parlist)
 	  parlstr+=par.toPrint(s+"  ");		
@@ -47,7 +48,7 @@ public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
 }
 
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
+  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 		//create the result
 		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
 		
@@ -68,27 +69,24 @@ public RetEffType retTypeCheck(FunNode funNode) {
 		 return res;
   }
   
-  public TypeNode typeCheck () {  //                           
+  public TypeNode typeCheck () throws SimplanPlusException {  //
 	 ArrowTypeNode t=null;
      if (entry.getType() instanceof ArrowTypeNode) t=(ArrowTypeNode) entry.getType(); 
-     else {
-       System.out.println("Invocation of a non-function "+id);
-       System.exit(0);
-     }
+     else 
+         throw new SimplanPlusException("Invocation of a non-function "+id);
+     
      ArrayList<TypeNode> p = t.getParList();
-     if ( !(p.size() == parlist.size()) ) {
-       System.out.println("Wrong number of parameters in the invocation of "+id);
-       System.exit(0);
-     } 
+     if ( !(p.size() == parlist.size()) )
+         throw new SimplanPlusException("Wrong number of parameters in the invocation of "+id);
+    
      for (int i=0; i<parlist.size(); i++) 
-       if ( !(TypeUtils.isSubtype( (parlist.get(i)).typeCheck(), p.get(i)) ) ) {
-         System.out.println("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id);
-         System.exit(0);
-       } 
+       if ( !(TypeUtils.isSubtype( (parlist.get(i)).typeCheck(), p.get(i)) ) )
+           throw new SimplanPlusException("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id);
+       
      return t.getRet();
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
       StringBuilder cgen = new StringBuilder();
 
       cgen.append("push $fp\n");

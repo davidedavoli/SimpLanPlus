@@ -6,6 +6,7 @@ import ast.node.dec.FunNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class PointerTypeNode implements TypeNode {
   private TypeNode type;
@@ -14,7 +15,7 @@ public class PointerTypeNode implements TypeNode {
 	  type=t;
   }
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"Pointer type\n"+type.toPrint(s+"   ");  
   }
     

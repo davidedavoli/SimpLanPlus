@@ -38,7 +38,7 @@ public class VoidTypeNode implements TypeNode {
  	}
   
   //non utilizzato
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager){
 		return "";
   }
 

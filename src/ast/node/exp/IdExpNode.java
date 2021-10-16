@@ -10,6 +10,7 @@ import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class IdExpNode extends LhsExpNode {
 
@@ -44,7 +45,7 @@ public class IdExpNode extends LhsExpNode {
 	  return entry;
   }
 
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"Id:" + id + " at nestlev " + nestinglevel +"\n" + entry.toPrint(s+"  ") ;  
   }
   
@@ -68,10 +69,10 @@ public class IdExpNode extends LhsExpNode {
 	  return res;
 	}
   
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck () throws SimplanPlusException {
 	if (entry.getType() instanceof ArrowTypeNode) { //
-	  System.out.println("Wrong usage of function identifier");
-      System.exit(0);
+	  throw new SimplanPlusException("Wrong usage of function identifier");
+     // System.exit(0);
     }
     return entry.getType();
   }
@@ -80,7 +81,7 @@ public class IdExpNode extends LhsExpNode {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
       /**
        * Ritorna valore di ID
        */

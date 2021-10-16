@@ -9,6 +9,7 @@ import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class PrintNode implements Node {
 
@@ -18,16 +19,16 @@ public class PrintNode implements Node {
     val=v;
   }
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
     return s+"Print\n" + val.toPrint(s+"  ") ;
   }
   
-  public TypeNode typeCheck() {
+  public TypeNode typeCheck() throws SimplanPlusException {
     return val.typeCheck();
   }  
   
   @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
+ 	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 
  	  return val.checkSemantics(env);
  	}
@@ -36,7 +37,7 @@ public class PrintNode implements Node {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
         StringBuilder cgen = new StringBuilder();
         cgen.append(val.codeGeneration(labelManager)).append("\n");
         cgen.append("print $a0\n");

@@ -8,6 +8,7 @@ import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class ArgNode implements Node {
 
@@ -33,7 +34,7 @@ public class ArgNode implements Node {
 	  return new ArrayList<SemanticError>();
 	}
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	  return s+"Par:" + id +"\n"
 			 +type.toPrint(s+"  ") ; 
   }
@@ -48,7 +49,7 @@ public class ArgNode implements Node {
   }
   
   //non utilizzato
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager){
 		return "";
   }
     

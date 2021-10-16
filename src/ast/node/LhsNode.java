@@ -9,6 +9,7 @@ import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class LhsNode implements Node {
 
@@ -52,12 +53,12 @@ public class LhsNode implements Node {
         return inner.checkSemantics(env);
   }
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"lhs: " + this.getDerefLevel()+" "+this.getID()+"\n";
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck () throws SimplanPlusException {
 	if (inner != null) {
 		return inner.typeCheck().dereference();
 	}
@@ -69,7 +70,7 @@ public class LhsNode implements Node {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
       /**
        * Ritorna indirizzo del puntatore
        */

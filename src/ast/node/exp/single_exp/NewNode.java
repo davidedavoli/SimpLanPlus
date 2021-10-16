@@ -74,6 +74,7 @@ import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class NewNode implements Node {
 	
@@ -93,7 +94,7 @@ public class NewNode implements Node {
 	      return res;
 	  }
 	  
-	  public String toPrint(String s) {
+	  public String toPrint(String s) throws SimplanPlusException {
 		return s+"New:\n" + type.toPrint(s+"   ") +"\n";
 	  }
 	  
@@ -106,7 +107,7 @@ public class NewNode implements Node {
 		  return new RetEffType(RetEffType.RetT.ABS);
 	  }
 	  
-	  public String codeGeneration(Label labelManager) {
+	  public String codeGeneration(Label labelManager){
 		  StringBuilder cgen = new StringBuilder();
 		  cgen.append("new $a0").append("// put new address in a0\n");
 		  return cgen.toString();

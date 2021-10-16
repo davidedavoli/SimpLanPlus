@@ -14,6 +14,7 @@ import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class DeletionNode implements Node {
 
@@ -28,7 +29,7 @@ public class DeletionNode implements Node {
   }
   
   @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
+  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 	  //create result list
       ArrayList<SemanticError> res = new ArrayList<SemanticError>();
       res = id.checkSemantics(env);
@@ -41,11 +42,9 @@ public class DeletionNode implements Node {
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () {
-	  if (! (type instanceof PointerTypeNode)){      
-      System.out.println("attempted deletion of a non-pointer variable");
-      System.exit(0);
-    }     
+  public TypeNode typeCheck () throws SimplanPlusException {
+	  if (! (type instanceof PointerTypeNode))
+          throw new SimplanPlusException("attempted deletion of a non-pointer variable");
     return id.typeCheck();
   }
   
@@ -53,7 +52,7 @@ public class DeletionNode implements Node {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
       StringBuilder cgen = new StringBuilder();
       System.out.println("DELETE NODE "+id.getID()+" NODO_ "+id);
       cgen.append(id.codeGeneration(labelManager)).append("\n");
