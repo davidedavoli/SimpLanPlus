@@ -58,6 +58,10 @@ public class BlockNode implements Node {
           env.symTable.add(hm);
       }
       current_nl = env.nestingLevel;
+      System.out.println("CURRENT NESTING LEVEL IN BLOCK AND IS FUNCTION");
+      System.out.println(current_nl);
+      System.out.println(isFunction);
+
 
       //declare resulting list
       ArrayList<SemanticError> res = new ArrayList<SemanticError>();
@@ -65,13 +69,17 @@ public class BlockNode implements Node {
           env.offset = -2;
       else
           env.offset = -1;
-          //check semantics in the dec list
+      System.out.println("OFFSET PRIMA DEC "+env.offset);
+
+      //check semantics in the dec list
       if(declarations.size() > 0){
     	  //if there are children then check semantics for every child and save the results
     	  for(Node n : declarations)
     		  res.addAll(n.checkSemantics(env));
       }
-      
+
+      System.out.println("OFFSET DOPO DEC "+env.offset);
+
       if(statements.size() > 0){
     	  //if there are children then check semantics for every child and save the results
     	  for(Node n : statements)

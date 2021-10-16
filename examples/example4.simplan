@@ -7,9 +7,8 @@ Simple function, calculated the successor
         print x + param;
         return x + param;
    }
-   int x = 1;
-   int c = successivo(1);
-   print c;
+   int x = successivo(1);
+   print x;
 }
 
 /*

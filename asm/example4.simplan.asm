@@ -1,9 +1,5 @@
 push 0
 mv $sp $fp //Load new $fp
-li $a0 1
-
-push $a0
-
 push $fp
 li $a0 1
 
@@ -15,7 +11,7 @@ jal  Function5// jump to start of function and put in $ra next istruction
 push $a0
 
 mv $fp $al //put in $al actual fp
-lw $a0 -4($al) //put in $a0 value of Id
+lw $a0 -3($al) //put in $a0 value of Id
 
 print $a0
 
