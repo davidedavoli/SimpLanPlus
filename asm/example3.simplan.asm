@@ -8,11 +8,6 @@ mv $fp $al //put in $al actual fp
 push $al
 jal  Function4// jump to start of function and put in $ra next istruction
 
-push $a0
-
-mv $fp $al //put in $a1 (al) actual fp
-lw $a0 -2($al) //put in $a0 value of Id
-
 print $a0
 
 halt
@@ -22,7 +17,7 @@ Function4:
 mv $sp $fp
 push $ra
 //Start codegen of ast.node.types.IntTypeNode<=ast.node.types.IntTypeNode
-mv $fp $al //put in $a1 (al) actual fp
+mv $fp $al //put in $al actual fp
 lw $a0 1($al) //put in $a0 value of Id
 push $a0 // push e1
 li $a0 1
@@ -34,7 +29,7 @@ bc $a0 LABELthen9
 //Start codegen of ast.node.types.IntTypeNode+ast.node.types.IntTypeNode
 push $fp
 //Start codegen of ast.node.types.IntTypeNode-ast.node.types.IntTypeNode
-mv $fp $al //put in $a1 (al) actual fp
+mv $fp $al //put in $al actual fp
 lw $a0 1($al) //put in $a0 value of Id
 push $a0 // push e1
 li $a0 1
@@ -50,7 +45,7 @@ jal  Function4// jump to start of function and put in $ra next istruction
 push $a0 // push e1
 push $fp
 //Start codegen of ast.node.types.IntTypeNode-ast.node.types.IntTypeNode
-mv $fp $al //put in $a1 (al) actual fp
+mv $fp $al //put in $al actual fp
 lw $a0 1($al) //put in $a0 value of Id
 push $a0 // push e1
 li $a0 2
@@ -72,7 +67,7 @@ lw $fp 0($fp) //Load old $fp pushed
 b endFunction4
 b LABELendIf10
 LABELthen9:
-mv $fp $al //put in $a1 (al) actual fp
+mv $fp $al //put in $al actual fp
 lw $a0 1($al) //put in $a0 value of Id
 
 subi $sp $fp 1 //Restore stackpointer as before block creation in return 

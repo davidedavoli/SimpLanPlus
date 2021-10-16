@@ -58,7 +58,7 @@ public class Test {
 		}
 		else{
 			System.out.println("Visualizing AST...");
-			System.out.println(ast.toPrint(""));
+			//System.out.println(ast.toPrint(""));
 		}
 
 		return err;
@@ -131,7 +131,7 @@ public class Test {
 	}
 
 	private static void interpreterCode(Instruction[] code,String filename){
-		System.out.println("Starting Virtual Machine for"+filename+"...");
+		System.out.println("Starting Virtual Machine for "+filename+"...");
 		SVM vm = new SVM(code);
 		vm.cpu();
 	}

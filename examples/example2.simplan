@@ -23,7 +23,8 @@ Articolated fibonacci example
         }
     }
 
-    print fibonacci(9);
+    int x = fibonacci(9);
+    print x;
 }
 /*
 Should print:

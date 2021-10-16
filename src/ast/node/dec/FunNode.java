@@ -40,11 +40,8 @@ public class FunNode implements Node {
 	body.setIsFunction(true);
 
   }
-  public String get_start_fun_label(){
-	  return beginFuncLabel;
-  }
 
-	public String get_end_fun_label(){
+  public String get_end_fun_label(){
 		return endFuncLabel;
 	}
 
@@ -123,10 +120,6 @@ public class FunNode implements Node {
 	String parlstr="";
 	for (Node par:parlist)
 	  parlstr+=par.toPrint(s+"  ");
-	/*String declstr="";
-	if (declist!=null)
-	  for (Node dec:declist)
-	    declstr+=dec.toPrint(s+"  ");*/
     return s+"Fun:" + id +"\n"
 		   +type.toPrint(s+"  ")
 		   +parlstr
@@ -136,9 +129,6 @@ public class FunNode implements Node {
   
   //valore di ritorno non utilizzato
   public TypeNode typeCheck () {
-	/*if (declist!=null)
-	  for (Node dec:declist)
-		dec.typeCheck();*/
 	body.typeCheck();
     return new ArrowTypeNode(partypes, type);
   }
@@ -171,6 +161,7 @@ public class FunNode implements Node {
 	  cgen.append("pop\n");
 	  cgen.append("lw $fp 0($sp)\n");
 	  cgen.append("pop\n");
+
 	  cgen.append("jr $ra\n");
 
 	  cgen.append("// END OF ").append(id).append("\n");

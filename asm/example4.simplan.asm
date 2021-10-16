@@ -12,14 +12,10 @@ mv $fp $al //put in $al actual fp
 push $al
 jal  Function5// jump to start of function and put in $ra next istruction
 
-//RITORNATO DA CGEN EXP
-mv $fp $al //put in $a1 (al) actual fp
-addi $al $al -3 //put in $al address of Id
+push $a0
 
-sw $a0 0($al) // 0($a1) = $a0 id=exp 
-
-mv $fp $al //put in $a1 (al) actual fp
-lw $a0 -3($al) //put in $a0 value of Id
+mv $fp $al //put in $al actual fp
+lw $a0 -4($al) //put in $a0 value of Id
 
 print $a0
 
@@ -34,10 +30,10 @@ li $a0 1
 push $a0
 
 //Start codegen of ast.node.types.IntTypeNode+ast.node.types.IntTypeNode
-mv $fp $al //put in $a1 (al) actual fp
+mv $fp $al //put in $al actual fp
 lw $a0 -2($al) //put in $a0 value of Id
 push $a0 // push e1
-mv $fp $al //put in $a1 (al) actual fp
+mv $fp $al //put in $al actual fp
 lw $a0 1($al) //put in $a0 value of Id
 lw $a2 0($sp) //take e2 and $a2 take e1
 pop // remove e1 from the stack to preserve stack
@@ -46,10 +42,10 @@ add $a0 $a2 $a0 // a0 = t1+a0
 print $a0
 
 //Start codegen of ast.node.types.IntTypeNode+ast.node.types.IntTypeNode
-mv $fp $al //put in $a1 (al) actual fp
+mv $fp $al //put in $al actual fp
 lw $a0 -2($al) //put in $a0 value of Id
 push $a0 // push e1
-mv $fp $al //put in $a1 (al) actual fp
+mv $fp $al //put in $al actual fp
 lw $a0 1($al) //put in $a0 value of Id
 lw $a2 0($sp) //take e2 and $a2 take e1
 pop // remove e1 from the stack to preserve stack
@@ -69,6 +65,6 @@ pop
 lw $fp 0($sp)
 pop
 jr $ra
-// END OF succ
+// END OF successivo
 
 //FINE FUNZIONI

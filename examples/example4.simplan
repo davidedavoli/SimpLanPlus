@@ -2,14 +2,14 @@
 Simple function, calculated the successor
 */
 {
-    int succ(int par){
+   int successivo(int param){
         int x = 1;
-        print x + par;
-        return x + par;
-    }
-    int res = 1;
-    res = succ(1);
-    print res;
+        print x + param;
+        return x + param;
+   }
+   int x = 1;
+   int c = successivo(1);
+   print c;
 }
 
 /*

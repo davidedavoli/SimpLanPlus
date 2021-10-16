@@ -59,7 +59,6 @@ public class BlockNode implements Node {
       }
       current_nl = env.nestingLevel;
 
-
       //declare resulting list
       ArrayList<SemanticError> res = new ArrayList<SemanticError>();
       if(isFunction)
