@@ -8,10 +8,16 @@ import Interpreter.parser.SVMParser;
 
 public class SVMVisitorImpl extends SVMBaseVisitor<Void> {
 
-	public Instruction[] code = new Instruction[SVM.CODESIZE];
+
+
+	private Instruction[] code = new Instruction[SVM.CODESIZE];
 	private int i = 0;
 	private HashMap<String,Integer> labelAdd = new HashMap<String,Integer>();
 	private HashMap<Integer,String> labelRef = new HashMap<Integer,String>();
+
+	public Instruction[] getCode() {
+		return code;
+	}
 
 	@Override
 	public Void visitAssembly(SVMParser.AssemblyContext ctx) {
@@ -20,6 +26,35 @@ public class SVMVisitorImpl extends SVMBaseVisitor<Void> {
 		for (Integer refAdd: labelRef.keySet()) {
 			code[refAdd] = new Instruction(SVMParser.ADDRESS, Integer.toString(labelAdd.get(labelRef.get(refAdd))));
 		}
+
+		/*System.out.println("LABEL REF");
+		System.out.println(labelRef);
+		System.out.println("LABEL ADD");
+		System.out.println(labelAdd);
+		System.out.println("CODE GEN");
+		String toPrint = "";
+
+		for (int i = 0;i<10000;i++){
+			Instruction ins = code[i];
+			if(ins != null){
+				String literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
+				String str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
+				toPrint += i+": "+ str +"\n";
+			}
+		}
+
+		//System.out.println(toPrint);
+		for (Integer refAdd: labelRef.keySet()) {
+			Instruction ins = code[refAdd];
+			String literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
+			String str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
+			System.out.println("ReF STR " + str);
+			ins = code[Integer.parseInt(ins.getArg1())];
+			literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
+			str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
+
+			System.out.println("ADDR ARRIVING " + str);
+		}*/
 		return null;
 	}
 
@@ -72,6 +107,9 @@ public class SVMVisitorImpl extends SVMBaseVisitor<Void> {
 			case SVMLexer.OR:
 				code[i++] = new Instruction(SVMParser.OR,  ctx.r1.getText(), ctx.r2.getText(), ctx.r3.getText());
 				break;
+			case SVMLexer.AND:
+				code[i++] = new Instruction(SVMParser.AND,  ctx.r1.getText(), ctx.r2.getText(), ctx.r3.getText());
+				break;
 			case SVMLexer.LOAD:
 				code[i++] = new Instruction(SVMParser.LOAD,  ctx.r1.getText(), ctx.n.getText());
 				break;
@@ -80,6 +118,9 @@ public class SVMVisitorImpl extends SVMBaseVisitor<Void> {
 				break;
 			case SVMLexer.LOADW:
 				code[i++] = new Instruction(SVMParser.LOADW,  ctx.r1.getText(), ctx.o.getText(), ctx.r2.getText());
+				break;
+			case SVMLexer.MOVE:
+				code[i++] = new Instruction(SVMParser.MOVE, ctx.r1.getText(), ctx.r2.getText());
 				break;
 			case SVMLexer.LABEL:
 				labelAdd.put(ctx.l.getText(), i);
@@ -106,6 +147,13 @@ public class SVMVisitorImpl extends SVMBaseVisitor<Void> {
 				break;
 			case SVMLexer.GT:
 				code[i++] = new Instruction(SVMParser.GT, ctx.r1.getText(), ctx.r2.getText(), ctx.r3.getText());
+				break;
+			case SVMLexer.JAL:
+				code[i++] = new Instruction(SVMParser.JAL, ctx.l.getText());
+				labelRef.put(i++,(ctx.l!=null? ctx.l.getText():null));
+				break;
+			case SVMLexer.JR:
+				code[i++] = new Instruction(SVMParser.JR, ctx.r1.getText());
 				break;
 			case SVMLexer.FREE:
 				code[i++] = new Instruction(SVMParser.FREE, ctx.r1.getText());

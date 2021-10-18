@@ -2,9 +2,11 @@ package ast.node.types;
 
 import java.util.ArrayList;
 
+import ast.node.dec.FunNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class PointerTypeNode implements TypeNode {
   private TypeNode type;
@@ -13,7 +15,7 @@ public class PointerTypeNode implements TypeNode {
 	  type=t;
   }
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"Pointer type\n"+type.toPrint(s+"   ");  
   }
     
@@ -40,7 +42,7 @@ public class PointerTypeNode implements TypeNode {
  	}
   
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   

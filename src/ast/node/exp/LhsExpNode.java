@@ -4,11 +4,14 @@ import java.util.ArrayList;
 
 import ast.STentry;
 import ast.node.Node;
+import ast.node.dec.FunNode;
+import ast.node.types.PointerTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class LhsExpNode implements Node {
 
@@ -61,25 +64,32 @@ public class LhsExpNode implements Node {
         return res;
   }
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"lhs: " + this.getDerefLevel()+" "+this.getID()+"\n";
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck () throws SimplanPlusException {
 	if (inner != null) {
-		return inner.typeCheck().dereference();
-	}
+        return new PointerTypeNode(inner.typeCheck());
+    }
 	else //Questo caso non dovrebbe mai verificarsi per l'implementazione di Visitor.
 		return null;
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
-		return ""; //TODO capire cosa ci va messo
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+      /**
+       * Mette in $a0 quello che c'è nella cella di memoria del puntatore
+       */
+      StringBuilder cgen = new StringBuilder();
+      cgen.append(inner.codeGeneration(labelManager)).append("\n");
+      cgen.append("lw $a0 0($a0)");
+
+      return cgen.toString();
   }  
     
 }  

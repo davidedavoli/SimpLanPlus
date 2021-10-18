@@ -2,28 +2,43 @@ package ast.node.statements;
 
 import ast.STentry;
 import ast.node.Node;
+import ast.node.dec.FunNode;
+import ast.node.dec.VarNode;
+import ast.node.exp.IfNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import util.Label;
-import util.FuncBodyUtils;
 import util.Environment;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class BlockNode implements Node {
 
-  private ArrayList<Node> declarations;
-  private ArrayList<Node> statements;
-  
-  public BlockNode (ArrayList<Node> d, ArrayList<Node> e) {
-    declarations=d;
-    statements=e;
-  }
-  
-  public String toPrint(String s) {
+  private final ArrayList<Node> declarations;
+  private final ArrayList<Node> statements;
+  private final Boolean isMain;
+  private Boolean isFunction;
+  private int current_nl;
+
+    public int getCurrent_nl() {
+        return current_nl;
+    }
+
+    public BlockNode(ArrayList<Node> d, ArrayList<Node> s, Boolean isMainBlock) {
+        declarations=d;
+        statements=s;
+        isMain = isMainBlock;
+        isFunction = false;
+    }
+    public void setIsFunction(Boolean isFunctionBlock){
+      isFunction = isFunctionBlock;
+    }
+
+    public String toPrint(String s) throws SimplanPlusException {
 	String declstr="";
 	String statstr="";
     for (Node dec:declarations)
@@ -34,26 +49,37 @@ public class BlockNode implements Node {
   }
   
   @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) {
-	  env.nestingLevel++;
+	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
       HashMap<String, STentry> hm = new HashMap<String,STentry> ();
-      env.symTable.add(hm);
-      
+
+      if (!isFunction) {
+          env.nestingLevel++;
+          env.symTable.add(hm);
+      }
+      current_nl = env.nestingLevel;
+      /*System.out.println("CURRENT NESTING LEVEL IN BLOCK AND IS FUNCTION");
+      System.out.println(current_nl);
+      System.out.println(isFunction);*/
+
+
       //declare resulting list
       ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-      
+      if(isFunction)
+          env.offset = -2;
+      else
+          env.offset = -1;
+      //System.out.println("OFFSET PRIMA DEC "+env.offset);
+
       //check semantics in the dec list
       if(declarations.size() > 0){
-    	  //FIXME offset messo completamente a caso
-    	  env.offset = -2;
     	  //if there are children then check semantics for every child and save the results
     	  for(Node n : declarations)
     		  res.addAll(n.checkSemantics(env));
       }
-      
+
+      //System.out.println("OFFSET DOPO DEC &isfun: "+isFunction+" "+env.offset);
+
       if(statements.size() > 0){
-    	  //FIXME offset messo completamente a caso
-    	  env.offset = -2;
     	  //if there are children then check semantics for every child and save the results
     	  for(Node n : statements)
     		  res.addAll(n.checkSemantics(env));
@@ -61,13 +87,15 @@ public class BlockNode implements Node {
 
       //check semantics in the exp body      
       //clean the scope, we are leaving a let scope
-      env.symTable.remove(env.nestingLevel--);
-      
+      if(!isFunction){
+          env.symTable.remove(env.nestingLevel--);
+      }
+
       //return the result
       return res;
 	}
   
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck () throws SimplanPlusException {
 	  //ne siamo sicuri?
 	TypeNode last =null;
     for (Node dec:declarations)
@@ -77,7 +105,7 @@ public class BlockNode implements Node {
     return last;
  }
   
-  public ArrayList<TypeNode> getReturnList(){
+  public ArrayList<TypeNode> getReturnList() throws SimplanPlusException {
       ArrayList<TypeNode> res = new ArrayList<TypeNode>();
       for (Node s: statements) {
     	  if (s instanceof BlockNode)
@@ -90,10 +118,10 @@ public class BlockNode implements Node {
       return res;
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  RetEffType tmp = new RetEffType(RetEffType.RetT.ABS);
 	  for (Node s:statements) {
-			  tmp= RetEffType.max(tmp, s.retTypeCheck());
+			  tmp= RetEffType.max(tmp, s.retTypeCheck(funNode));
 	  }
 	  return tmp;
   }
@@ -115,15 +143,53 @@ public class BlockNode implements Node {
 //	  return err;
 //  }
   
-  public String codeGeneration(Label labelManager) {
-	  String code="";
-	  for (Node dec:declarations)
-		    code+=dec.codeGeneration(labelManager);
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+      StringBuilder cgen = new StringBuilder();
+
+
+      /**
+       * Activation link
+       */
+        if (!isFunction){
+            cgen.append("push 0\n");
+
+            if (!isMain) {
+              cgen.append("push $fp //loadind new block\n");
+            }
+
+            cgen.append("mv $sp $fp //Load new $fp\n");
+
+        }
+
+      Collection<Node> varDec = declarations.stream().filter(dec -> dec instanceof VarNode).collect(Collectors.toList());
+      Collection<Node> funDec = declarations.stream().filter(fun -> fun instanceof FunNode).collect(Collectors.toList());
+
+      for (Node dec:varDec)
+            cgen.append(dec.codeGeneration(labelManager)).append("\n");
+
+
 	  for (Node stat:statements)
-		    code+=stat.codeGeneration(labelManager);
-	  return  "push 0\n"+
-			  code+
-			  FuncBodyUtils.getCode();
+          cgen.append(stat.codeGeneration(labelManager)).append("\n");
+
+      if(!isFunction){
+           if(isMain){
+               cgen.append("halt\n");
+           }
+           else{
+                cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode\n");
+                cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
+            }
+      }
+
+      if (funDec.size() > 0)
+         cgen.append("//CREO FUNZIONI\n");
+      for (Node fun:funDec){
+          cgen.append(fun.codeGeneration(labelManager)).append("\n");
+      }
+      if (funDec.size() > 0)
+          cgen.append("//FINE FUNZIONI\n");
+	  return  cgen.toString();
+
   } 
   
   

@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 import ast.STentry;
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -10,7 +11,7 @@ import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
-import util.FuncBodyUtils;
+import util.SimplanPlusException;
 
 public class CallNode implements Node {
 
@@ -18,6 +19,7 @@ public class CallNode implements Node {
   private STentry entry;
   private ArrayList<Node> parlist; 
   private int nestinglevel;
+  private String endFunction;
 
   
   public CallNode (String i, STentry e, ArrayList<Node> p, int nl) {
@@ -32,7 +34,7 @@ public class CallNode implements Node {
     parlist = args;
 }
 
-public String toPrint(String s) {  //
+public String toPrint(String s) throws SimplanPlusException {  //
     String parlstr="";
 	for (Node par:parlist)
 	  parlstr+=par.toPrint(s+"  ");		
@@ -41,11 +43,12 @@ public String toPrint(String s) {  //
            +parlstr;        
   }
 
-public RetEffType retTypeCheck() {
+public RetEffType retTypeCheck(FunNode funNode) {
+
 	  return new RetEffType(RetEffType.RetT.ABS);
 }
 
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
+  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 		//create the result
 		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
 		
@@ -66,44 +69,47 @@ public RetEffType retTypeCheck() {
 		 return res;
   }
   
-  public TypeNode typeCheck () {  //                           
+  public TypeNode typeCheck () throws SimplanPlusException {  //
 	 ArrowTypeNode t=null;
      if (entry.getType() instanceof ArrowTypeNode) t=(ArrowTypeNode) entry.getType(); 
-     else {
-       System.out.println("Invocation of a non-function "+id);
-       System.exit(0);
-     }
+     else 
+         throw new SimplanPlusException("Invocation of a non-function "+id);
+     
      ArrayList<TypeNode> p = t.getParList();
-     if ( !(p.size() == parlist.size()) ) {
-       System.out.println("Wrong number of parameters in the invocation of "+id);
-       System.exit(0);
-     } 
+     if ( !(p.size() == parlist.size()) )
+         throw new SimplanPlusException("Wrong number of parameters in the invocation of "+id);
+    
      for (int i=0; i<parlist.size(); i++) 
-       if ( !(TypeUtils.isSubtype( (parlist.get(i)).typeCheck(), p.get(i)) ) ) {
-         System.out.println("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id);
-         System.exit(0);
-       } 
+       if ( !(TypeUtils.isSubtype( (parlist.get(i)).typeCheck(), p.get(i)) ) )
+           throw new SimplanPlusException("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id);
+       
      return t.getRet();
   }
   
-  public String codeGeneration(Label labelManager) {
-	    String parCode="";
-	    for (int i=parlist.size()-1; i>=0; i--)
-	    	parCode+=parlist.get(i).codeGeneration(labelManager);
-	    
-	    String getAR="";
-		  for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++) 
-		    	 getAR+="lw\n";
-		  					// formato AR: control_link+parameters+access_link+dich_locali
-		return "lfp\n"+ 				// CL
-               parCode+
-               "lfp\n"+getAR+ 		// setto AL risalendo la catena statica
-               						// ora recupero l'indirizzo a cui saltare e lo metto sullo stack
-               "push "+entry.getOffset()+"\n"+ // metto offset sullo stack
-		       "lfp\n"+getAR+ 		// risalgo la catena statica
-			   "add\n"+ 
-               "lw\n"+ 				// carico sullo stack il valore all'indirizzo ottenuto
-		       "js\n";
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+      StringBuilder cgen = new StringBuilder();
+
+      cgen.append("push $fp\n");
+
+      for (int i=parlist.size()-1; i>=0; i--){
+          cgen.append(parlist.get(i).codeGeneration(labelManager)).append("\n");
+          cgen.append("push $a0\n");
+      }
+       /*   for (Node par:parlist) {
+          cgen.append(par.codeGeneration(labelManager)).append("\n");
+          cgen.append("push $a0\n");
+      }*/
+
+      cgen.append("mv $fp $al //put in $al actual fp\n");
+
+
+      for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
+          cgen.append("lw $al 0($al) //go up to chain\n");
+
+      cgen.append("push $al\n");
+      cgen.append("jal  ").append(entry.getBeginFuncLabel()).append("// jump to start of function and put in $ra next istruction\n");
+
+      return cgen.toString();
   }
 
     

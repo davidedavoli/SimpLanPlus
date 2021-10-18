@@ -34,17 +34,17 @@ deletion    : 'delete' ID;
 
 print	    : 'print' exp;
 
-ret	    : 'return' (exp)?;
+ret	        : 'return' (exp)?;
 
 ite         : 'if' '(' exp ')' statement ('else' statement)?;
 
 call        : ID '(' (exp(',' exp)*)? ')';
 
-exp	    : '(' exp ')'				        #baseExp
-	    | '-' exp					        #negExp
+exp	    : '(' exp ')'				                        #baseExp
+	    | '-' exp					                        #negExp
 	    | '!' exp                                           #notExp
-	    | lhs						#derExp
-	    | 'new' type					#newExp
+	    | lhs						                        #derExp
+	    | 'new' type					                    #newExp
 	    | left=exp op=('*' | '/')               right=exp   #binExp
 	    | left=exp op=('+' | '-')               right=exp   #binExp
 	    | left=exp op=('<' | '<=' | '>' | '>=') right=exp   #binExp
@@ -53,7 +53,7 @@ exp	    : '(' exp ')'				        #baseExp
 	    | left=exp op='||'                      right=exp   #binExp
 	    | call                                              #callExp
 	    | BOOL                                              #boolExp
-	    | NUMBER					        #valExp;
+	    | NUMBER					                        #valExp;
 
 
 // THIS IS THE LEXER INPUT

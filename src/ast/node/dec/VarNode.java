@@ -12,7 +12,7 @@ import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
-import util.FuncBodyUtils;
+import util.SimplanPlusException;
 
 public class VarNode implements Node {
 
@@ -27,19 +27,22 @@ public class VarNode implements Node {
   }
   
   @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
+  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
   		//create result list
   		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
   	  
   		//env.offset = -2;
   		HashMap<String, STentry> hm = env.symTable.get(env.nestingLevel);
-        STentry entry = new STentry(env.nestingLevel,type, env.offset--); //separo introducendo "entry"
+
+          int new_offset = env.offset--;
+          //System.out.println("NEW OFFSET "+new_offset);
+        STentry entry = new STentry(env.nestingLevel,type, new_offset); //separo introducendo "entry"
         
         if (exp!=null)
         	res.addAll(exp.checkSemantics(env));
 
         if ( hm.put(id,entry) != null )
-        		res.add(new SemanticError("Var id "+id+" already declared"));
+        		res.add(new SemanticError("Var id '"+id+"' already declared"));
                 
         return res;
   }
@@ -72,18 +75,18 @@ public class VarNode implements Node {
 //	  return res;
 //  }
 
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"Var:" + id +"\n"
 	  	   +type.toPrint(s+"  ")
          +((exp==null)?"":exp.toPrint(s+"  ")); 
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck () throws SimplanPlusException {
     if (exp != null && ! (TypeUtils.isSubtype(exp.typeCheck(),type)) ){
       System.out.println("incompatible value for variable "+id);
       System.exit(0);
@@ -91,10 +94,22 @@ public class VarNode implements Node {
     return type;
   }
   
-  public String codeGeneration(Label labelManager) {
-	  //TODO 
-	 //	return exp.codeGeneration();
-	  return "";
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+      StringBuilder cgen = new StringBuilder();
+      if(exp != null){
+          cgen.append(exp.codeGeneration(labelManager)).append("\n");
+          cgen.append("push $a0\n");
+
+      }
+      else{
+          /**
+           * Decidere se pushare 0 per dire che non c'è nulla o alzare solamente lo stack pointer
+           */
+          cgen.append("subi $sp $sp 1 // non assegnato nulla\n");
+          //cgen.append("push 0\n");
+      }
+
+	  return cgen.toString();
   }  
     
 }  

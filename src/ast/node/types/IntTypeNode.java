@@ -2,9 +2,11 @@ package ast.node.types;
 
 import java.util.ArrayList;
 
+import ast.node.dec.FunNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class IntTypeNode implements TypeNode {
   
@@ -14,10 +16,8 @@ public class IntTypeNode implements TypeNode {
   public String toPrint(String s) {
 	return s+"IntType\n";  
   }
-  public TypeNode dereference() {
-      System.out.println("Attempt to dereference an int");
-      System.exit(0);
-	  return null;
+  public TypeNode dereference() throws SimplanPlusException {
+      throw new SimplanPlusException("Attempt to dereference an int");
   }
   //non utilizzato
   public TypeNode typeCheck() {
@@ -29,7 +29,7 @@ public class IntTypeNode implements TypeNode {
 		return "";
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   

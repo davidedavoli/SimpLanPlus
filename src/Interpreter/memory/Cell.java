@@ -9,7 +9,8 @@ public class Cell {
     }
 
     public int write(int v){
-        return val=v;
+        val = v;
+        return val;
     }
 
     public void free(){

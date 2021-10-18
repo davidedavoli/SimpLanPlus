@@ -5,18 +5,20 @@ import java.util.ArrayList;
 import ast.STentry;
 import ast.node.LhsNode;
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
-import util.FuncBodyUtils;
+import util.SimplanPlusException;
 
 public class AssignmentNode implements Node {
 
   private LhsNode lhs;
   private Node exp;
+
   
   public AssignmentNode (LhsNode l, Node e) {
     lhs=l;
@@ -24,7 +26,7 @@ public class AssignmentNode implements Node {
   }	  
 
   @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
+  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 
 	  //create result list
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
@@ -42,27 +44,39 @@ public class AssignmentNode implements Node {
         return res;
   }
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"Var:" + lhs.getID() +"\n"
 	  	   +lhs.typeCheck().toPrint(s+"  ")  
            +exp.toPrint(s+"  "); 
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () {
-    if (! (TypeUtils.isSubtype(exp.typeCheck(),lhs.typeCheck())) ){
-      System.out.println("incompatible value in assignment for variable "+lhs.getID());
-      System.exit(0);
-    }     
+  public TypeNode typeCheck () throws SimplanPlusException {
+    if (! (TypeUtils.isSubtype(exp.typeCheck(),lhs.typeCheck())) )
+        throw new SimplanPlusException("incompatible value in assignment for variable "+lhs.getID());
+    
     return lhs.typeCheck();
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
-		return exp.codeGeneration(labelManager);
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+      StringBuilder cgen = new StringBuilder();
+      cgen.append(exp.codeGeneration(labelManager)).append("\n");
+
+
+      //cgen.append("push $a0 // save exp on stack \n");
+        cgen.append("//RITORNATO DA CGEN EXP\n");
+      cgen.append(lhs.codeGeneration(labelManager)).append("\n");
+      //cgen.append("pop $a0 // put in $a0 top of stack \n");
+
+      //$a1 indirizzo di lhs
+
+      cgen.append("sw $a0 0($al) // 0($a1) = $a0 id=exp \n");
+
+      return cgen.toString();
   }
 
 //@Override

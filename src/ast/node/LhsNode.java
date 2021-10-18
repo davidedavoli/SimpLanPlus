@@ -3,11 +3,13 @@ package ast.node;
 import java.util.ArrayList;
 
 import ast.STentry;
+import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class LhsNode implements Node {
 
@@ -51,12 +53,12 @@ public class LhsNode implements Node {
         return inner.checkSemantics(env);
   }
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"lhs: " + this.getDerefLevel()+" "+this.getID()+"\n";
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck () throws SimplanPlusException {
 	if (inner != null) {
 		return inner.typeCheck().dereference();
 	}
@@ -64,14 +66,22 @@ public class LhsNode implements Node {
 		return null;
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
-	  	String precode="";
-	  	String postcode="";
-		return precode+inner.codeGeneration(labelManager)+postcode; //TODO precode e postcode dovrebbero dereferenziare il valore generato da inner
-  }  
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+      /**
+       * Ritorna indirizzo del puntatore
+       */
+
+      StringBuilder cgen = new StringBuilder();
+      inner.codeGeneration(labelManager);
+      cgen.append("lw $al 0($al)");
+
+      return cgen.toString();
+
+
+  }
     
 }  

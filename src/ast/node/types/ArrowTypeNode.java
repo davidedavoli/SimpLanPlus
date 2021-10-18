@@ -2,9 +2,11 @@ package ast.node.types;
 import java.util.ArrayList;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class ArrowTypeNode implements TypeNode {
 
@@ -16,13 +18,11 @@ public class ArrowTypeNode implements TypeNode {
     ret=r;
   }
   
-  public TypeNode dereference() {//TODO qualcosa di più elegante?
-      System.out.println("Attempt to dereference a bool");
-      System.exit(0);
-      return null;
+  public TypeNode dereference() throws SimplanPlusException {//TODO qualcosa di più elegante?
+      throw new SimplanPlusException("Attempt to dereference a bool");
   }
     
-  public String toPrint(String s) { //
+  public String toPrint(String s) throws SimplanPlusException { //
 	String parlstr="";
     for (Node par:parlist)
       parlstr+=par.toPrint(s+"  ");
@@ -48,7 +48,7 @@ public class ArrowTypeNode implements TypeNode {
     return null;
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

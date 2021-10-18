@@ -3,12 +3,14 @@ package ast.node.exp.single_exp;
 import java.util.ArrayList;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class BoolNode implements Node {
 
@@ -27,7 +29,7 @@ public class BoolNode implements Node {
     return new BoolTypeNode();
   }    
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
@@ -37,7 +39,7 @@ public class BoolNode implements Node {
  	  return new ArrayList<SemanticError>();
  	}
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager){
       StringBuilder cgen = new StringBuilder();
       cgen.append("li $a0 ").append(val?1:0).append("\n");
       return cgen.toString();

@@ -1,0 +1,31 @@
+/*
+Pointer usage example
+*/
+{
+    ^^int  y = new ^int;
+    y^ = new int;
+    y^^ = 5;
+    print y;
+    print y^;
+    print y^^;
+    print y^;
+    delete y;
+    print y^;
+}
+
+/*
+should print:
+;Pointer
+;Pointer
+;5
+;Pointer
+;Error?
+
+It print;
+;0
+;1
+;5
+;1
+;1
+
+*/

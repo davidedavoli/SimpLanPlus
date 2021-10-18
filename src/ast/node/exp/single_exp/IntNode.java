@@ -3,6 +3,7 @@ package ast.node.exp.single_exp;
 import java.util.ArrayList;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.IntTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -32,11 +33,11 @@ public class IntNode implements Node {
  	  return new ArrayList<SemanticError>();
  	}
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager){
 
       StringBuilder cgen = new StringBuilder();
       cgen.append("li $a0 ").append(val).append("\n");

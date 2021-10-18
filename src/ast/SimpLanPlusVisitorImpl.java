@@ -7,7 +7,7 @@ import ast.node.IdNode;
 import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
-import ast.node.dec.NewNode;
+import ast.node.exp.single_exp.NewNode;
 import ast.node.dec.VarNode;
 import ast.node.exp.*;
 import ast.node.exp.single_exp.BoolNode;
@@ -23,6 +23,7 @@ import ast.node.types.TypeNode;
 import ast.node.types.VoidTypeNode;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	
@@ -32,7 +33,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		
 		//resulting node of the right type
 		BlockNode res;
-		
+
 		//list of declarations in @res
 		ArrayList<Node> declarations = new ArrayList<Node>();
 		ArrayList<Node> statements = new ArrayList<Node>();
@@ -55,8 +56,8 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		//visit exp context
 		
 		//build @res accordingly with the result of the visits to its content
-		res = new BlockNode(declarations,  statements);
-		
+		res = new BlockNode(declarations,  statements,false);
+
 		return res;
 	}
 	
@@ -104,7 +105,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	public Node visitDecFun(DecFunContext ctx) {
 		//initialize @res with the visits to the type and its ID
 		FunNode res =null;
-		
+		//System.out.println("VISITOR "+ctx.ID().getText());
 		if (ctx.type()!=null)
 			res = new FunNode(ctx.ID().getText(), (TypeNode) visit(ctx.type()));//WARNING casting
 		else
@@ -117,22 +118,10 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 			res.addPar( new ArgNode(arg.ID().getText(), (TypeNode)visit( arg.type() )) );//WARNING casting
 		
 		//add body
-		//create a list for the nested declarations
-		ArrayList<Node> innerDec = new ArrayList<Node>();
-		
-		//check whether there are actually nested decs
-		//FIXME forse serve per le regole di shading dei parametri, ma sembra un po' a caso, per ora lo lasciamo
-		if(ctx.block().declaration() != null){
-			//if there are visit each dec and add it to the @innerDec list
-			for(DeclarationContext dc : ctx.block().declaration())
-				innerDec.add(visit(dc));
-		}
-		
-		//get the exp body
-		Node block = visitBlock(ctx.block());
+		BlockNode block = (BlockNode) visitBlock(ctx.block());
 		
 		//add the body and the inner declarations to the function
-		res.addDecBody(innerDec, block);
+		res.addFunBlock( block);
 		
 		return res;		
 	}
@@ -186,7 +175,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	
 	@Override
 	public Node visitDeletion(DeletionContext ctx) {
-		return new DeletionNode(ctx.ID().getText());
+		return new DeletionNode(new IdExpNode(ctx.ID().getText()));
 	}
 	
 	@Override
@@ -201,7 +190,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		ParserRuleContext fct=ctx.getParent();
 		while (fct !=null && !(fct instanceof DecFunContext))
 			fct=fct.getParent();
-		
+
 		if (fct==null)
 			return new RetNode(visit(ctx.exp()), null);//in caso in cui il ret non sia in una funzione
 		else if (((DecFunContext)fct).type()!= null)
@@ -223,9 +212,10 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		Node condExp = visit (ctx.exp());
 		
 		Node thenExp = visit (ctx.statement(0));
-		
-		Node elseExp = visit (ctx.statement(1));
-		
+		Node elseExp = null;
+		if(ctx.statement(1) != null){
+			elseExp = visit (ctx.statement(1));
+		}
 		//build the @res properly and return it
 		res = new IfNode(condExp, thenExp, elseExp);
 		
@@ -327,9 +317,9 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		return new NotExpNode(visit(ctx.exp()));
 		}
 	
-	/*@Override public Node visitNegExp(SimpLanPlusParser.NegExpContext ctx) {
+	@Override public Node visitNegExp(SimpLanPlusParser.NegExpContext ctx) {
 		return new NegExpNode(visit(ctx.exp())); 
-		}*/
+	}
 	
 	@Override
 	public Node visitBoolExp(BoolExpContext ctx) {
@@ -344,5 +334,41 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		//there is no need to perform a check here, the lexer ensures this text is a boolean
 		return visit(ctx.call()); 
 	}
-	
+
+	public Node visitMainBlock(BlockContext ctx, Boolean isMainBlock) {
+
+		//resulting node of the right type
+		BlockNode res;
+
+		//list of declarations in @res
+		ArrayList<Node> declarations = new ArrayList<Node>();
+		ArrayList<Node> statements = new ArrayList<Node>();
+
+		//visit all nodes corresponding to declarations inside the let context and store them in @declarations
+		//notice that the ctx.let().dec() method returns a list, this is because of the use of * or + in the grammar
+		//antlr detects this is a group and therefore returns a list
+		if (ctx.declaration()!=null) {
+			for (DeclarationContext dc : ctx.declaration()){
+				declarations.add( visit(dc) );
+			}
+		}
+
+		if (ctx.statement()!= null) {
+			for (StatementContext st : ctx.statement()){
+				statements.add( visit(st) );
+			}
+		}
+
+		//visit exp context
+
+		//build @res accordingly with the result of the visits to its content
+		res = new BlockNode(declarations,  statements,isMainBlock);
+
+		return res;
+	}
+	@Override
+	public Node visit(ParseTree tree){
+		return tree != null ? super.visit(tree) : null;
+	}
+
 }

@@ -3,12 +3,14 @@ package ast.node.exp;
 import java.util.ArrayList;
 
 import ast.STentry;
+import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class IdExpNode extends LhsExpNode {
 
@@ -43,7 +45,7 @@ public class IdExpNode extends LhsExpNode {
 	  return entry;
   }
 
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	return s+"Id:" + id + " at nestlev " + nestinglevel +"\n" + entry.toPrint(s+"  ") ;  
   }
   
@@ -67,26 +69,32 @@ public class IdExpNode extends LhsExpNode {
 	  return res;
 	}
   
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck () throws SimplanPlusException {
 	if (entry.getType() instanceof ArrowTypeNode) { //
-	  System.out.println("Wrong usage of function identifier");
-      System.exit(0);
+	  throw new SimplanPlusException("Wrong usage of function identifier");
+     // System.exit(0);
     }
     return entry.getType();
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
-  public String codeGeneration(Label labelManager) {
-      String getAR="";
-	  for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++) 
-	    	 getAR+="lw\n";
-	    return "push "+entry.getOffset()+"\n"+ //metto offset sullo stack
-		       "lfp\n"+getAR+ //risalgo la catena statica
-			   "add\n"+ 
-               "lw\n"; //carico sullo stack il valore all'indirizzo ottenuto
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+      /**
+       * Ritorna valore di ID
+       */
 
+      StringBuilder cgen = new StringBuilder();
+
+      cgen.append("mv $fp $al //put in $al actual fp\n");
+
+      for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
+          cgen.append("lw $al 0($al) //go up to chain\n");
+
+      cgen.append("lw $a0 ").append(entry.getOffset()).append("($al) //put in $a0 value of Id\n");
+
+      return cgen.toString();
   }
 }  

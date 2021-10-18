@@ -1,12 +1,24 @@
 package ast;
 
 import ast.node.types.TypeNode;
+import util.SimplanPlusException;
 
 public class STentry {
  
-  private int nl;
+  private final int nl;
   private TypeNode type;
-  private int offset;
+  private final int offset;
+
+  public String getBeginFuncLabel() {
+    return beginFuncLabel;
+  }
+
+  public String getEndFuncLabel() {
+    return endFuncLabel;
+  }
+
+  private String beginFuncLabel = "";
+  private String endFuncLabel = "";
   
   public STentry (int n, int os)
   {nl=n;
@@ -16,6 +28,13 @@ public class STentry {
   {nl=n;
    type=t;
    offset=os;}
+
+  public STentry (int n, int os, String bFL, String eFL) {
+    nl=n;
+    offset=os;
+    beginFuncLabel= bFL;
+    endFuncLabel = eFL;
+  }
   
   public void addType (TypeNode t)
   {type=t;}
@@ -29,7 +48,7 @@ public class STentry {
   public int getNestinglevel ()
   {return nl;}
   
-  public String toPrint(String s) { //
+  public String toPrint(String s) throws SimplanPlusException { //
 	   return s+"STentry: nestlev " + Integer.toString(nl) +"\n"+
 			  s+"STentry: type\n" + 
 			  type.toPrint(s+"  ") + 

@@ -36,7 +36,7 @@
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/src/Interpreter/lexer/SVM.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="D:\universita\SimpLanPlus\src\Interpreter" />
+          <option name="outputDir" value="D:\universita\SimpLanPlus\src\Interpreter\gen" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
           <option name="pkg" value="" />

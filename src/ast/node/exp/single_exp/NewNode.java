@@ -62,17 +62,19 @@
 //}  
 
 
-package ast.node.dec;
+package ast.node.exp.single_exp;
 
 import java.util.ArrayList;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.PointerTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class NewNode implements Node {
 	
@@ -92,7 +94,7 @@ public class NewNode implements Node {
 	      return res;
 	  }
 	  
-	  public String toPrint(String s) {
+	  public String toPrint(String s) throws SimplanPlusException {
 		return s+"New:\n" + type.toPrint(s+"   ") +"\n";
 	  }
 	  
@@ -101,11 +103,13 @@ public class NewNode implements Node {
 	    return new PointerTypeNode(type);
 	  }
 	  
-	  public RetEffType retTypeCheck() {
+	  public RetEffType retTypeCheck(FunNode funNode) {
 		  return new RetEffType(RetEffType.RetT.ABS);
 	  }
 	  
-	  public String codeGeneration(Label labelManager) {
-			return "";//TODO
+	  public String codeGeneration(Label labelManager){
+		  StringBuilder cgen = new StringBuilder();
+		  cgen.append("new $a0").append("// put new address in a0\n");
+		  return cgen.toString();
 	  }  
 }  

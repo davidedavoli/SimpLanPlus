@@ -2,11 +2,13 @@ package ast.node;
 
 import java.util.ArrayList;
 
+import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
 
 public class ArgNode implements Node {
 
@@ -32,7 +34,7 @@ public class ArgNode implements Node {
 	  return new ArrayList<SemanticError>();
 	}
   
-  public String toPrint(String s) {
+  public String toPrint(String s) throws SimplanPlusException {
 	  return s+"Par:" + id +"\n"
 			 +type.toPrint(s+"  ") ; 
   }
@@ -42,12 +44,12 @@ public class ArgNode implements Node {
      return null;
   }
   
-  public RetEffType retTypeCheck() {
+  public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   
   //non utilizzato
-  public String codeGeneration(Label labelManager) {
+  public String codeGeneration(Label labelManager){
 		return "";
   }
     

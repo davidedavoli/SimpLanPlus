@@ -1,6 +1,7 @@
 package ast.node.exp;
 
 import ast.node.Node;
+import ast.node.dec.FunNode;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.IntTypeNode;
 import ast.node.types.RetEffType;
@@ -8,6 +9,8 @@ import ast.node.types.TypeNode;
 import util.Environment;
 import util.Label;
 import util.SemanticError;
+import util.SimplanPlusException;
+
 import java.util.ArrayList;
 
 /**
@@ -26,58 +29,56 @@ public class BinExpNode implements Node {
     }
 
     @Override
-    public String toPrint(String indent) {
+    public String toPrint(String indent) throws SimplanPlusException {
         return indent + lhs + " " + operator + " " + rhs.toPrint(indent);
     }
 
     @Override
-    public TypeNode typeCheck() {
+    public TypeNode typeCheck() throws SimplanPlusException {
         TypeNode lhsType = lhs.typeCheck();
         TypeNode rhsType = rhs.typeCheck();
-        
-        if (lhsType != rhsType) {
-            System.out.println("OPERANDI DI TIPO DIVERSO, LANCIARE ECCEZIONE");
-            return null;
-        }
-        
-        
+
+        if(!(lhsType instanceof IntTypeNode && rhsType instanceof IntTypeNode))
+            if(!(lhsType instanceof BoolTypeNode && rhsType instanceof BoolTypeNode))
+                throw new SimplanPlusException("Operands are of different type");
+
+
         /**
         * +, -, *, / <,<=,>,>=: solo int
         * ==,!= : solo o tra int o tra bool
         * &&, ||, ! : solo tra bool
         * */
-        
+
         switch (operator) {
             /**
-             * Math operator
+             * Math operator da cambiare
              */
             case "+":
             case "-":
             case "*":
             case "/":
-            case "<":
-            case "<=":
-            case ">":
-            case ">=":
                 // Both must be integer type
                 if (!(lhsType instanceof IntTypeNode)) {
                     System.out.println("Gli operandi non sono int, lanciare un'eccezione");
                 }
                 return new IntTypeNode();
+
+            case "<":
+            case "<=":
+            case ">":
+            case ">=":
+                if (!(lhsType instanceof IntTypeNode)) {
+                    System.out.println("Gli operandi non sono int, lanciare un'eccezione");
+                }
+                return new BoolTypeNode();
             /**
              * Bool operator
              * These can be done with bool and Int
-             * 
+             *
              */
             case "==":
             case "!=":
-                if (!(lhsType instanceof IntTypeNode)) {
-                    return new BoolTypeNode();
-                }
-                else {
-                    return new IntTypeNode();
-                }
-                
+                return new BoolTypeNode();
 
             case "&&":
             case "||":
@@ -93,40 +94,46 @@ public class BinExpNode implements Node {
     }
 
     @Override
-    public String codeGeneration(Label labelManager) {
+    public String codeGeneration(Label labelManager) throws SimplanPlusException {
 
         StringBuilder cgen = new StringBuilder();
-        cgen.append("//Strart codegen of ").append(lhs.toString()).append(operator).append(rhs.toString())
+
+        cgen.append("//Start codegen of ").append(lhs.getClass().getName()).append(operator).append(rhs.getClass().getName())
                 .append("\n");
         /**
          * Cgen for lhs and rhs to push them on the stack
          */
         String lhs_generated = lhs.codeGeneration(labelManager);
         cgen.append(lhs_generated);
+
         cgen.append("push $a0 // push e1\n");
         String rhs_generated = rhs.codeGeneration(labelManager);
+
         cgen.append(rhs_generated);
-        cgen.append("lw $t1 0($sp) take e2 and $t1 take e1\n");
+
+        cgen.append("lw $a2 0($sp) //take e2 and $a2 take e1\n");
         cgen.append("pop // remove e1 from the stack to preserve stack\n");
 
         /**
-         * $t1(=e1) operation $a0(=e2)
+         * $a2(=e1) operation $a0(=e2)
          */
 
         switch (operator) {
             case "+":{
-                cgen.append("add $a0 $t1 $a0 // a0 = t1+a0\n");
+                cgen.append("add $a0 $a2 $a0 // a0 = t1+a0\n");
+
+                break;
             }
             case "-": {
-                cgen.append("sub $a0 $t1 $a0 // a0 = t1-a0\n");
+                cgen.append("sub $a0 $a2 $a0 // a0 = t1-a0\n");
                 break;
             }
             case "*": {
-                cgen.append("mult $a0 $t1 $a0 // a0 = t1+a0\n");
+                cgen.append("mult $a0 $a2 $a0 // a0 = t1+a0\n");
                 break;
             }
             case "/": {
-                cgen.append("div $a0 $t1 $a0 // a0 = t1/a0\n");
+                cgen.append("div $a0 $a2 $a0 // a0 = t1/a0\n");
                 break;
             }
             /*
@@ -137,118 +144,41 @@ public class BinExpNode implements Node {
             * eq
             * */
             case "<=":{
-                cgen.append("le $a0 $t1 $a0 // $a0 = $t1 <= $a0");
+                cgen.append("le $a0 $a2 $a0 // $a0 = $a2 <= $a0\n");
                 break;
             }
             case "<":{
-                cgen.append("lt $a0 $t1 $a0 // $a0 = $t1 < $a0");
+                cgen.append("lt $a0 $a2 $a0 // $a0 = $a2 < $a0\n");
                 break;
             }
             case ">":{
-                cgen.append("gt $a0 $t1 $a0 // $a0 = $t1 > $a0");
+                cgen.append("gt $a0 $a2 $a0 // $a0 = $a2 > $a0\n");
                 break;
             }
             case ">=":{
-                cgen.append("ge $a0 $t1 $a0 // $a0 = $t1 >= $a0");
+                cgen.append("ge $a0 $a2 $a0 // $a0 = $a2 >= $a0\n");
                 break;
             }
             case "==":{
-                cgen.append("eq $a0 $t1 $a0 // $a0 = $t1 == $a0");
+                cgen.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0\n");
                 break;
             }
             case "!=":{
-                cgen.append("eq $a0 $t1 $a0 // $a0 = $t1 == $a0");
-                cgen.append("not $a0 $a0 // $a0 = !$a0");
+                cgen.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0\n");
+                cgen.append("not $a0 $a0 // $a0 = !$a0\n");
                 break;
             }
             case "&&":{
-                cgen.append("and $a0 $t1 $a0 // $a0 = $t1 && $a0");
+                cgen.append("and $a0 $a2 $a0 // $a0 = $a2 && $a0\n");
+                //cgen.append("mult $a0 $a2 $a0 // $a0 = $a2 && $a0 aka $a0 = $a2 * $a0\n");
                 break;
             }
 
             case "||":{
-                cgen.append("or $a0 $t1 $a0 // $a0 = $t1 || $a0");
+                cgen.append("or $a0 $a2 $a0 // $a0 = $a2 || $a0\n");
                 break;
             }
-           /* case "<":{
-                String true_label = labelManager.freshLabel("is_less_branch");
-                String end_true_label = "end_of_" + true_label;
-
-                String boolCondition = "blr $t1 $a0 ";
-                String comment = "// jump to label if $t1 < $a0 \n";
-
-                makeBoolExp(cgen, boolCondition, true_label, end_true_label, comment);
-                
-                break;
-            }
-            case ">":{
-                String true_label = labelManager.freshLabel("is_high_branch");
-                String end_true_label = "end_of_" + true_label;
-
-                String boolCondition = "brr $t1 $a0 ";
-                String comment = "// jump to label if $t1 > $a0 \n";
-
-                makeBoolExp(cgen, boolCondition, true_label, end_true_label, comment);
-                
-                break;
-            }
-            case ">=":{
-                String true_label = labelManager.freshLabel("is_high_equal_branch");
-                String end_true_label = "end_of_" + true_label;
-
-                String boolCondition = "breq $t1 $a0 ";
-                String comment = "// jump to label if $t1 >= $a0 \n";
-
-                makeBoolExp(cgen, boolCondition, true_label, end_true_label, comment);
-                break;
-            }
-            case "==": {
-                String true_label = labelManager.freshLabel("is_equal_branch");
-                String end_true_label = "end_of_" + true_label;
-
-                String boolCondition = "beq $t1 $a0 ";
-                String comment = "// jump to label if $t1 == $a0 \n";
-
-                makeBoolExp(cgen, boolCondition, true_label, end_true_label, comment);
-
-                break;
-            }
-            case "!=": {
-                String true_label = labelManager.freshLabel("is_not_equal_branch");
-                String end_true_label = "end_of_" + true_label;
-
-                String boolCondition = "bneq $t1 $a0 ";
-                String comment = "// jump to label if $t1 != $a0 \n";
-
-                makeBoolExp(cgen, boolCondition, true_label, end_true_label, comment);
-
-                break;
-            }
-
-            case "&&": {
-                String true_label = labelManager.freshLabel("true_and_branch");
-                String end_true_label = "end_of_" + true_label;
-
-                String boolCondition = "and $t1 $a0 ";
-                String comment = "// jump to label if $t1 && $a0 \n";
-
-                makeBoolExp(cgen, boolCondition, true_label, end_true_label, comment);
-
-                break;
-            }
-
-            case "||": {
-                String true_label = labelManager.freshLabel("true_or_branch");
-                String end_true_label = "end_of_" + true_label;
-
-                String boolCondition = "or $t1 $a0 ";
-                String comment = "// jump to label if $t1 || $a0 \n";
-
-                makeBoolExp(cgen, boolCondition, true_label, end_true_label, comment);
-
-                break;
-            }*/
-
+           
             /**
              * Case of == and != to implement on boolean expression
              */
@@ -275,12 +205,17 @@ public class BinExpNode implements Node {
     }
     */
     @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) {
-        return null;
+    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+        ArrayList<SemanticError> binExpNodeErrors = new ArrayList<>();
+
+        binExpNodeErrors.addAll(lhs.checkSemantics(env));
+        binExpNodeErrors.addAll(rhs.checkSemantics(env));
+
+        return binExpNodeErrors;
     }
 
     @Override
-    public RetEffType retTypeCheck() {
+    public RetEffType retTypeCheck(FunNode funNode) {
         return null;
     }
 }

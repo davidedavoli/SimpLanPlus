@@ -4,7 +4,8 @@ import java.util.ArrayList;
 
 import ast.node.Node;
 import ast.node.dec.FunNode;
-import ast.node.types.BoolTypeNode;
+import ast.node.types.IntTypeNode;
+import ast.node.types.TypeUtils;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import util.Environment;
@@ -12,11 +13,11 @@ import util.Label;
 import util.SemanticError;
 import util.SimplanPlusException;
 
-public class NotExpNode implements Node {
+public class NegExpNode implements Node {
 
   private Node exp;
   
-  public NotExpNode (Node e) {
+  public NegExpNode (Node e) {
     exp=e;
   }
   
@@ -33,30 +34,26 @@ public class NotExpNode implements Node {
  	}
   
   public String toPrint(String s) throws SimplanPlusException {
-    return "not " + exp.toPrint(s);
+    return "neg " + exp.toPrint(s);
     }
   
   public TypeNode typeCheck() throws SimplanPlusException {
-	  TypeNode expType = exp.typeCheck();
-
-	  if (! (expType instanceof BoolTypeNode)){
-		  throw new SimplanPlusException("Exp not bool, throw exception");
-	  }
-	  return new BoolTypeNode();
-
+	  if (! TypeUtils.isSubtype(exp.typeCheck(),new IntTypeNode())) 
+		  	  throw new SimplanPlusException("Non int negate");
+	  return new IntTypeNode();
   }
-  
-  public RetEffType retTypeCheck(FunNode funNode) {
+
+	@Override
+	public String codeGeneration(Label labelManager) throws SimplanPlusException {
+		StringBuilder cgen = new StringBuilder();
+		String loaded_exp = exp.codeGeneration(labelManager);
+		cgen.append(loaded_exp).append("\n");
+		cgen.append("multi $a0 $a0 -1 //do negate\n");
+		return cgen.toString();
+	}
+
+	public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
-	  StringBuilder cgen = new StringBuilder();
-	  String loaded_exp = exp.codeGeneration(labelManager);
-	  cgen.append(loaded_exp).append("\n");
-	  cgen.append("not $a0 $a0\n");
 
-	  return cgen.toString();
-
-  }
 }  
