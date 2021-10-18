@@ -4,17 +4,16 @@ import ast.STentry;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.dec.VarNode;
-import ast.node.exp.IfNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import util.Label;
-import util.Environment;
-import util.SemanticError;
-import util.SimplanPlusException;
+import ast.Label;
+import semantic.Environment;
+import semantic.SemanticError;
+import semantic.SimplanPlusException;
 
 public class BlockNode implements Node {
 

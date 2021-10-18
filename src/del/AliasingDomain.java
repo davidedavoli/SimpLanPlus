@@ -2,7 +2,7 @@ package del;
 
 import java.util.HashSet;
 import java.util.Set;
-import util.Pair;
+import semantic.Pair;
 
 public class AliasingDomain {
 	

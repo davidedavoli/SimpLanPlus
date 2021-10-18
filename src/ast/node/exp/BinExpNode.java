@@ -6,10 +6,10 @@ import ast.node.types.BoolTypeNode;
 import ast.node.types.IntTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
-import util.SimplanPlusException;
+import semantic.Environment;
+import ast.Label;
+import semantic.SemanticError;
+import semantic.SimplanPlusException;
 
 import java.util.ArrayList;
 

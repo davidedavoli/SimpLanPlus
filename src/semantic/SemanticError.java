@@ -1,4 +1,4 @@
-package util;
+package semantic;
 
 public class SemanticError {
 	

@@ -1,7 +1,7 @@
 package ast;
 
 import ast.node.types.TypeNode;
-import util.SimplanPlusException;
+import semantic.SimplanPlusException;
 
 public class STentry {
  

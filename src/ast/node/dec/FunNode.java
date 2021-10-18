@@ -1,6 +1,8 @@
 package ast.node.dec;
 import java.util.*;
 
+import ast.FuncBodyUtils;
+import ast.Label;
 import ast.STentry;
 import ast.node.ArgNode;
 import ast.node.Node;
@@ -8,8 +10,9 @@ import ast.node.statements.BlockNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import ast.node.types.VoidTypeNode;
-import util.*;
+import semantic.Environment;
+import semantic.SemanticError;
+import semantic.SimplanPlusException;
 
 public class FunNode implements Node {
 

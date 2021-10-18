@@ -1,7 +1,6 @@
 package ast.node.types;
 
-import ast.node.Node;
-import util.SimplanPlusException;
+import semantic.SimplanPlusException;
 
 public class TypeUtils {
     public static boolean isSubtype (TypeNode a, TypeNode b) throws SimplanPlusException {

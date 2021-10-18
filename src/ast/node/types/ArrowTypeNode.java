@@ -3,10 +3,10 @@ import java.util.ArrayList;
 
 import ast.node.Node;
 import ast.node.dec.FunNode;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
-import util.SimplanPlusException;
+import semantic.Environment;
+import ast.Label;
+import semantic.SemanticError;
+import semantic.SimplanPlusException;
 
 public class ArrowTypeNode implements TypeNode {
 

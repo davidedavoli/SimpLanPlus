@@ -1,8 +1,5 @@
 package mainPackage;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -19,12 +16,11 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import ast.SimpLanPlusVisitorImpl;
 import parser.SimpLanPlusParser;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
-import util.SimplanPlusException;
+import semantic.Environment;
+import ast.Label;
+import semantic.SemanticError;
+import semantic.SimplanPlusException;
 
-import static org.antlr.v4.codegen.DefaultOutputModelFactory.list;
 
 public class Test {
 	private final static String dir = "examples/";

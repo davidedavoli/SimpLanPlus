@@ -3,9 +3,9 @@ package ast.node.types;
 import java.util.ArrayList;
 
 import ast.node.dec.FunNode;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
+import semantic.Environment;
+import ast.Label;
+import semantic.SemanticError;
 
 public class VoidTypeNode implements TypeNode {
   

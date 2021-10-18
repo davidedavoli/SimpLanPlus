@@ -3,10 +3,10 @@ package ast.node.types;
 import java.util.ArrayList;
 
 import ast.node.dec.FunNode;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
-import util.SimplanPlusException;
+import semantic.Environment;
+import ast.Label;
+import semantic.SemanticError;
+import semantic.SimplanPlusException;
 
 public class PointerTypeNode implements TypeNode {
   private TypeNode type;

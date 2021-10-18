@@ -3,10 +3,10 @@ package ast.node.types;
 import java.util.ArrayList;
 
 import ast.node.Node;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
-import util.SimplanPlusException;
+import semantic.Environment;
+import ast.Label;
+import semantic.SemanticError;
+import semantic.SimplanPlusException;
 
 public interface TypeNode extends Node{
    

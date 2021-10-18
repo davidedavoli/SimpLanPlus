@@ -7,10 +7,10 @@ import ast.node.dec.FunNode;
 import ast.node.types.PointerTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import util.Environment;
-import util.Label;
-import util.SemanticError;
-import util.SimplanPlusException;
+import semantic.Environment;
+import ast.Label;
+import semantic.SemanticError;
+import semantic.SimplanPlusException;
 
 public class PointerNode implements Node {
 

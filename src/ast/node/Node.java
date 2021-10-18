@@ -6,10 +6,10 @@ import ast.node.types.TypeNode;
 
 import java.util.ArrayList;
 
-import util.Environment;
-import util.Label;
-import util.SemanticError;
-import util.SimplanPlusException;
+import semantic.Environment;
+import ast.Label;
+import semantic.SemanticError;
+import semantic.SimplanPlusException;
 
 public interface Node {
   String toPrint(String indent) throws SimplanPlusException;
