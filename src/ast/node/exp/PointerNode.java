@@ -36,7 +36,12 @@ public class PointerNode implements Node {
   public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
+
+  @Override
+  public ArrayList<SemanticError> checkEffects(Environment env) {
+    return null;
+  }
+
   public String codeGeneration(Label labelManager) {
 
       return "push "+val+"\n";

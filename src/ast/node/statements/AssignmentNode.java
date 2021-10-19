@@ -59,8 +59,13 @@ public class AssignmentNode implements Node {
   public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  public String codeGeneration(Label labelManager) {
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    public String codeGeneration(Label labelManager) {
 		return exp.codeGeneration(labelManager);
   }
 
