@@ -56,22 +56,18 @@ public RetEffType retTypeCheck(FunNode funNode) {
     public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 		//create the result
 		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-		
-		 int j=env.nestingLevel;
-		 STentry tmp=null; 
-		 while (j>=0 && tmp==null)
-		     tmp=(env.symTable.get(j--)).get(id);
-		 if (tmp==null)
-			 res.add(new SemanticError("Id "+id+" not declared"));
-		 
-		 else{
-			 this.entry = tmp;
-			 this.nestinglevel = env.nestingLevel;
-			 
-			 for(Node arg : parlist)
-				 res.addAll(arg.checkSemantics(env));
-		 }
-		 return res;
+
+
+        entry = env.lookUp(id);
+        if (entry == null)
+            res.add(new SemanticError("Id "+id+" not declared"));
+        else{
+            nestinglevel = env.getNestingLevel();
+            for(Node arg : parlist)
+                res.addAll(arg.checkSemantics(env));
+        }
+
+		return res;
   }
   
   public TypeNode typeCheck () throws SimplanPlusException {  //

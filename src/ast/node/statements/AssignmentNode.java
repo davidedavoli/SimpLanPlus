@@ -31,13 +31,10 @@ public class AssignmentNode implements Node {
 	  //create result list
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
 
-	  int j=env.nestingLevel;
-	  STentry tmp=null;
-	  while (j>=0 && tmp==null)
-		  tmp=(env.symTable.get(j--)).get(lhs.getID());
-	  if (tmp==null)
-		  res.add(new SemanticError("Id "+lhs.getID()+" not declared"));
-	    
+      STentry entry = env.lookUp(lhs.getID());
+      if (entry == null)
+          res.add(new SemanticError("Id "+lhs.getID()+" not declared"));
+
 	  res.addAll(lhs.checkSemantics(env));
       res.addAll(exp.checkSemantics(env));
         

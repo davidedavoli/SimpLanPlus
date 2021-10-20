@@ -54,18 +54,14 @@ public class IdExpNode extends LhsExpNode {
 	  
 	  //create result list
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-	  
-	  int j=env.nestingLevel;
-	  STentry tmp=null; 
-	  while (j>=0 && tmp==null)
-		  tmp=(env.symTable.get(j--)).get(id);
-      if (tmp==null)
-          res.add(new SemanticError("Id "+id+" not declared"));
-      else{
-    	  		entry = tmp;
-    	  		nestinglevel = env.nestingLevel;
-      }
-	  
+
+
+      entry = env.lookUp(id);
+      if (entry == null)
+          res.add(new SemanticError("Id "+id+" in expNode not declared"));
+      else
+          nestinglevel = env.getNestingLevel();
+
 	  return res;
 	}
   

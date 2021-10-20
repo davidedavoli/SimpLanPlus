@@ -17,9 +17,9 @@ import semantic.SimplanPlusException;
 public class FunNode implements Node {
 
   private String id;
-  private TypeNode type; 
+  private TypeNode type;
   private ArrayList<TypeNode> partypes;
-  private ArrayList<Node> parlist = new ArrayList<Node>(); 
+  private ArrayList<Node> parlist = new ArrayList<Node>();
   //private ArrayList<Node> declist;
   private BlockNode body;
   private String beginFuncLabel = "";
@@ -32,7 +32,7 @@ public class FunNode implements Node {
 	endFuncLabel = FuncBodyUtils.endFreshFunLabel();
 	//System.out.println("CREO FUNZIONE " +id);
   }
-  
+
   public void addFunBlock(BlockNode b) {
     body=b;
 	body.setIsFunction(true);
@@ -43,64 +43,52 @@ public class FunNode implements Node {
 		return endFuncLabel;
 	}
 
-  
+
   @Override
 	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
-	  
+
 	  //create result list
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-	  
+
 	  //env.offset = -2;
-	  HashMap<String, STentry> hm = env.symTable.get(env.nestingLevel);
-	  int new_offset = env.offset--;
-      STentry entry = new STentry(env.nestingLevel,new_offset,beginFuncLabel,endFuncLabel); //separo introducendo "entry"
-      
+	  HashMap<String, STentry> hm = env.getCurrentST();
+	  STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel);
+
       if ( hm.put(id,entry) != null )
         res.add(new SemanticError("Fun id '"+id+"' already declared"));
       else{
-    	  //creare una nuova hashmap per la symTable
-	      env.nestingLevel++;
-	      HashMap<String,STentry> hmn = new HashMap<String,STentry> ();
-
-		  env.symTable.add(hmn);
+		  env.createVoidScope();
 
 	      ArrayList<TypeNode> parTypes = new ArrayList<TypeNode>();
 	      int paroffset=1;
-	      
 	      //check args
 	      for(Node a : parlist){
 	    	  ArgNode arg = (ArgNode) a;
 	    	  parTypes.add(arg.getType());
-
-				  if ( hmn.put(arg.getId(),new STentry(env.nestingLevel,arg.getType(),paroffset++)) != null  )
-	    		  	System.out.println("Parameter id '"+arg.getId()+"' already declared");
+			  STentry oldEntry = env.newFunctionParameter(arg.getId(),arg.getType(),paroffset++);
+			  if(oldEntry != null)
+				  System.out.println("Parameter id '"+arg.getId()+"' already declared");
 	      }
 
 	      //set func type
-	      
+
 	      partypes= parTypes;
-	      
+
 	      entry.addType( new ArrowTypeNode(parTypes, type) );
-	      
+
 
 		  res.addAll(body.checkSemantics(env));
 
 		  //close scope
 
-	      env.symTable.remove(env.nestingLevel--);
-		  if(env.nestingLevel >= 0){
-			  Optional<STentry> stEntry = env.symTable.get(env.nestingLevel).values().stream().min(Comparator.comparing(STentry::getOffset));
-			  int offset = stEntry.map(STentry::getOffset).orElse(-1);
-			  //System.out.println("NEW OFFSET HAS TO BE " + offset);
-			  env.offset = offset ;
-		  }
+	      env.popFunScope();
 
-	      
+
       }
-      
+
       RetEffType abs = new RetEffType(RetEffType.RetT.ABS);
       RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
-      
+
       //!(type instanceof VoidTypeNode) &&
       if ( body.retTypeCheck(this).leq(abs)) {
     	  res.add(new SemanticError("Possible absence of return value"));
@@ -109,10 +97,10 @@ public class FunNode implements Node {
     	  res.add(new SemanticError("Return statement in void function"));
       }*/
 
-      
+
       return res;
 	}
-  
+
   public void addPar (Node p) {
     parlist.add(p);
   }
@@ -130,15 +118,15 @@ public class FunNode implements Node {
 		   +type.toPrint(s+"  ")
 		   +parlstr
 	   	   //+declstr
-           +body.toPrint(s+"  ") ; 
+           +body.toPrint(s+"  ") ;
   }
-  
+
   //valore di ritorno non utilizzato
   public TypeNode typeCheck () throws SimplanPlusException {
 	body.typeCheck();
     return new ArrowTypeNode(partypes, type);
   }
-  
+
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
@@ -180,5 +168,5 @@ public class FunNode implements Node {
 
 	  return cgen.toString();
   }
-  
-}  
+
+}

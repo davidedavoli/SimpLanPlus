@@ -52,10 +52,11 @@ public class BlockNode implements Node {
       HashMap<String, STentry> hm = new HashMap<String,STentry> ();
 
       if (!isFunction) {
-          env.nestingLevel++;
-          env.symTable.add(hm);
+          //env.nestingLevel++;
+          //env.symTable.add(hm);
+          env.createVoidScope();
       }
-      current_nl = env.nestingLevel;
+      current_nl = env.getNestingLevel();
       /*System.out.println("CURRENT NESTING LEVEL IN BLOCK AND IS FUNCTION");
       System.out.println(current_nl);
       System.out.println(isFunction);*/
@@ -64,10 +65,9 @@ public class BlockNode implements Node {
       //declare resulting list
       ArrayList<SemanticError> res = new ArrayList<SemanticError>();
       if(isFunction)
-          env.offset = -2;
+          env.functionOffset();
       else
-          env.offset = -1;
-      //System.out.println("OFFSET PRIMA DEC "+env.offset);
+          env.blockOffset();
 
       //check semantics in the dec list
       if(declarations.size() > 0){
@@ -76,7 +76,6 @@ public class BlockNode implements Node {
     		  res.addAll(n.checkSemantics(env));
       }
 
-      //System.out.println("OFFSET DOPO DEC &isfun: "+isFunction+" "+env.offset);
 
       if(statements.size() > 0){
     	  //if there are children then check semantics for every child and save the results
@@ -87,7 +86,7 @@ public class BlockNode implements Node {
       //check semantics in the exp body      
       //clean the scope, we are leaving a let scope
       if(!isFunction){
-          env.symTable.remove(env.nestingLevel--);
+          env.popBlockScope();
       }
 
       //return the result

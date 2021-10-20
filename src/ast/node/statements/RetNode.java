@@ -43,7 +43,7 @@ public class RetNode implements Node {
       if(val != null){
           res.addAll(val.checkSemantics(env));
       }
-      current_nl=env.nestingLevel;
+      current_nl=env.getNestingLevel();
 	  return res;
  	}
 

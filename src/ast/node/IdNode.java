@@ -54,26 +54,7 @@ public class IdNode extends LhsNode {
 	return s+"Id:" + id + " at nestlev " + nestinglevel +"\n" + entry.toPrint(s+"  ") ;  
   }
   
-  @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) {
-	  
-	  //create result list
-	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-	  
-	  int j=env.nestingLevel;
-	  STentry tmp=null; 
-	  while (j>=0 && tmp==null)
-		  tmp=(env.symTable.get(j--)).get(id);
-      if (tmp==null)
-          res.add(new SemanticError("Id "+id+" not declared"));
-      
-      else{
-    	  		entry = tmp;
-    	  		nestinglevel = env.nestingLevel;
-      }
-      	  
-	  return res;
-	}
+
   
   @Override
   public TypeNode typeCheck () {
@@ -107,7 +88,21 @@ public class IdNode extends LhsNode {
   }
 
     @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+
+        //create result list
+        ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+        entry = env.lookUp(id);
+        if (entry == null)
+            res.add(new SemanticError("Id "+id+" not declared"));
+        else
+            nestinglevel = env.getNestingLevel();
+        return res;
+    }
+    @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
+        entry = env.lookUp(id);
+        nestinglevel = env.getNestingLevel();;
       return new ArrayList<>();
     }
 

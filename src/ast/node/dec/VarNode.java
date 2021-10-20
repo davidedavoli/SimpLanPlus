@@ -28,30 +28,6 @@ public class VarNode implements Node {
         exp=v;
     }
 
-    @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
-        //create result list
-        ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-
-        //env.offset = -2;
-        HashMap<String, STentry> hm = env.symTable.get(env.nestingLevel);
-
-        int new_offset = env.offset--;
-        //System.out.println("NEW OFFSET "+new_offset);
-        STentry entry = new STentry(env.nestingLevel, type, new_offset); //separo introducendo "entry"
-        id.setEntry(entry);
-
-        if (exp != null){
-            res.addAll(exp.checkSemantics(env));
-            //  dereferenceLevel = 0 because we set the status of a variable
-            id.setStatus(new Effect(Effect.RW), 0);
-        }
-
-        if ( hm.put(id.getID(),entry) != null )
-            res.add(new SemanticError("Var id '"+id+"' already declared"));
-
-        return res;
-    }
 
     //  @Override
     //  public ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl) {
@@ -91,17 +67,6 @@ public class VarNode implements Node {
     return new RetEffType(RetEffType.RetT.ABS);
     }
 
-    @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
-        ArrayList<SemanticError> errors = new ArrayList<>();
-        if(exp != null){
-            errors.addAll(exp.checkEffects(env));
-        }
-        HashMap<String, STentry> hm = new HashMap<> ();
-        hm.put(id.getID(), id.getEntry());
-        env.symTable.add(hm);
-        return errors;
-    }
 
     //valore di ritorno non utilizzato
     public TypeNode typeCheck () throws SimplanPlusException {
@@ -126,6 +91,43 @@ public class VarNode implements Node {
             //cgen.append("push 0\n");
         }
         return cgen.toString();
+    }
+
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+        //create result list
+        ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+
+        //env.offset = -2;
+        HashMap<String, STentry> hm = env.getCurrentST();
+
+        //return offset and decrement it by 1
+        int new_offset = env.decOffset();
+        STentry entry = new STentry(env.getNestingLevel(), type, new_offset); //separo introducendo "entry"
+        id.setEntry(entry);
+
+        if (exp != null){
+            res.addAll(exp.checkSemantics(env));
+            //  dereferenceLevel = 0 because we set the status of a variable
+            id.setStatus(new Effect(Effect.RW), 0);
+        }
+
+        if ( hm.put(id.getID(),entry) != null )
+            res.add(new SemanticError("Var id '"+id+"' already declared"));
+
+        return res;
+    }
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        ArrayList<SemanticError> errors = new ArrayList<>();
+        if(exp != null){
+            errors.addAll(exp.checkEffects(env));
+        }
+        HashMap<String, STentry> hm = new HashMap<> ();
+        hm.put(id.getID(), id.getEntry());
+        env.addEntry(hm);
+        return errors;
     }
 
 }

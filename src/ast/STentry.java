@@ -61,4 +61,6 @@ public class STentry {
   public void setStatus(Effect effect, int dereferenceLevel) {
     this.variableStatus.set(dereferenceLevel, effect);
   }
+
+
 }  
