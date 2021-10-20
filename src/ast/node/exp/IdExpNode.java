@@ -1,8 +1,10 @@
 package ast.node.exp;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ast.STentry;
+import ast.node.LhsNode;
 import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
@@ -76,7 +78,7 @@ public class IdExpNode extends LhsExpNode {
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
+
   public String codeGeneration(Label labelManager) throws SimplanPlusException {
       /**
        * Ritorna valore di ID

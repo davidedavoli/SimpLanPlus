@@ -28,4 +28,5 @@ public interface Node {
   RetEffType retTypeCheck(FunNode funNode);
 
   ArrayList<SemanticError> checkEffects(Environment env);
+
 }

@@ -1,5 +1,6 @@
 package ast.node.exp;
 
+import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.types.BoolTypeNode;
@@ -12,6 +13,7 @@ import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class to handle math expression. These operations are permitted only on Integers value
@@ -213,12 +215,15 @@ public class BinExpNode extends ExpNode {
 
         return binExpNodeErrors;
     }
-
     @Override
-    public RetEffType retTypeCheck(FunNode funNode) {
-        return null;
-    }
+    public List<LhsNode> variables() {
+        List<LhsNode> variables = new ArrayList<>();
 
+        //variables.addAll(lhs.variables());
+        //variables.addAll(rhs.variables());
+
+        return variables;
+    }
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
         ArrayList<SemanticError> errors = new ArrayList<>();
@@ -229,5 +234,10 @@ public class BinExpNode extends ExpNode {
         errors.addAll(checkExpStatus(env));
 
         return errors;
+    }
+
+    @Override
+    public RetEffType retTypeCheck(FunNode funNode) {
+        return null;
     }
 }

@@ -62,5 +62,17 @@ public class STentry {
     this.variableStatus.set(dereferenceLevel, effect);
   }
 
+  public Effect getStatus(int dereferenceLevel) {
+    return this.variableStatus.get(dereferenceLevel);
+  }
 
-}  
+
+  public List<Effect> getStatusList() {
+    return variableStatus;
+  }
+
+  public int getMaxDereferenceLevel() {
+    return variableStatus.size();
+
+  }
+}

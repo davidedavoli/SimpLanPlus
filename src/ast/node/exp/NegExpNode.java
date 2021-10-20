@@ -1,7 +1,9 @@
 package ast.node.exp;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.types.IntTypeNode;
@@ -55,10 +57,16 @@ public class NegExpNode extends ExpNode {
 	public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-
+	/*@Override
+	public List<LhsNode> variables() {
+		return exp.variables();
+	}*/
 	@Override
 	public ArrayList<SemanticError> checkEffects(Environment env) {
-		return new ArrayList<>();
+		ArrayList<SemanticError> errors = new ArrayList<>();
+		errors.addAll(exp.checkEffects(env));
+		errors.addAll(checkExpStatus(env));
+		return errors;
 	}
 
 }  

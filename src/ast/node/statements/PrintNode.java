@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import ast.node.Node;
 import ast.node.dec.FunNode;
+import ast.node.exp.ExpNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import semantic.Environment;
@@ -39,7 +40,9 @@ public class PrintNode implements Node {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return new ArrayList<>();
+      ArrayList<SemanticError> errors = new ArrayList<>();
+      errors.addAll(val.checkEffects(env));
+      return errors;
     }
 
     public String codeGeneration(Label labelManager) throws SimplanPlusException {

@@ -52,15 +52,9 @@ public class BlockNode implements Node {
       HashMap<String, STentry> hm = new HashMap<String,STentry> ();
 
       if (!isFunction) {
-          //env.nestingLevel++;
-          //env.symTable.add(hm);
           env.createVoidScope();
       }
       current_nl = env.getNestingLevel();
-      /*System.out.println("CURRENT NESTING LEVEL IN BLOCK AND IS FUNCTION");
-      System.out.println(current_nl);
-      System.out.println(isFunction);*/
-
 
       //declare resulting list
       ArrayList<SemanticError> res = new ArrayList<SemanticError>();
@@ -126,7 +120,24 @@ public class BlockNode implements Node {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return new ArrayList<>();
+        ArrayList<SemanticError> errors = new ArrayList<>();
+
+        if (!isFunction) {
+            env.createVoidScope();
+        }
+
+        for (Node dec : declarations) {
+            errors.addAll(dec.checkEffects(env));
+        }
+
+        for(Node stm: statements) {
+            errors.addAll(stm.checkEffects(env));
+        }
+
+        if (!isFunction) {
+            env.popBlockScope();
+        }
+        return errors;
     }
 
 //  public ArrayList<SemanticError> delTypeCheck(DelEnv env, int n){

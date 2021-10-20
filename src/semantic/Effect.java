@@ -83,4 +83,5 @@ public class Effect {
         Effect e = (Effect) obj;
         return status == e.status;
     }
+
 }

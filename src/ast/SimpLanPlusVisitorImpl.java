@@ -175,7 +175,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	
 	@Override
 	public Node visitDeletion(DeletionContext ctx) {
-		return new DeletionNode(new IdExpNode(ctx.ID().getText()));
+		return new DeletionNode(new IdNode(ctx.ID().getText()));
 	}
 	
 	@Override
@@ -263,7 +263,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		if (ctx.ID() != null)
 			return new IdExpNode(ctx.ID().getText());
 		else
-			return new LhsExpNode(visitLhsExp(ctx.lhs()));
+			return new LhsExpNode(visitLhsExp(ctx.lhs()),visitLhs(ctx.lhs()));
 	}
 	
 	@Override

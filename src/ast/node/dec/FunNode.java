@@ -43,64 +43,6 @@ public class FunNode implements Node {
 		return endFuncLabel;
 	}
 
-
-  @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
-
-	  //create result list
-	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-
-	  //env.offset = -2;
-	  HashMap<String, STentry> hm = env.getCurrentST();
-	  STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel);
-
-      if ( hm.put(id,entry) != null )
-        res.add(new SemanticError("Fun id '"+id+"' already declared"));
-      else{
-		  env.createVoidScope();
-
-	      ArrayList<TypeNode> parTypes = new ArrayList<TypeNode>();
-	      int paroffset=1;
-	      //check args
-	      for(Node a : parlist){
-	    	  ArgNode arg = (ArgNode) a;
-	    	  parTypes.add(arg.getType());
-			  STentry oldEntry = env.newFunctionParameter(arg.getId(),arg.getType(),paroffset++);
-			  if(oldEntry != null)
-				  System.out.println("Parameter id '"+arg.getId()+"' already declared");
-	      }
-
-	      //set func type
-
-	      partypes= parTypes;
-
-	      entry.addType( new ArrowTypeNode(parTypes, type) );
-
-
-		  res.addAll(body.checkSemantics(env));
-
-		  //close scope
-
-	      env.popFunScope();
-
-
-      }
-
-      RetEffType abs = new RetEffType(RetEffType.RetT.ABS);
-      RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
-
-      //!(type instanceof VoidTypeNode) &&
-      if ( body.retTypeCheck(this).leq(abs)) {
-    	  res.add(new SemanticError("Possible absence of return value"));
-      }
-      /*if ((type instanceof VoidTypeNode) && pres.leq(body.retTypeCheck())) {
-    	  res.add(new SemanticError("Return statement in void function"));
-      }*/
-
-
-      return res;
-	}
-
   public void addPar (Node p) {
     parlist.add(p);
   }
@@ -130,6 +72,65 @@ public class FunNode implements Node {
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
+
+
+
+	@Override
+	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+
+		//create result list
+		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+
+		//env.offset = -2;
+		HashMap<String, STentry> hm = env.getCurrentST();
+		STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel);
+
+		if ( hm.put(id,entry) != null )
+			res.add(new SemanticError("Fun id '"+id+"' already declared"));
+		else{
+			env.createVoidScope();
+
+			ArrayList<TypeNode> parTypes = new ArrayList<TypeNode>();
+			int paroffset=1;
+			//check args
+			for(Node a : parlist){
+				ArgNode arg = (ArgNode) a;
+				parTypes.add(arg.getType());
+				STentry oldEntry = env.newFunctionParameter(arg.getId(),arg.getType(),paroffset++);
+				if(oldEntry != null)
+					System.out.println("Parameter id '"+arg.getId()+"' already declared");
+			}
+
+			//set func type
+
+			partypes= parTypes;
+
+			entry.addType( new ArrowTypeNode(parTypes, type) );
+
+
+			res.addAll(body.checkSemantics(env));
+
+			//close scope
+
+			env.popFunScope();
+
+
+		}
+
+		RetEffType abs = new RetEffType(RetEffType.RetT.ABS);
+		RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
+
+		//!(type instanceof VoidTypeNode) &&
+		if ( body.retTypeCheck(this).leq(abs)) {
+			res.add(new SemanticError("Possible absence of return value"));
+		}
+      /*if ((type instanceof VoidTypeNode) && pres.leq(body.retTypeCheck())) {
+    	  res.add(new SemanticError("Return statement in void function"));
+      }*/
+
+
+		return res;
+	}
 
 	@Override
 	public ArrayList<SemanticError> checkEffects(Environment env) {

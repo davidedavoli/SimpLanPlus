@@ -126,7 +126,7 @@ public class VarNode implements Node {
         }
         HashMap<String, STentry> hm = new HashMap<> ();
         hm.put(id.getID(), id.getEntry());
-        env.addEntry(hm);
+        env.addEntry(id.getID(), id.getEntry());
         return errors;
     }
 

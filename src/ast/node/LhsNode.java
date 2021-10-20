@@ -6,6 +6,7 @@ import ast.STentry;
 import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
+import parser.SimpLanPlusParser;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -72,7 +73,10 @@ public class LhsNode implements Node {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return new ArrayList<>();
+        ArrayList<SemanticError> errors = new ArrayList<>();
+
+        errors.addAll(inner.checkEffects(env));
+        return  errors;
     }
 
     public String codeGeneration(Label labelManager) throws SimplanPlusException {

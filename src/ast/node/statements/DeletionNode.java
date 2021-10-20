@@ -5,12 +5,15 @@ import java.util.ArrayList;
 //import org.stringtemplate.v4.compiler.STParser.notConditional_return;
 
 import ast.STentry;
+import ast.node.IdNode;
+import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.exp.IdExpNode;
 import ast.node.types.PointerTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
+import semantic.Effect;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -18,11 +21,11 @@ import semantic.SimplanPlusException;
 
 public class DeletionNode implements Node {
 
-  private IdExpNode id;
+  private IdNode id;
   private TypeNode type;
   private STentry entry;
   
-  public DeletionNode (IdExpNode i) {
+  public DeletionNode (IdNode i) {
     id=i;
     type=null;
     entry=null;
@@ -34,6 +37,7 @@ public class DeletionNode implements Node {
       ArrayList<SemanticError> res = new ArrayList<SemanticError>();
       res = id.checkSemantics(env);
       type = id.typeCheck();
+      entry = id.getEntry();
       return res;
   }
   
@@ -54,7 +58,32 @@ public class DeletionNode implements Node {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return new ArrayList<>();
+      ArrayList<SemanticError> errors = new ArrayList<>();
+
+      errors.addAll(id.checkEffects(env));
+
+      STentry idEntry = id.getEntry();
+      System.out.println(idEntry.getStatusList());
+      /*System.out.println("ENTRY TO DELETE");
+      System.out.println(idEntry);
+      System.out.println(idEntry.getStatus(0));*/
+
+      System.out.println(idEntry);
+      if (
+              idEntry.getStatus(1).equals(new Effect(Effect.DEL))
+              ||
+              idEntry.getStatus(1).equals(new Effect(Effect.ERR))
+      ) {
+        errors.add(new SemanticError(id.getID() + " already deleted."));
+      } else {
+
+        errors.addAll(env.checkStmStatus(
+                new LhsNode(id),
+                Effect::sequenceEffect,
+                Effect.DEL)
+        );
+      }
+      return errors;
     }
 
     public String codeGeneration(Label labelManager) throws SimplanPlusException {

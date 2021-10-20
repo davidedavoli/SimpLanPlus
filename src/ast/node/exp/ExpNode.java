@@ -1,6 +1,7 @@
 package ast.node.exp;
 
 import ast.Label;
+import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
@@ -10,6 +11,7 @@ import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ExpNode implements Node {
     @Override
@@ -40,6 +42,11 @@ public class ExpNode implements Node {
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
         return new ArrayList<>();
+    }
+
+
+    public List<LhsNode> variables() {
+        return null;
     }
 
     public ArrayList<SemanticError> checkExpStatus(Environment env) {

@@ -1,8 +1,10 @@
 package semantic;
 
 import java.util.*;
+import java.util.function.BiFunction;
 
 import ast.STentry;
+import ast.node.LhsNode;
 import ast.node.types.TypeNode;
 
 public class Environment {
@@ -127,12 +129,57 @@ public class Environment {
 		return entry;
 	}
 
-	public void addEntry(HashMap<String, STentry> entry){
-		this.symTable.add(entry);
+	public void addEntry(String id, STentry entry){
+		HashMap<String, STentry> ST = this.symTable.get(nestingLevel);
+		ST.put(id,entry);
+
 	}
 
 	/**
 	 * End new parameter/declaration function
 	 */
+
+
+	/**
+	 *
+	 * Check Stm status
+	 * @param {LhsNode} variable is the variable that will receive the new effect
+	 * @param {BiFunction} function from effect that has to be invoke
+	 * @param {int} effect to be applayed
+	 */
+	public ArrayList<SemanticError> checkStmStatus(
+		LhsNode variable,
+		BiFunction<Effect,Effect,Effect> effectFun,
+		int effect
+	) {
+
+		ArrayList<SemanticError> errors = new ArrayList<>();
+
+		try {
+			STentry idEntry = lookUp(variable.getID());
+			//Non deferenzia con 1
+			Effect oldEffect = idEntry.getStatus(variable.getDerefLevel());
+			System.out.println("OLD EFFECT");
+			System.out.println(oldEffect.toString());
+			Effect newEffect = new Effect(effect);
+
+			Effect newStatus = effectFun.apply(oldEffect,newEffect);
+			idEntry.setStatus(newStatus, variable.getDerefLevel());
+
+			if (newStatus.equals(new Effect(Effect.ERR))) {
+				errors.add(new SemanticError(variable.getID() + " used after delete."));
+			}
+		} catch (Exception exception) {
+			errors.add(new SemanticError(variable.getID() + " not declared. Aborting."));
+		}
+		return errors;
+	}
+
+	/**
+	 *
+	 * End Stm status
+	 *
+	 */
+
 
 }

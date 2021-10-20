@@ -1,7 +1,9 @@
 package ast.node.exp;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.types.BoolTypeNode;
@@ -45,6 +47,10 @@ public class NotExpNode extends ExpNode {
 	  return new BoolTypeNode();
 
   }
+	/*@Override
+	public List<LhsNode> variables() {
+		return exp.variables();
+	}*/
   
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
@@ -52,7 +58,10 @@ public class NotExpNode extends ExpNode {
 
 	@Override
 	public ArrayList<SemanticError> checkEffects(Environment env) {
-		return new ArrayList<>();
+		ArrayList<SemanticError> errors = new ArrayList<>();
+		errors.addAll(exp.checkEffects(env));
+		errors.addAll(checkExpStatus(env));
+		return errors;
 	}
 
 	public String codeGeneration(Label labelManager) throws SimplanPlusException {

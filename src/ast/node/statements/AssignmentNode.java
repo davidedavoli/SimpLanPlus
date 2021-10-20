@@ -1,14 +1,18 @@
 package ast.node.statements;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ast.STentry;
 import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
+import ast.node.exp.ExpNode;
+import ast.node.exp.LhsExpNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
+import semantic.Effect;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -61,10 +65,36 @@ public class AssignmentNode implements Node {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return new ArrayList<>();
+      ArrayList<SemanticError> errors = new ArrayList<>();
+
+      errors.addAll(lhs.checkEffects(env));
+      errors.addAll(exp.checkEffects(env));
+      STentry idEntry = env.lookUp(lhs.getID());
+      if (idEntry.getStatus(lhs.getDerefLevel()).equals(new Effect(Effect.ERR))) {
+        errors.addAll(env.checkStmStatus(lhs, Effect::sequenceEffect, Effect.RW));
+      }
+     /* else if (exp instanceof LhsExpNode) {
+        // need to implement variables
+        LhsNode rhsPointer = exp.variables().get(0);
+        int lhsDerefLvl = lhs.getDerefLevel();
+        int expDerefLvl = rhsPointer.getDerefLevel();
+        int lhsMaxDerefLvl = idEntry.getMaxDereferenceLevel();
+
+        for (int i = lhsDerefLvl, j = expDerefLvl; i < lhsMaxDerefLvl; i++, j++) {
+          STentry rhsEntry = env.lookUp(rhsPointer.getID());
+          Effect rhsStatus = rhsEntry.getStatus(j);
+          idEntry.setStatus(rhsStatus, i);
+        }
+      }
+      */else { // lhs is not in error status and exp is not a pointer.
+        idEntry.setStatus(new Effect(Effect.RW), lhs.getDerefLevel());
+      }
+
+      return errors;
     }
 
-    public String codeGeneration(Label labelManager) throws SimplanPlusException {
+
+  public String codeGeneration(Label labelManager) throws SimplanPlusException {
       StringBuilder cgen = new StringBuilder();
       cgen.append(exp.codeGeneration(labelManager)).append("\n");
 

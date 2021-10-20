@@ -102,8 +102,11 @@ public class IdNode extends LhsNode {
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
         entry = env.lookUp(id);
+        System.out.println("ID ENTRY");
+        System.out.println(id);
+        System.out.println(env.getCurrentST());
         nestinglevel = env.getNestingLevel();;
-      return new ArrayList<>();
+        return new ArrayList<>();
     }
 
     public void setStatus(Effect effect, int dereferenceLevel){
