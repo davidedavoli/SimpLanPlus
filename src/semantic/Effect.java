@@ -11,13 +11,13 @@ package semantic;
 
 public class Effect {
     // init effect
-    private static final int INIT = 0;
+    public static final int INIT = 0;
     // read & write effect
-    private static final int RW = 1;
+    public static final int RW = 1;
     // delete effect
-    private static final int DEL = 2;
+    public static final int DEL = 2;
     // error effect
-    private static final int ERR = 3;
+    public static final int ERR = 3;
 
     // Actual status of a variable.
     private final int status;
@@ -26,7 +26,11 @@ public class Effect {
         this.status = status;
     }
 
-    public Effect(Effect effect) {
+    public Effect() {
+        this(INIT);
+    }
+
+    public Effect(final Effect effect) {
         this(effect.status);
     }
 
