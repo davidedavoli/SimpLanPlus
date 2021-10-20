@@ -22,7 +22,7 @@ public class Effect {
     // Actual status of a variable.
     private final int status;
 
-    private Effect(int status) {
+    public Effect(int status) {
         this.status = status;
     }
 

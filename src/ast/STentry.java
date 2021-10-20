@@ -1,13 +1,38 @@
 package ast;
 
 import ast.node.types.TypeNode;
+import semantic.Effect;
 import semantic.SimplanPlusException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class STentry {
- 
-  private final int nl;
+
+  private final int nestingLevel;
   private TypeNode type;
   private final int offset;
+
+  // status of variable
+  private List<Effect> variableStatus;
+
+  private String beginFuncLabel = "";
+  private String endFuncLabel = "";
+   
+  public STentry (int nestingLevel, TypeNode type, int offset) {
+    this.nestingLevel = nestingLevel;
+    this.type = type;
+    this.offset = offset;
+    this.variableStatus.add(new Effect(Effect.INIT));
+  }
+
+  public STentry (int nestingLevel, int offset, String bFL, String eFL) {
+    this.nestingLevel = nestingLevel;
+    this.offset = offset;
+    beginFuncLabel = bFL;
+    endFuncLabel = eFL;
+    this.variableStatus = new ArrayList<>();
+  }
 
   public String getBeginFuncLabel() {
     return beginFuncLabel;
@@ -17,39 +42,16 @@ public class STentry {
     return endFuncLabel;
   }
 
-  private String beginFuncLabel = "";
-  private String endFuncLabel = "";
+  public void addType (TypeNode t) {this.type = t;}
   
-  public STentry (int n, int os)
-  {nl=n;
-  offset=os;} 
-   
-  public STentry (int n, TypeNode t, int os)
-  {nl=n;
-   type=t;
-   offset=os;}
+  public TypeNode getType () {return this.type;}
 
-  public STentry (int n, int os, String bFL, String eFL) {
-    nl=n;
-    offset=os;
-    beginFuncLabel= bFL;
-    endFuncLabel = eFL;
-  }
+  public int getOffset () {return this.offset;}
   
-  public void addType (TypeNode t)
-  {type=t;}
-  
-  public TypeNode getType ()
-  {return type;}
-
-  public int getOffset ()
-  {return offset;}
-  
-  public int getNestinglevel ()
-  {return nl;}
+  public int getNestinglevel () {return this.nestingLevel;}
   
   public String toPrint(String s) throws SimplanPlusException { //
-	   return s+"STentry: nestlev " + Integer.toString(nl) +"\n"+
+	   return s+"STentry: nestlev " + Integer.toString(nestingLevel) +"\n"+
 			  s+"STentry: type\n" + 
 			  type.toPrint(s+"  ") + 
 		      s+"STentry: offset " + Integer.toString(offset) + "\n";
