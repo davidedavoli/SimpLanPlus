@@ -56,4 +56,9 @@ public class NegExpNode implements Node {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 
+	@Override
+	public ArrayList<SemanticError> checkEffects(Environment env) {
+		return null;
+	}
+
 }  

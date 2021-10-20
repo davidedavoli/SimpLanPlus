@@ -106,8 +106,13 @@ public class NewNode implements Node {
 	  public RetEffType retTypeCheck(FunNode funNode) {
 		  return new RetEffType(RetEffType.RetT.ABS);
 	  }
-	  
-	  public String codeGeneration(Label labelManager){
+
+	@Override
+	public ArrayList<SemanticError> checkEffects(Environment env) {
+		return null;
+	}
+
+	public String codeGeneration(Label labelManager){
 		  StringBuilder cgen = new StringBuilder();
 		  cgen.append("new $a0").append("// put new address in a0\n");
 		  return cgen.toString();

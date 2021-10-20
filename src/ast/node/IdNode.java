@@ -100,4 +100,9 @@ public class IdNode extends LhsNode {
       return cgen.toString();
 
   }
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
 }  

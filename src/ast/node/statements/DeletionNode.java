@@ -51,8 +51,13 @@ public class DeletionNode implements Node {
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    public String codeGeneration(Label labelManager) throws SimplanPlusException {
       StringBuilder cgen = new StringBuilder();
       System.out.println("DELETE NODE "+id.getID()+" NODO_ "+id);
       cgen.append(id.codeGeneration(labelManager)).append("\n");

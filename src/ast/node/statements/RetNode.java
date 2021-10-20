@@ -63,8 +63,13 @@ public class RetNode implements Node {
 	    return new RetEffType(RetEffType.RetT.PRES);
   }
 
-    
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+
+    public String codeGeneration(Label labelManager) throws SimplanPlusException {
         StringBuilder cgen = new StringBuilder();
         if( val != null){
             cgen.append(val.codeGeneration(labelManager)).append("\n");

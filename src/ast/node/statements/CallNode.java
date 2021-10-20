@@ -48,7 +48,12 @@ public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
 }
 
-  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 		//create the result
 		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
 		

@@ -60,8 +60,13 @@ public class IfNode implements Node {
 	  else
 		  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  public TypeNode typeCheck() throws SimplanPlusException {
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    public TypeNode typeCheck() throws SimplanPlusException {
     if (
             !(TypeUtils.isSubtype(cond.typeCheck(),new BoolTypeNode()))
 

@@ -52,6 +52,11 @@ public class ArrowTypeNode implements TypeNode {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 
+  @Override
+  public ArrayList<SemanticError> checkEffects(Environment env) {
+    return null;
+  }
+
   //non utilizzato
   public String codeGeneration(Label labelManager) {
 		return "";

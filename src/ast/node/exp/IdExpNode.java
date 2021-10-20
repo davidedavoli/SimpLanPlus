@@ -46,7 +46,7 @@ public class IdExpNode extends LhsExpNode {
   }
 
   public String toPrint(String s) throws SimplanPlusException {
-	return s+"Id:" + id + " at nestlev " + nestinglevel +"\n" + entry.toPrint(s+"  ") ;  
+	return s+"Id:" + id + " at nestlev " + nestinglevel +"\n" + entry.toPrint(s+"  ") ;
   }
   
   @Override
@@ -97,4 +97,9 @@ public class IdExpNode extends LhsExpNode {
 
       return cgen.toString();
   }
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
 }  

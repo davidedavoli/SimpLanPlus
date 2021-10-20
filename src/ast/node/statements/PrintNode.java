@@ -36,8 +36,13 @@ public class PrintNode implements Node {
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    public String codeGeneration(Label labelManager) throws SimplanPlusException {
         StringBuilder cgen = new StringBuilder();
         cgen.append(val.codeGeneration(labelManager)).append("\n");
         cgen.append("print $a0\n");

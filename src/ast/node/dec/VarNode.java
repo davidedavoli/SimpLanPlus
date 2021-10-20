@@ -84,8 +84,13 @@ public class VarNode implements Node {
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  //valore di ritorno non utilizzato
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    //valore di ritorno non utilizzato
   public TypeNode typeCheck () throws SimplanPlusException {
     if (exp != null && ! (TypeUtils.isSubtype(exp.typeCheck(),type)) ){
       System.out.println("incompatible value for variable "+id);

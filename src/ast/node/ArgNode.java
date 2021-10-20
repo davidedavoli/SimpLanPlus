@@ -47,8 +47,13 @@ public class ArgNode implements Node {
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  //non utilizzato
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    //non utilizzato
   public String codeGeneration(Label labelManager){
 		return "";
   }

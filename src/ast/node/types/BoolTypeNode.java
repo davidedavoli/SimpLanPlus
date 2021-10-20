@@ -29,8 +29,13 @@ public class BoolTypeNode implements TypeNode {
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  @Override
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    @Override
  	public ArrayList<SemanticError> checkSemantics(Environment env) {
 
  	  return new ArrayList<SemanticError>();

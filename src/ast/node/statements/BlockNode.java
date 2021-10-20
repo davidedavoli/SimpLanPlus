@@ -125,6 +125,11 @@ public class BlockNode implements Node {
 	  return tmp;
   }
 
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
 //  public ArrayList<SemanticError> delTypeCheck(DelEnv env, int n){
 //	  ArrayList<SemanticError> err = new ArrayList<SemanticError>();
 //	  

@@ -26,4 +26,6 @@ public interface Node {
   //ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl);
 
   RetEffType retTypeCheck(FunNode funNode);
+
+  ArrayList<SemanticError> checkEffects(Environment env);
 }

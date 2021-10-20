@@ -45,8 +45,13 @@ public class PointerTypeNode implements TypeNode {
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  //TODO Generare il codice
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    //TODO Generare il codice
   public String codeGeneration(Label labelManager) {
 		return "";
   }

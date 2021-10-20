@@ -80,8 +80,13 @@ public class LhsExpNode implements Node {
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-  
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+
+    @Override
+    public ArrayList<SemanticError> checkEffects(Environment env) {
+        return null;
+    }
+
+    public String codeGeneration(Label labelManager) throws SimplanPlusException {
       /**
        * Mette in $a0 quello che c'è nella cella di memoria del puntatore
        */
