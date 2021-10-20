@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * Class to handle math expression. These operations are permitted only on Integers value
  */
 
-public class BinExpNode implements Node {
+public class BinExpNode extends ExpNode {
     private final Node lhs;
     private final String operator;
     private final Node rhs;
@@ -221,6 +221,13 @@ public class BinExpNode implements Node {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return null;
+        ArrayList<SemanticError> errors = new ArrayList<>();
+
+        errors.addAll(lhs.checkEffects(env));
+        errors.addAll(rhs.checkEffects(env));
+
+        errors.addAll(checkExpStatus(env));
+
+        return errors;
     }
 }

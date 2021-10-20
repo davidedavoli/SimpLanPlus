@@ -13,7 +13,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class NegExpNode implements Node {
+public class NegExpNode extends ExpNode {
 
   private Node exp;
   

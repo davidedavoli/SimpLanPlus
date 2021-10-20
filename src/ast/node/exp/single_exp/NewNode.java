@@ -68,6 +68,7 @@ import java.util.ArrayList;
 
 import ast.node.Node;
 import ast.node.dec.FunNode;
+import ast.node.exp.ExpNode;
 import ast.node.types.PointerTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -76,7 +77,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class NewNode implements Node {
+public class NewNode extends ExpNode {
 	
 	  private TypeNode type;
 	  
@@ -109,7 +110,7 @@ public class NewNode implements Node {
 
 	@Override
 	public ArrayList<SemanticError> checkEffects(Environment env) {
-		return null;
+		return new ArrayList<>();
 	}
 
 	public String codeGeneration(Label labelManager){

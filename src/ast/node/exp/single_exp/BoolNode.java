@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import ast.node.Node;
 import ast.node.dec.FunNode;
+import ast.node.exp.ExpNode;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -11,7 +12,7 @@ import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
 
-public class BoolNode implements Node {
+public class BoolNode extends ExpNode {
 
   private boolean val;
   
@@ -34,7 +35,7 @@ public class BoolNode implements Node {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return null;
+      return new ArrayList<>();
     }
 
     @Override

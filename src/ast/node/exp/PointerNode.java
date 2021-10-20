@@ -12,7 +12,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class PointerNode implements Node {
+public class PointerNode extends ExpNode {
 
   private Integer val;
   private TypeNode type;
