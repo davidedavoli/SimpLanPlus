@@ -11,13 +11,13 @@ package semantic;
 
 public class Effect {
     // init effect
-    public static final int INIT = 0;
+    private static final int INIT = 0;
     // read & write effect
-    public static final int RW = 1;
+    private static final int RW = 1;
     // delete effect
-    public static final int DEL = 2;
+    private static final int DEL = 2;
     // error effect
-    public static final int ERR = 3;
+    private static final int ERR = 3;
 
     // Actual status of a variable.
     private final int status;

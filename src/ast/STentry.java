@@ -14,7 +14,7 @@ public class STentry {
   private final int offset;
 
   // status of variable
-  private List<Effect> variableStatus;
+  private List<Effect> variableStatus = new ArrayList<Effect>();
 
   private String beginFuncLabel = "";
   private String endFuncLabel = "";
@@ -23,7 +23,8 @@ public class STentry {
     this.nestingLevel = nestingLevel;
     this.type = type;
     this.offset = offset;
-    this.variableStatus.add(new Effect(Effect.INIT));
+    Effect initEffect = new Effect();
+    this.variableStatus.add(initEffect);
   }
 
   public STentry (int nestingLevel, int offset, String bFL, String eFL) {
