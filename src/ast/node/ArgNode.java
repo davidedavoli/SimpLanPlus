@@ -50,7 +50,7 @@ public class ArgNode implements Node {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return null;
+        return new ArrayList<>();
     }
 
     //non utilizzato

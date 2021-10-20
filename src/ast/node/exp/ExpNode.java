@@ -39,10 +39,14 @@ public class ExpNode implements Node {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return null;
+        return new ArrayList<>();
     }
 
     public ArrayList<SemanticError> checkExpStatus(Environment env) {
-        return null;
+        ArrayList<SemanticError> errors = new ArrayList<>();
+        //TODO: prendere la lista delle variabili dell'espressione e fare un check status su ogni variabile. Fare
+        //      l'append nella lista degli errori
+
+        return errors;
     }
 }

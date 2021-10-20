@@ -57,4 +57,8 @@ public class STentry {
 			  type.toPrint(s+"  ") + 
 		      s+"STentry: offset " + Integer.toString(offset) + "\n";
   }
+
+  public void setStatus(Effect effect, int dereferenceLevel) {
+    this.variableStatus.set(dereferenceLevel, effect);
+  }
 }  

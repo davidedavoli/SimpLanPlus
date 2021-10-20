@@ -44,9 +44,9 @@ public class Test {
 		Node ast = visitor.visitMainBlock(parser.block(), true); //generazione AST
 		return ast;
 	}
-	private static ArrayList<SemanticError> checkErrorAst(Node ast) throws SimplanPlusException {
+	private static ArrayList<SemanticError> checkErrorAst(Node ast, Environment env) throws SimplanPlusException {
 		//SIMPLE CHECK FOR LEXER ERRORS
-		Environment env = new Environment();
+
 		ArrayList<SemanticError> err = ast.checkSemantics(env);
 
 
@@ -108,8 +108,9 @@ public class Test {
 		CommonTokenStream tokens = lexer(fileAbsName);
 
 		Node ast = parser(tokens);
+		Environment env = new Environment();
 
-		ArrayList<SemanticError> err = checkErrorAst(ast);
+		ArrayList<SemanticError> err = checkErrorAst(ast, env);
 
 		if(err.size()>0){
 			System.out.println("You had: " +err.size()+" errors:");
@@ -119,6 +120,11 @@ public class Test {
 		}
 
 		typeCheck(ast);
+		ArrayList<SemanticError> effectErrors = ast.checkEffects(env);
+		if( !effectErrors.isEmpty() ) {
+			System.out.println(effectErrors);
+			return;
+		}
 		codeGeneration(fileAsm,ast);
 
 		CommonTokenStream tokensASM = SVMLexer(fileAsm);

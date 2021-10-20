@@ -138,7 +138,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		}
 		
 		//build the varNode
-		return new VarNode(ctx.ID().getText(), typeNode, expNode);
+		return new VarNode(new IdNode(ctx.ID().getText()), typeNode, expNode);
 	}
 
 	@Override

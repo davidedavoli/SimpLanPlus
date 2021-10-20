@@ -63,7 +63,7 @@ public class IfNode extends ExpNode {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return null;
+        return new ArrayList<>();
     }
 
     public TypeNode typeCheck() throws SimplanPlusException {

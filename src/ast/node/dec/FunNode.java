@@ -145,7 +145,7 @@ public class FunNode implements Node {
 
 	@Override
 	public ArrayList<SemanticError> checkEffects(Environment env) {
-		return null;
+	  return new ArrayList<>();
 	}
 
 	public String codeGeneration(Label labelManager) throws SimplanPlusException {

@@ -50,7 +50,7 @@ public RetEffType retTypeCheck(FunNode funNode) {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return null;
+        return new ArrayList<>();
     }
 
     public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {

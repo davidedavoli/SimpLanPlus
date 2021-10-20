@@ -58,7 +58,7 @@ public class NegExpNode extends ExpNode {
 
 	@Override
 	public ArrayList<SemanticError> checkEffects(Environment env) {
-		return null;
+		return new ArrayList<>();
 	}
 
 }  

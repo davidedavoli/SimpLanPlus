@@ -48,7 +48,7 @@ public class PointerTypeNode implements TypeNode {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return null;
+        return new ArrayList<>();
     }
 
     //TODO Generare il codice

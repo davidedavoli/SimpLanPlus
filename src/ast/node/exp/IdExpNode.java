@@ -100,6 +100,6 @@ public class IdExpNode extends LhsExpNode {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return null;
+        return new ArrayList<>();
     }
 }  

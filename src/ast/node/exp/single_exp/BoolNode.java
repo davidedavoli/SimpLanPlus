@@ -2,52 +2,51 @@ package ast.node.exp.single_exp;
 
 import java.util.ArrayList;
 
-import ast.node.Node;
-import ast.node.dec.FunNode;
-import ast.node.exp.ExpNode;
-import ast.node.types.BoolTypeNode;
-import ast.node.types.RetEffType;
-import ast.node.types.TypeNode;
-import semantic.Environment;
-import ast.Label;
-import semantic.SemanticError;
+  import ast.node.Node;
+  import ast.node.dec.FunNode;
+  import ast.node.exp.ExpNode;
+  import ast.node.types.BoolTypeNode;
+  import ast.node.types.RetEffType;
+  import ast.node.types.TypeNode;
+  import semantic.Environment;
+  import ast.Label;
+  import semantic.SemanticError;
 
 public class BoolNode extends ExpNode {
 
   private boolean val;
-  
+
   public BoolNode (boolean n) {
-    val=n;
+  val=n;
   }
-  
+
   public String toPrint(String s) {
     if (val) return s+"Bool:true\n";
-    else return s+"Bool:false\n";  
+    else return s+"Bool:false\n";
   }
-  
+
   public TypeNode typeCheck() {
-    return new BoolTypeNode();
-  }    
-  
-  public RetEffType retTypeCheck(FunNode funNode) {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  return new BoolTypeNode();
   }
 
-    @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
-      return new ArrayList<>();
-    }
+  public RetEffType retTypeCheck(FunNode funNode) {
+    return new RetEffType(RetEffType.RetT.ABS);
+  }
 
-    @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
+  @Override
+  public ArrayList<SemanticError> checkEffects(Environment env) {
+    return new ArrayList<>();
+  }
 
- 	  return new ArrayList<SemanticError>();
- 	}
-  
+  @Override
+  public ArrayList<SemanticError> checkSemantics(Environment env) {
+
+    return new ArrayList<SemanticError>();
+  }
+
   public String codeGeneration(Label labelManager){
-      StringBuilder cgen = new StringBuilder();
-      cgen.append("li $a0 ").append(val?1:0).append("\n");
-      return cgen.toString();
-	  }
-         
-}  
+    StringBuilder cgen = new StringBuilder();
+    cgen.append("li $a0 ").append(val?1:0).append("\n");
+    return cgen.toString();
+  }
+}

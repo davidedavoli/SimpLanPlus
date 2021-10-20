@@ -7,6 +7,7 @@ import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
+import semantic.Effect;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -15,7 +16,10 @@ import semantic.SimplanPlusException;
 public class IdNode extends LhsNode {
 
   private String id;
-  private STentry entry;
+
+
+
+    private STentry entry;
   private int nestinglevel;
   
   public IdNode (String i) {
@@ -40,7 +44,8 @@ public class IdNode extends LhsNode {
   public int getNestingLevel() {
 	  return nestinglevel;
   }
-  
+
+  public void setEntry(STentry entry) { this.entry = entry; }
   public STentry getEntry() {
 	  return entry;
   }
@@ -103,6 +108,10 @@ public class IdNode extends LhsNode {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return null;
+      return new ArrayList<>();
+    }
+
+    public void setStatus(Effect effect, int dereferenceLevel){
+        this.entry.setStatus(effect, dereferenceLevel);
     }
 }  
