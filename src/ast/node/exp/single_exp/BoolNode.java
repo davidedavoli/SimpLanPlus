@@ -1,11 +1,14 @@
 package ast.node.exp.single_exp;
 
 import java.util.ArrayList;
+import java.util.List;
 
-  import ast.node.Node;
+import ast.Dereferenceable;
+import ast.node.LhsNode;
+import ast.node.Node;
   import ast.node.dec.FunNode;
-  import ast.node.exp.ExpNode;
-  import ast.node.types.BoolTypeNode;
+import ast.node.exp.ExpNode;
+import ast.node.types.BoolTypeNode;
   import ast.node.types.RetEffType;
   import ast.node.types.TypeNode;
   import semantic.Environment;
@@ -36,6 +39,11 @@ public class BoolNode extends ExpNode {
   @Override
   public ArrayList<SemanticError> checkEffects(Environment env) {
     return new ArrayList<>();
+  }
+
+  @Override
+  public List<Dereferenceable> variables() {
+    return new ArrayList<Dereferenceable>();
   }
 
   @Override

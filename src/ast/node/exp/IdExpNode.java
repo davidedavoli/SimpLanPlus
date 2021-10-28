@@ -3,6 +3,7 @@ package ast.node.exp;
 import java.util.ArrayList;
 import java.util.List;
 
+import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.LhsNode;
 import ast.node.dec.FunNode;
@@ -14,15 +15,15 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class IdExpNode extends LhsExpNode {
+public class IdExpNode extends LhsExpNode implements Dereferenceable {
 
   private String id;
   private STentry entry;
   private int nestinglevel;
   
   public IdExpNode (String i) {
-	  super(null);
-	  id=i;
+      super(null);
+      id=i;
   }
   
   @Override

@@ -65,7 +65,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	public Node visitStatement(StatementContext ctx){
 		Node tmp=null;
 		if (ctx.assignment()!= null) {//WARNING Casting
-			tmp = new AssignmentNode((LhsNode)visit(ctx.assignment().lhs()), visit(ctx.assignment().exp()));
+			tmp = new AssignmentNode((LhsNode)visit(ctx.assignment().lhs()), (ExpNode) visit(ctx.assignment().exp()));
 		}
 		else if (ctx.deletion()!= null) {
 			tmp = visit(ctx.deletion());
@@ -162,7 +162,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	
 	@Override
 	public Node visitAssignment(AssignmentContext ctx) {
-		return new AssignmentNode(visitLhs(ctx.lhs()), visit(ctx.exp()));
+		return new AssignmentNode(visitLhs(ctx.lhs()), (ExpNode) visit(ctx.exp()));
 	}
 	
 	@Override 
@@ -209,7 +209,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		//notice once again the need of named terminals in the rule, this is because
 		//we need to point to the right expression among the 3 possible ones in the rule
 		
-		Node condExp = visit (ctx.exp());
+		ExpNode condExp = (ExpNode) visit (ctx.exp());
 		
 		Node thenExp = visit (ctx.statement(0));
 		Node elseExp = null;
@@ -217,7 +217,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 			elseExp = visit (ctx.statement(1));
 		}
 		//build the @res properly and return it
-		res = new IfNode(condExp, thenExp, elseExp);
+		res = new IfNode( condExp, thenExp, elseExp);
 		
 		return res;
 	}
@@ -227,16 +227,16 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		//this corresponds to a function invocation
 		//declare the result
 		Node res;
-		
+
 		//get the invocation arguments
-		ArrayList<Node> args = new ArrayList<Node>();
-		
+		ArrayList<ExpNode> args = new ArrayList<ExpNode>();
+
 		for(ExpContext exp : ctx.exp())
-			args.add(visit(exp));
+			args.add((ExpNode) visit(exp));
 
 		//instantiate the invocation
 		res = new CallNode(ctx.ID().getText(), args);
-		
+
 		return res;
 	}
 	
@@ -256,18 +256,19 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	
 	@Override
 	public Node visitBinExp(BinExpContext ctx) {
-		return new BinExpNode(visit(ctx.left), ctx.op.getText(), visit(ctx.right));
+		return new BinExpNode((ExpNode) visit(ctx.left), ctx.op.getText(), (ExpNode) visit(ctx.right));
 	}
 	
 	private LhsExpNode visitLhsExp(LhsContext ctx) {
-		if (ctx.ID() != null)
+		if (ctx.ID() != null){
 			return new IdExpNode(ctx.ID().getText());
+		}
 		else
 			return new LhsExpNode(visitLhsExp(ctx.lhs()),visitLhs(ctx.lhs()));
 	}
 	
 	@Override
-	public Node visitDerExp(DerExpContext ctx) { 
+	public Node visitDerExp(DerExpContext ctx) {
 		return visitLhsExp(ctx.lhs());
 	}
 	
@@ -291,7 +292,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 //	}
 
 	@Override
-	public Node visitNewExp(NewExpContext ctx){ 
+	public Node visitNewExp(NewExpContext ctx){
 		if (ctx.getParent() instanceof AssignmentContext) {
 			NewNode tmp = new NewNode((TypeNode)visit(ctx.type()));
 //			tmp.setID(visitLhsExp(((AssignmentContext)ctx.getParent()).lhs()).getID());
@@ -309,16 +310,16 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		else return new NewNode(null); //WARNING in questo modo stiamo ammettendo solo uso di new nella forma type? id=new o return new.
 	}
 
-	@Override public Node visitValExp(SimpLanPlusParser.ValExpContext ctx) { 
+	@Override public ExpNode visitValExp(SimpLanPlusParser.ValExpContext ctx) {
 		return new IntNode(Integer.parseInt(ctx.NUMBER().getText()));
 		}
 	
-	@Override public Node visitNotExp(SimpLanPlusParser.NotExpContext ctx) { 
-		return new NotExpNode(visit(ctx.exp()));
+	@Override public ExpNode visitNotExp(SimpLanPlusParser.NotExpContext ctx) {
+		return new NotExpNode((ExpNode) visit(ctx.exp()));
 		}
 	
-	@Override public Node visitNegExp(SimpLanPlusParser.NegExpContext ctx) {
-		return new NegExpNode(visit(ctx.exp())); 
+	@Override public ExpNode visitNegExp(SimpLanPlusParser.NegExpContext ctx) {
+		return new NegExpNode((ExpNode) visit(ctx.exp()));
 	}
 	
 	@Override
@@ -330,9 +331,9 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	
 	@Override
 	public Node visitCallExp(CallExpContext ctx) {
-		
+		Node inner = visit(ctx.call());
 		//there is no need to perform a check here, the lexer ensures this text is a boolean
-		return visit(ctx.call()); 
+		return new CallExpNode((CallNode) inner);
 	}
 
 	public Node visitMainBlock(BlockContext ctx, Boolean isMainBlock) {

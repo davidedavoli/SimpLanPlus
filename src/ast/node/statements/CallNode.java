@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import ast.STentry;
 import ast.node.Node;
 import ast.node.dec.FunNode;
+import ast.node.exp.ExpNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -17,26 +18,26 @@ public class CallNode implements Node {
 
   private String id;
   private STentry entry;
-  private ArrayList<Node> parlist; 
+  private ArrayList<ExpNode> parlist;
   private int nestinglevel;
   private String endFunction;
 
   
-  public CallNode (String i, STentry e, ArrayList<Node> p, int nl) {
+  public CallNode (String i, STentry e, ArrayList<ExpNode> p, int nl) {
     id=i;
     entry=e;
     parlist = p;
     nestinglevel=nl;
   }
   
-  public CallNode(String text, ArrayList<Node> args) {
+  public CallNode(String text, ArrayList<ExpNode> args) {
 	id=text;
     parlist = args;
 }
 
 public String toPrint(String s) throws SimplanPlusException {  //
     String parlstr="";
-	for (Node par:parlist)
+	for (ExpNode par:parlist)
 	  parlstr+=par.toPrint(s+"  ");		
 	return s+"Call:" + id + " at nestlev " + nestinglevel +"\n" 
            +entry.toPrint(s+"  ")
@@ -63,7 +64,7 @@ public RetEffType retTypeCheck(FunNode funNode) {
             res.add(new SemanticError("Id "+id+" not declared"));
         else{
             nestinglevel = env.getNestingLevel();
-            for(Node arg : parlist)
+            for(ExpNode arg : parlist)
                 res.addAll(arg.checkSemantics(env));
         }
 
@@ -113,5 +114,8 @@ public RetEffType retTypeCheck(FunNode funNode) {
       return cgen.toString();
   }
 
-    
-}  
+
+    public ArrayList<ExpNode> getParlist() {
+        return parlist;
+    }
+}

@@ -3,6 +3,7 @@ package ast.node.statements;
 import java.util.ArrayList;
 import java.util.List;
 
+import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.LhsNode;
 import ast.node.Node;
@@ -21,10 +22,10 @@ import semantic.SimplanPlusException;
 public class AssignmentNode implements Node {
 
   private LhsNode lhs;
-  private Node exp;
+  private ExpNode exp;
 
   
-  public AssignmentNode (LhsNode l, Node e) {
+  public AssignmentNode (LhsNode l, ExpNode e) {
     lhs=l;
     exp=e;
   }	  
@@ -73,9 +74,12 @@ public class AssignmentNode implements Node {
       if (idEntry.getStatus(lhs.getDerefLevel()).equals(new Effect(Effect.ERR))) {
         errors.addAll(env.checkStmStatus(lhs, Effect::sequenceEffect, Effect.RW));
       }
-     /* else if (exp instanceof LhsExpNode) {
+      else if (exp instanceof LhsExpNode) {
         // need to implement variables
-        LhsNode rhsPointer = exp.variables().get(0);
+        List<Dereferenceable> rhsPointerList = exp.variables();
+          System.out.println("**************************");
+          System.out.println(rhsPointerList);
+        Dereferenceable rhsPointer = rhsPointerList.get(0);
         int lhsDerefLvl = lhs.getDerefLevel();
         int expDerefLvl = rhsPointer.getDerefLevel();
         int lhsMaxDerefLvl = idEntry.getMaxDereferenceLevel();
@@ -86,7 +90,7 @@ public class AssignmentNode implements Node {
           idEntry.setStatus(rhsStatus, i);
         }
       }
-      */else { // lhs is not in error status and exp is not a pointer.
+      else { // lhs is not in error status and exp is not a pointer.
         idEntry.setStatus(new Effect(Effect.RW), lhs.getDerefLevel());
       }
 

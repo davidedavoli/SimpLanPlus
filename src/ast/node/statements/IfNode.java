@@ -1,9 +1,12 @@
-package ast.node.exp;
+package ast.node.statements;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
+import ast.node.exp.ExpNode;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -13,13 +16,13 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class IfNode extends ExpNode {
+public class IfNode implements Node {
 
-  private Node cond;
+  private ExpNode cond;
   private Node th;
   private Node el;
   
-  public IfNode (Node c, Node t, Node e) {
+  public IfNode (ExpNode c, Node t, Node e) {
     cond=c;
     th=t;
     el=e;

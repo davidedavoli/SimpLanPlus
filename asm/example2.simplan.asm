@@ -146,7 +146,7 @@ bc $a0 LABELthen7
 push 0
 push $fp //loadind new block
 mv $sp $fp //Load new $fp
-//Start codegen of ast.node.exp.single_exp.IntNode+ast.node.statements.CallNode
+//Start codegen of ast.node.exp.single_exp.IntNode+ast.node.exp.CallExpNode
 li $a0 1
 push $a0 // push e1
 push $fp

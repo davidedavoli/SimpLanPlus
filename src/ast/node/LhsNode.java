@@ -2,17 +2,17 @@ package ast.node;
 
 import java.util.ArrayList;
 
+import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import parser.SimpLanPlusParser;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class LhsNode implements Node {
+public class LhsNode implements Node, Dereferenceable {
 
   protected LhsNode inner;
 

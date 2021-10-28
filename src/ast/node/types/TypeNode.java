@@ -8,7 +8,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public interface TypeNode extends Node{
+public interface TypeNode extends Node {
    
   String toPrint(String indent) throws SimplanPlusException;
 

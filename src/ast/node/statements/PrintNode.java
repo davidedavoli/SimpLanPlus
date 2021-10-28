@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import ast.node.Node;
 import ast.node.dec.FunNode;
-import ast.node.exp.ExpNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import semantic.Environment;

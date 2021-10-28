@@ -3,6 +3,7 @@ package ast.node.exp;
 import java.util.ArrayList;
 import java.util.List;
 
+import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.LhsNode;
 import ast.node.dec.FunNode;
@@ -15,7 +16,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class LhsExpNode extends ExpNode {
+public class LhsExpNode extends ExpNode implements Dereferenceable {
 
     protected LhsExpNode inner;
     protected LhsNode lhs;
@@ -89,10 +90,10 @@ public class LhsExpNode extends ExpNode {
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-    public List<LhsNode> variables() {
-        List<LhsNode> variable = new ArrayList<>();
+    public List<Dereferenceable> variables() {
+        List<Dereferenceable> variable = new ArrayList<>();
 
-        variable.add(lhs);
+        variable.add(this);
 
         return variable;
     }

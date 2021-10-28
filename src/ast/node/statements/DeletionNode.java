@@ -9,7 +9,6 @@ import ast.node.IdNode;
 import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
-import ast.node.exp.IdExpNode;
 import ast.node.types.PointerTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;

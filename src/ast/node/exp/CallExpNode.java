@@ -5,6 +5,7 @@ import ast.Label;
 import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
+import ast.node.statements.CallNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import semantic.Environment;
@@ -14,45 +15,47 @@ import semantic.SimplanPlusException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ExpNode implements Node {
+public class CallExpNode extends ExpNode {
+    CallNode inner;
+    public CallExpNode(CallNode inner) {
+        this.inner=inner;
+    }
+
     @Override
     public String toPrint(String indent) throws SimplanPlusException {
-        return null;
+        return inner.toPrint(indent);
     }
 
     @Override
     public TypeNode typeCheck() throws SimplanPlusException {
-        return null;
+        return inner.typeCheck();
     }
 
     @Override
     public String codeGeneration(Label labelManager) throws SimplanPlusException {
-        return null;
+        return inner.codeGeneration(labelManager);
     }
 
     @Override
     public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
-        return null;
+        return inner.checkSemantics(env);
     }
 
     @Override
     public RetEffType retTypeCheck(FunNode funNode) {
-        return null;
+        return inner.retTypeCheck(funNode);
     }
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return new ArrayList<>();
+        return inner.checkEffects(env);
     }
 
-
-    public abstract List<Dereferenceable> variables();
-
-    public ArrayList<SemanticError> checkExpStatus(Environment env) {
-        ArrayList<SemanticError> errors = new ArrayList<>();
-        //TODO: prendere la lista delle variabili dell'espressione e fare un check status su ogni variabile. Fare
-        //      l'append nella lista degli errori
-
-        return errors;
+    @Override
+    public List<Dereferenceable> variables() {
+        List<Dereferenceable> l = new ArrayList<>();
+        for (ExpNode par: inner.getParlist())
+            l.addAll(par.variables());
+        return l;
     }
 }

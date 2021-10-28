@@ -1,5 +1,6 @@
 package ast.node.exp;
 
+import ast.Dereferenceable;
 import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
@@ -20,11 +21,11 @@ import java.util.List;
  */
 
 public class BinExpNode extends ExpNode {
-    private final Node lhs;
+    private final ExpNode lhs;
     private final String operator;
-    private final Node rhs;
+    private final ExpNode rhs;
 
-    public BinExpNode(Node lhs,String operator, Node rhs) {
+    public BinExpNode(ExpNode lhs, String operator, ExpNode rhs) {
         this.lhs = lhs;
         this.operator = operator;
         this.rhs = rhs;
@@ -216,11 +217,11 @@ public class BinExpNode extends ExpNode {
         return binExpNodeErrors;
     }
     @Override
-    public List<LhsNode> variables() {
-        List<LhsNode> variables = new ArrayList<>();
+    public List<Dereferenceable> variables() {
+        List<Dereferenceable> variables = new ArrayList<>();
 
-        //variables.addAll(lhs.variables());
-        //variables.addAll(rhs.variables());
+        variables.addAll(lhs.variables());
+        variables.addAll(rhs.variables());
 
         return variables;
     }

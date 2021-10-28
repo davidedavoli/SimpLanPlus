@@ -3,6 +3,7 @@ package ast.node.exp;
 import java.util.ArrayList;
 import java.util.List;
 
+import ast.Dereferenceable;
 import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
@@ -17,9 +18,9 @@ import semantic.SimplanPlusException;
 
 public class NegExpNode extends ExpNode {
 
-  private Node exp;
+  private ExpNode exp;
   
-  public NegExpNode (Node e) {
+  public NegExpNode (ExpNode e) {
     exp=e;
   }
   
@@ -57,10 +58,12 @@ public class NegExpNode extends ExpNode {
 	public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
-	/*@Override
-	public List<LhsNode> variables() {
+
+	@Override
+	public List<Dereferenceable> variables() {
 		return exp.variables();
-	}*/
+	}
+
 	@Override
 	public ArrayList<SemanticError> checkEffects(Environment env) {
 		ArrayList<SemanticError> errors = new ArrayList<>();

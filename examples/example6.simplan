@@ -3,8 +3,7 @@ Pointer usage example
 */
 {
     int x = 1;
-    print x;
-    /*^^int  y = new ^int;
+/*    ^^int  y = new ^int;
     y^ = new int;
     y^^ = 5;
     print y;
@@ -12,7 +11,10 @@ Pointer usage example
     print y^^;
     print y^;
     delete y;
-    print y^;*/
+    print y^;
+*/
+    int c;
+    int y = c;
 }
 
 /*

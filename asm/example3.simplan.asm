@@ -31,7 +31,7 @@ pop // remove e1 from the stack to preserve stack
 le $a0 $a2 $a0 // $a0 = $a2 <= $a0
 
 bc $a0 LABELthen9
-//Start codegen of ast.node.statements.CallNode+ast.node.statements.CallNode
+//Start codegen of ast.node.exp.CallExpNode+ast.node.exp.CallExpNode
 push $fp
 //Start codegen of ast.node.exp.IdExpNode-ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp

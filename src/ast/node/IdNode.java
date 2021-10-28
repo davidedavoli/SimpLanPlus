@@ -2,6 +2,7 @@ package ast.node;
 
 import java.util.ArrayList;
 
+import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
@@ -13,13 +14,10 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class IdNode extends LhsNode {
+public class IdNode extends LhsNode implements Dereferenceable {
 
   private String id;
-
-
-
-    private STentry entry;
+  private STentry entry;
   private int nestinglevel;
   
   public IdNode (String i) {

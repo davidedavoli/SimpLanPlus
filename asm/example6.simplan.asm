@@ -4,9 +4,11 @@ li $a0 1
 
 push $a0
 
-mv $fp $al //put in $al actual fp
-lw $a0 -1($al) //put in $a0 value of Id
+subi $sp $sp 1 // non assegnato nulla
 
-print $a0
+mv $fp $al //put in $al actual fp
+lw $a0 -2($al) //put in $a0 value of Id
+
+push $a0
 
 halt

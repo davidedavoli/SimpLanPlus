@@ -66,7 +66,7 @@ public class Test {
 		System.out.println(type.toPrint("Type checking ok! Type of the program is: "));
 	}
 
-	private static void codeGeneration(String fileAsm,Node ast) throws IOException, SimplanPlusException {
+	private static void codeGeneration(String fileAsm, Node ast) throws IOException, SimplanPlusException {
 
 		Label labelManager = new Label();
 		String code=ast.codeGeneration(labelManager);

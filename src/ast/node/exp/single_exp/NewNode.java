@@ -65,7 +65,10 @@
 package ast.node.exp.single_exp;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import ast.Dereferenceable;
+import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.exp.ExpNode;
@@ -111,6 +114,11 @@ public class NewNode extends ExpNode {
 	@Override
 	public ArrayList<SemanticError> checkEffects(Environment env) {
 		return new ArrayList<>();
+	}
+
+	@Override
+	public List<Dereferenceable> variables() {
+		return new ArrayList<Dereferenceable>();
 	}
 
 	public String codeGeneration(Label labelManager){
