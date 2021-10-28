@@ -7,6 +7,7 @@ import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
+import semantic.Effect;
 import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
@@ -48,10 +49,10 @@ public abstract class ExpNode implements Node {
 
     public abstract List<Dereferenceable> variables();
 
-    public ArrayList<SemanticError> checkExpStatus(Environment env) {
+    protected ArrayList<SemanticError> checkExpStatus(Environment env) {
         ArrayList<SemanticError> errors = new ArrayList<>();
-        //TODO: prendere la lista delle variabili dell'espressione e fare un check status su ogni variabile. Fare
-        //      l'append nella lista degli errori
+
+        variables().forEach(var -> errors.addAll(env.checkStmStatus(var, Effect::sequenceEffect, Effect.RW)));
 
         return errors;
     }

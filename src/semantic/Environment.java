@@ -3,6 +3,7 @@ package semantic;
 import java.util.*;
 import java.util.function.BiFunction;
 
+import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.LhsNode;
 import ast.node.types.TypeNode;
@@ -148,7 +149,7 @@ public class Environment {
 	 * @param {int} effect to be applayed
 	 */
 	public ArrayList<SemanticError> checkStmStatus(
-		LhsNode variable,
+		Dereferenceable variable,
 		BiFunction<Effect,Effect,Effect> effectFun,
 		int effect
 	) {

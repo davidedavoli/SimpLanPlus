@@ -10,6 +10,7 @@ import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
+import semantic.Effect;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -99,6 +100,14 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        return new ArrayList<>();
+        ArrayList<SemanticError> errors = new ArrayList<>();
+        Effect actualStatus = entry.getStatus(getDerefLevel());
+
+        if (actualStatus.equals(new Effect(Effect.INIT))) {
+            errors.add(new SemanticError(this.getID() + " used before writing value."));
+        }
+        errors.addAll(checkExpStatus(env));
+
+        return errors;
     }
 }  
