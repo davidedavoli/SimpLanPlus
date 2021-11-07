@@ -62,12 +62,6 @@ public class DeletionNode implements Node {
       errors.addAll(id.checkEffects(env));
 
       STentry idEntry = id.getEntry();
-      System.out.println(idEntry.getStatusList());
-      /*System.out.println("ENTRY TO DELETE");
-      System.out.println(idEntry);
-      System.out.println(idEntry.getStatus(0));*/
-
-      System.out.println(idEntry);
       if (
               idEntry.getStatus(1).equals(new Effect(Effect.DEL))
               ||
@@ -87,7 +81,6 @@ public class DeletionNode implements Node {
 
     public String codeGeneration(Label labelManager) throws SimplanPlusException {
       StringBuilder cgen = new StringBuilder();
-      System.out.println("DELETE NODE "+id.getID()+" NODO_ "+id);
       cgen.append(id.codeGeneration(labelManager)).append("\n");
       cgen.append("free $a0 //free address in $a0\n");
 

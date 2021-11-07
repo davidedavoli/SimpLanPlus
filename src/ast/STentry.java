@@ -1,9 +1,10 @@
 package ast;
 
+import ast.node.types.PointerTypeNode;
 import ast.node.types.TypeNode;
 import semantic.Effect;
 import semantic.SimplanPlusException;
-
+import ast.node.types.TypeUtils;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,17 +15,28 @@ public class STentry {
   private final int offset;
 
   // status of variable
-  private List<Effect> variableStatus = new ArrayList<Effect>();
-
+  private List<Effect> variableStatus;
   private String beginFuncLabel = "";
   private String endFuncLabel = "";
    
-  public STentry (int nestingLevel, TypeNode type, int offset) {
+  public STentry (int nestingLevel, TypeNode type, int offset)  {
     this.nestingLevel = nestingLevel;
     this.type = type;
     this.offset = offset;
+    this.variableStatus = new ArrayList<>();
     Effect initEffect = new Effect();
-    this.variableStatus.add(initEffect);
+    try{
+      int derefLevel = ((PointerTypeNode) type).getDerefLevel();
+      for(int g=0; g <= derefLevel;g++){
+        this.variableStatus.add(initEffect);
+      }
+    }
+    catch(Exception e){
+      this.variableStatus.add(initEffect);
+    }
+
+
+
   }
 
   public STentry (int nestingLevel, int offset, String bFL, String eFL) {
@@ -63,7 +75,7 @@ public class STentry {
   }
 
   public Effect getStatus(int dereferenceLevel) {
-    return this.variableStatus.get(dereferenceLevel);
+    return variableStatus.get(dereferenceLevel);
   }
 
 
@@ -73,6 +85,13 @@ public class STentry {
 
   public int getMaxDereferenceLevel() {
     return variableStatus.size();
+  }
 
+  public void printStatus() {
+    System.out.println(this.variableStatus);
+  }
+
+  public void setStatusList(List<Effect> statusList) {
+    this.variableStatus = statusList;
   }
 }

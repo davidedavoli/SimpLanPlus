@@ -59,7 +59,8 @@ public class AssignmentNode implements Node {
     
     return lhs.typeCheck();
   }
-  
+
+
   public RetEffType retTypeCheck(FunNode funNode) {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
@@ -75,24 +76,40 @@ public class AssignmentNode implements Node {
         errors.addAll(env.checkStmStatus(lhs, Effect::sequenceEffect, Effect.RW));
       }
       else if (exp instanceof LhsExpNode) {
-        // need to implement variables
+
         List<Dereferenceable> rhsPointerList = exp.variables();
-          System.out.println("**************************");
-          System.out.println(rhsPointerList);
+        System.out.println("**************************");
+        System.out.println(rhsPointerList);
         Dereferenceable rhsPointer = rhsPointerList.get(0);
+        //idEntry.setStatusList(env.lookUp(rhsPointer.getID()).getStatusList());
+        STentry rhsEntry = env.lookUp(rhsPointer.getID());
         int lhsDerefLvl = lhs.getDerefLevel();
         int expDerefLvl = rhsPointer.getDerefLevel();
         int lhsMaxDerefLvl = idEntry.getMaxDereferenceLevel();
 
         for (int i = lhsDerefLvl, j = expDerefLvl; i < lhsMaxDerefLvl; i++, j++) {
-          STentry rhsEntry = env.lookUp(rhsPointer.getID());
+
           Effect rhsStatus = rhsEntry.getStatus(j);
-          idEntry.setStatus(rhsStatus, i);
+          if(rhsStatus.equals(new Effect(Effect.DEL))){
+            errors.add(new SemanticError("Assigning deleted variable."));
+          }
+          lhs.setStatus(rhsStatus,i);
+          // idEntry.setStatus(rhsStatus, i);
         }
+
       }
       else { // lhs is not in error status and exp is not a pointer.
-        idEntry.setStatus(new Effect(Effect.RW), lhs.getDerefLevel());
+        lhs.setStatus(new Effect(Effect.RW), lhs.getDerefLevel());
+        //idEntry.setStatus(new Effect(Effect.RW), lhs.getDerefLevel());
       }
+      System.out.println("LHS LEVEL "+ lhs.getDerefLevel());
+      System.out.println("status list ");
+      env.addEntry(lhs.getID(),idEntry);
+
+      //lhs.setEntry(idEntry);
+      System.out.println("ENTRY " + lhs.getID() + " " + lhs.getEntry().getStatusList());
+      idEntry.printStatus();
+
 
       return errors;
     }
@@ -104,7 +121,7 @@ public class AssignmentNode implements Node {
 
 
       //cgen.append("push $a0 // save exp on stack \n");
-        cgen.append("//RITORNATO DA CGEN EXP\n");
+      cgen.append("//RITORNATO DA CGEN EXP\n");
       cgen.append(lhs.codeGeneration(labelManager)).append("\n");
       //cgen.append("pop $a0 // put in $a0 top of stack \n");
 

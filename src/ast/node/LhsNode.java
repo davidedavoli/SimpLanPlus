@@ -7,6 +7,7 @@ import ast.STentry;
 import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
+import semantic.Effect;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -20,6 +21,9 @@ public class LhsNode implements Node, Dereferenceable {
       inner=i;
   }
 
+  public void setEntry(STentry entry) {
+      inner.setEntry(entry);
+  }
   public String getID() {
       return inner.getID();
   }
@@ -74,8 +78,11 @@ public class LhsNode implements Node, Dereferenceable {
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
         ArrayList<SemanticError> errors = new ArrayList<>();
-
         errors.addAll(inner.checkEffects(env));
+        System.out.println("DEREF LEVEL IN LHS " + getDerefLevel());
+        if (!inner.getEntry().getStatus(getDerefLevel()-1).equals(new Effect(Effect.RW))) {
+            errors.add(new SemanticError(inner.getID() + " has not all pointer to rw "));
+        }
         return  errors;
     }
 
@@ -85,10 +92,15 @@ public class LhsNode implements Node, Dereferenceable {
        */
 
       StringBuilder cgen = new StringBuilder();
-      inner.codeGeneration(labelManager);
-      cgen.append("lw $al 0($al)");
+      cgen.append(inner.codeGeneration(labelManager));
+      cgen.append("lw $al 0($al) //deferencing inner\n");
 
       return cgen.toString();
     }
-
+    public Effect getStatus(int dereferenceLevel) {
+      return inner.getStatus(dereferenceLevel);
+    }
+    public void setStatus(Effect effect,int level){
+        inner.setStatus(effect,level);
+    }
 }

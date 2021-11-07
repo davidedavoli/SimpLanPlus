@@ -26,13 +26,14 @@ public class PointerTypeNode implements TypeNode {
   
   public TypeNode dereference() {
 	    return type;
-	  }
+  }
   
   public int getDerefLevel(){
+      System.out.println("POINTER TYPE NODE" +type);
 	  if (type instanceof PointerTypeNode)
 		  return 1+((PointerTypeNode)type).getDerefLevel();
 	  else
-		  return 0;
+		  return 1;
   }
   
   @Override

@@ -35,7 +35,7 @@ public class IdNode extends LhsNode implements Dereferenceable {
 	  return this;
   }
   
-  public int detDerefLevel() {
+  public int getDerefLevel() {
 	  return 0;
   }
   
@@ -43,7 +43,10 @@ public class IdNode extends LhsNode implements Dereferenceable {
 	  return nestinglevel;
   }
 
-  public void setEntry(STentry entry) { this.entry = entry; }
+  public void setEntry(STentry entry) {
+      System.out.println("ST ENTRY SET IN ID NODE");
+      this.entry = entry;
+  }
   public STentry getEntry() {
 	  return entry;
   }
@@ -100,9 +103,6 @@ public class IdNode extends LhsNode implements Dereferenceable {
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
         entry = env.lookUp(id);
-        System.out.println("ID ENTRY");
-        System.out.println(id);
-        System.out.println(env.getCurrentST());
         nestinglevel = env.getNestingLevel();;
         return new ArrayList<>();
     }
@@ -110,4 +110,7 @@ public class IdNode extends LhsNode implements Dereferenceable {
     public void setStatus(Effect effect, int dereferenceLevel){
         this.entry.setStatus(effect, dereferenceLevel);
     }
-}  
+    public Effect getStatus(int dereferenceLevel){
+        return this.entry.getStatus( dereferenceLevel);
+    }
+}

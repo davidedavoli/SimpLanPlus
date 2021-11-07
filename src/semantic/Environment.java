@@ -133,7 +133,10 @@ public class Environment {
 	public void addEntry(String id, STentry entry){
 		HashMap<String, STentry> ST = this.symTable.get(nestingLevel);
 		ST.put(id,entry);
-
+	}
+	public void removeEntry(String id){
+		HashMap<String, STentry> ST = this.symTable.get(nestingLevel);
+		ST.remove(id);
 	}
 
 	/**
@@ -158,10 +161,8 @@ public class Environment {
 
 		try {
 			STentry idEntry = lookUp(variable.getID());
-			//Non deferenzia con 1
+
 			Effect oldEffect = idEntry.getStatus(variable.getDerefLevel());
-			System.out.println("OLD EFFECT");
-			System.out.println(oldEffect.toString());
 			Effect newEffect = new Effect(effect);
 
 			Effect newStatus = effectFun.apply(oldEffect,newEffect);

@@ -34,6 +34,7 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
     public String getID() {
 	  return inner.getID();
   }
+
   
   /*Non dovrebbe essere fatto così.
   public LhsExpNode getInner() {
@@ -104,9 +105,6 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
         errors.addAll(inner.checkEffects(env));
 
         STentry innerEntry = getEntry();
-        System.out.println("INNER ENTRY ");
-        System.out.println(innerEntry);
-        System.out.println(getDerefLevel());
         Effect actualStatus = innerEntry.getStatus(getDerefLevel()-1);
 
         if (actualStatus.equals(new Effect(Effect.INIT))) {

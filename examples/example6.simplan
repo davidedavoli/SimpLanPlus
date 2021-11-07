@@ -2,19 +2,33 @@
 Pointer usage example
 */
 {
-    int x = 1;
-/*    ^^int  y = new ^int;
-    y^ = new int;
-    y^^ = 5;
-    print y;
+    ^int y = new int;
+    ^int z = new int;
+    y^ = 5;
+    z = y;
+    delete z;
     print y^;
-    print y^^;
+    y^ = 4;
     print y^;
-    delete y;
-    print y^;
-*/
-    int c;
-    int y = c;
+    print z;
+    print z^;
+
+    //y^ = 6;
+    //print y^;
+
+
+    /*
+    ^^int z;
+    ^^^int c = new ^^int;
+    c^ = new ^int;
+    c^^ = new int;
+    c^^^ = 4;
+    z = c^;
+    print z;
+    print z^;
+    print z^^;
+    */
+
 }
 
 /*

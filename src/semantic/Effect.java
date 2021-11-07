@@ -46,7 +46,6 @@ public class Effect {
 
         if ((effect1.status <= RW && effect2.status == DEL) || (effect1.status == DEL && effect2.status == INIT))
             return new Effect(DEL);
-
         return new Effect(ERR);
     }
 
