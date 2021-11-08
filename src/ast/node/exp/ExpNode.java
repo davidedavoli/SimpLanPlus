@@ -52,7 +52,7 @@ public abstract class ExpNode implements Node {
     protected ArrayList<SemanticError> checkExpStatus(Environment env) {
         ArrayList<SemanticError> errors = new ArrayList<>();
 
-        variables().forEach(var -> errors.addAll(env.checkStmStatus(var, Effect::sequenceEffect, Effect.RW)));
+        variables().forEach(var -> errors.addAll(env.checkStmStatus(var, Effect::sequenceEffect, Effect.READWRITE)));
 
         return errors;
     }

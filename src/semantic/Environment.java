@@ -154,7 +154,7 @@ public class Environment {
 	public ArrayList<SemanticError> checkStmStatus(
 		Dereferenceable variable,
 		BiFunction<Effect,Effect,Effect> effectFun,
-		int effect
+		Effect effect
 	) {
 
 		ArrayList<SemanticError> errors = new ArrayList<>();
@@ -168,7 +168,7 @@ public class Environment {
 			Effect newStatus = effectFun.apply(oldEffect,newEffect);
 			idEntry.setStatus(newStatus, variable.getDerefLevel());
 
-			if (newStatus.equals(new Effect(Effect.ERR))) {
+			if (newStatus.equals(new Effect(Effect.ERROR))) {
 				errors.add(new SemanticError(variable.getID() + " used after delete."));
 			}
 		} catch (Exception exception) {

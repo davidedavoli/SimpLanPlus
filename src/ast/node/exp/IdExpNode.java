@@ -1,11 +1,10 @@
 package ast.node.exp;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import ast.Dereferenceable;
 import ast.STentry;
-import ast.node.LhsNode;
+import ast.node.IdNode;
 import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
@@ -26,7 +25,11 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
       super(null);
       id=i;
   }
-  
+
+    public Effect getStatus(int dereferenceLevel) {
+        return entry.getStatus(dereferenceLevel);
+    }
+
   @Override
   public String getID(){
 	  return this.id;
@@ -90,7 +93,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
 
       cgen.append("mv $fp $al //put in $al actual fp\n");
 
-      for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
+      for (int i = 0; i<nestinglevel-entry.getNestingLevel(); i++)
           cgen.append("lw $al 0($al) //go up to chain\n");
 
       cgen.append("lw $a0 ").append(entry.getOffset()).append("($al) //put in $a0 value of Id\n");
@@ -103,7 +106,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
         ArrayList<SemanticError> errors = new ArrayList<>();
         Effect actualStatus = entry.getStatus(getDerefLevel());
 
-        if (actualStatus.equals(new Effect(Effect.INIT))) {
+        if (actualStatus.equals(new Effect(Effect.INITIALIZED))) {
             errors.add(new SemanticError(this.getID() + " used before writing value."));
         }
         errors.addAll(checkExpStatus(env));

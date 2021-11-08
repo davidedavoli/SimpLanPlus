@@ -8,10 +8,10 @@ Pointer usage example
     z = y;
     delete z;
     print y^;
-    y^ = 4;
+    /*y^ = 4;
     print y^;
     print z;
-    print z^;
+    print z^;*/
 
     //y^ = 6;
     //print y^;

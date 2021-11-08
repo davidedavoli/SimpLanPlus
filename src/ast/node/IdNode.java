@@ -79,7 +79,7 @@ public class IdNode extends LhsNode implements Dereferenceable {
 
       cgen.append("mv $fp $al //put in $a1 (al) actual fp\n");
 
-      for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
+      for (int i = 0; i<nestinglevel-entry.getNestingLevel(); i++)
           cgen.append("lw $al 0($al) //go up to chain\n");
 
       cgen.append("addi $al $al ").append(entry.getOffset()).append(" //put in $al address of Id\n");
@@ -108,9 +108,9 @@ public class IdNode extends LhsNode implements Dereferenceable {
     }
 
     public void setStatus(Effect effect, int dereferenceLevel){
-        this.entry.setStatus(effect, dereferenceLevel);
+        entry.setStatus(effect, dereferenceLevel);
     }
     public Effect getStatus(int dereferenceLevel){
-        return this.entry.getStatus( dereferenceLevel);
+        return entry.getStatus(dereferenceLevel);
     }
 }

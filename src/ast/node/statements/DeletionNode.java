@@ -63,9 +63,9 @@ public class DeletionNode implements Node {
 
       STentry idEntry = id.getEntry();
       if (
-              idEntry.getStatus(1).equals(new Effect(Effect.DEL))
+              idEntry.getStatus(1).equals(new Effect(Effect.DELETED))
               ||
-              idEntry.getStatus(1).equals(new Effect(Effect.ERR))
+              idEntry.getStatus(1).equals(new Effect(Effect.ERROR))
       ) {
         errors.add(new SemanticError(id.getID() + " already deleted."));
       } else {
@@ -73,9 +73,10 @@ public class DeletionNode implements Node {
         errors.addAll(env.checkStmStatus(
                 new LhsNode(id),
                 Effect::sequenceEffect,
-                Effect.DEL)
+                Effect.DELETED)
         );
       }
+      System.out.println("ENTRY deleted " + id.getID() + " " + id.getEntry().getStatusList());
       return errors;
     }
 

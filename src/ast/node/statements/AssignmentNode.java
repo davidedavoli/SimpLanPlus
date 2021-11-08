@@ -9,6 +9,7 @@ import ast.node.LhsNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.exp.ExpNode;
+import ast.node.exp.IdExpNode;
 import ast.node.exp.LhsExpNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
@@ -71,46 +72,35 @@ public class AssignmentNode implements Node {
 
       errors.addAll(lhs.checkEffects(env));
       errors.addAll(exp.checkEffects(env));
-      STentry idEntry = env.lookUp(lhs.getID());
-      if (idEntry.getStatus(lhs.getDerefLevel()).equals(new Effect(Effect.ERR))) {
-        errors.addAll(env.checkStmStatus(lhs, Effect::sequenceEffect, Effect.RW));
+      if (lhs.getEntry().getStatus(lhs.getDerefLevel()).equals(new Effect(Effect.ERROR))) {
+        errors.addAll(env.checkStmStatus(lhs, Effect::sequenceEffect, Effect.READWRITE));
       }
       else if (exp instanceof LhsExpNode) {
 
         List<Dereferenceable> rhsPointerList = exp.variables();
+
         System.out.println("**************************");
         System.out.println(rhsPointerList);
-        Dereferenceable rhsPointer = rhsPointerList.get(0);
-        //idEntry.setStatusList(env.lookUp(rhsPointer.getID()).getStatusList());
-        STentry rhsEntry = env.lookUp(rhsPointer.getID());
+        var rhsPointer = rhsPointerList.get(0);
+
         int lhsDerefLvl = lhs.getDerefLevel();
         int expDerefLvl = rhsPointer.getDerefLevel();
-        int lhsMaxDerefLvl = idEntry.getMaxDereferenceLevel();
-
+        int lhsMaxDerefLvl = lhs.getEntry().getMaxDereferenceLevel();
         for (int i = lhsDerefLvl, j = expDerefLvl; i < lhsMaxDerefLvl; i++, j++) {
-
-          Effect rhsStatus = rhsEntry.getStatus(j);
+          /*
           if(rhsStatus.equals(new Effect(Effect.DEL))){
             errors.add(new SemanticError("Assigning deleted variable."));
-          }
-          lhs.setStatus(rhsStatus,i);
-          // idEntry.setStatus(rhsStatus, i);
+          }*/
+
+          Effect status = rhsPointer.getEntry().getStatus(j);
+          lhs.getEntry().setStatus(status,i);
         }
 
       }
       else { // lhs is not in error status and exp is not a pointer.
-        lhs.setStatus(new Effect(Effect.RW), lhs.getDerefLevel());
-        //idEntry.setStatus(new Effect(Effect.RW), lhs.getDerefLevel());
+        lhs.getEntry().setStatus(new Effect(Effect.READWRITE), lhs.getDerefLevel());
       }
-      System.out.println("LHS LEVEL "+ lhs.getDerefLevel());
-      System.out.println("status list ");
-      env.addEntry(lhs.getID(),idEntry);
-
-      //lhs.setEntry(idEntry);
       System.out.println("ENTRY " + lhs.getID() + " " + lhs.getEntry().getStatusList());
-      idEntry.printStatus();
-
-
       return errors;
     }
 

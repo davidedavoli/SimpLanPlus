@@ -109,7 +109,7 @@ public class VarNode implements Node {
         if (exp != null){
             res.addAll(exp.checkSemantics(env));
             //  dereferenceLevel = 0 because we set the status of a variable
-            id.setStatus(new Effect(Effect.RW), 0);
+            id.setStatus(new Effect(Effect.READWRITE), 0);
         }
 
         if ( hm.put(id.getID(),entry) != null )

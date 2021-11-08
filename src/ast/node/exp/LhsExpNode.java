@@ -107,7 +107,7 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
         STentry innerEntry = getEntry();
         Effect actualStatus = innerEntry.getStatus(getDerefLevel()-1);
 
-        if (actualStatus.equals(new Effect(Effect.INIT))) {
+        if (actualStatus.equals(new Effect(Effect.INITIALIZED))) {
             errors.add(new SemanticError(inner.getID() + " used before writing value."));
         }
         errors.addAll(checkExpStatus(env));

@@ -80,7 +80,7 @@ public class LhsNode implements Node, Dereferenceable {
         ArrayList<SemanticError> errors = new ArrayList<>();
         errors.addAll(inner.checkEffects(env));
         System.out.println("DEREF LEVEL IN LHS " + getDerefLevel());
-        if (!inner.getEntry().getStatus(getDerefLevel()-1).equals(new Effect(Effect.RW))) {
+        if (!inner.getEntry().getStatus(getDerefLevel()-1).equals(new Effect(Effect.READWRITE))) {
             errors.add(new SemanticError(inner.getID() + " has not all pointer to rw "));
         }
         return  errors;
@@ -97,9 +97,7 @@ public class LhsNode implements Node, Dereferenceable {
 
       return cgen.toString();
     }
-    public Effect getStatus(int dereferenceLevel) {
-      return inner.getStatus(dereferenceLevel);
-    }
+
     public void setStatus(Effect effect,int level){
         inner.setStatus(effect,level);
     }

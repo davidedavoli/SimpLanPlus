@@ -105,7 +105,7 @@ public RetEffType retTypeCheck(FunNode funNode) {
       cgen.append("mv $fp $al //put in $al actual fp\n");
 
 
-      for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
+      for (int i = 0; i<nestinglevel-entry.getNestingLevel(); i++)
           cgen.append("lw $al 0($al) //go up to chain\n");
 
       cgen.append("push $al\n");

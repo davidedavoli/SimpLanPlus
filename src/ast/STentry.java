@@ -7,6 +7,7 @@ import semantic.SimplanPlusException;
 import ast.node.types.TypeUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 public class STentry {
 
@@ -15,7 +16,7 @@ public class STentry {
   private final int offset;
 
   // status of variable
-  private List<Effect> variableStatus;
+  private final List<Effect> variableStatus;
   private String beginFuncLabel = "";
   private String endFuncLabel = "";
    
@@ -24,15 +25,15 @@ public class STentry {
     this.type = type;
     this.offset = offset;
     this.variableStatus = new ArrayList<>();
-    Effect initEffect = new Effect();
+    //Effect initEffect = new Effect();
     try{
-      int derefLevel = ((PointerTypeNode) type).getDerefLevel();
-      for(int g=0; g <= derefLevel;g++){
-        this.variableStatus.add(initEffect);
+      int deferenceLevel = ((PointerTypeNode) type).getDerefLevel();
+      for(int g=0; g <= deferenceLevel;g++){
+        this.variableStatus.add(new Effect(Effect.INITIALIZED));
       }
     }
     catch(Exception e){
-      this.variableStatus.add(initEffect);
+      this.variableStatus.add(new Effect(Effect.INITIALIZED));
     }
 
 
@@ -61,13 +62,13 @@ public class STentry {
 
   public int getOffset () {return this.offset;}
   
-  public int getNestinglevel () {return this.nestingLevel;}
+  public int getNestingLevel() {return this.nestingLevel;}
   
   public String toPrint(String s) throws SimplanPlusException { //
-	   return s+"STentry: nestlev " + Integer.toString(nestingLevel) +"\n"+
+	   return s+"STentry: nestlev " + nestingLevel +"\n"+
 			  s+"STentry: type\n" + 
 			  type.toPrint(s+"  ") + 
-		      s+"STentry: offset " + Integer.toString(offset) + "\n";
+		      s+"STentry: offset " + offset + "\n";
   }
 
   public void setStatus(Effect effect, int dereferenceLevel) {
@@ -91,7 +92,4 @@ public class STentry {
     System.out.println(this.variableStatus);
   }
 
-  public void setStatusList(List<Effect> statusList) {
-    this.variableStatus = statusList;
-  }
 }

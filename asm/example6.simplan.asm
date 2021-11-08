@@ -31,15 +31,6 @@ addi $al $al -2 //put in $al address of Id
 
 free $a0 //free address in $a0
 
-li $a0 4
-
-//RITORNATO DA CGEN EXP
-mv $fp $al //put in $a1 (al) actual fp
-addi $al $al -1 //put in $al address of Id
-lw $al 0($al) //deferencing inner
-
-sw $a0 0($al) // 0($a1) = $a0 id=exp 
-
 mv $fp $al //put in $al actual fp
 lw $a0 -1($al) //put in $a0 value of Id
 
