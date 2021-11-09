@@ -5,7 +5,6 @@ import java.util.function.BiFunction;
 
 import ast.Dereferenceable;
 import ast.STentry;
-import ast.node.LhsNode;
 import ast.node.types.TypeNode;
 
 public class Environment {
@@ -162,11 +161,11 @@ public class Environment {
 		try {
 			STentry idEntry = lookUp(variable.getID());
 
-			Effect oldEffect = idEntry.getStatus(variable.getDerefLevel());
+			Effect oldEffect = idEntry.getDereferenceLevelVariableStatus(variable.getDereferenceLevel());
 			Effect newEffect = new Effect(effect);
 
 			Effect newStatus = effectFun.apply(oldEffect,newEffect);
-			idEntry.setStatus(newStatus, variable.getDerefLevel());
+			idEntry.setDereferenceLevelVariableStatus(newStatus, variable.getDereferenceLevel());
 
 			if (newStatus.equals(new Effect(Effect.ERROR))) {
 				errors.add(new SemanticError(variable.getID() + " used after delete."));

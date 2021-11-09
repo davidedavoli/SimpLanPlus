@@ -63,9 +63,9 @@ public class DeletionNode implements Node {
 
       STentry idEntry = id.getEntry();
       if (
-              idEntry.getStatus(1).equals(new Effect(Effect.DELETED))
+              idEntry.getDereferenceLevelVariableStatus(1).equals(new Effect(Effect.DELETED))
               ||
-              idEntry.getStatus(1).equals(new Effect(Effect.ERROR))
+              idEntry.getDereferenceLevelVariableStatus(1).equals(new Effect(Effect.ERROR))
       ) {
         errors.add(new SemanticError(id.getID() + " already deleted."));
       } else {

@@ -4,10 +4,17 @@ Pointer usage example
 {
     ^int y = new int;
     ^int z = new int;
-    y^ = 5;
     z = y;
+    y^ = 5;
+    print z^;
     delete z;
     print y^;
+    /*
+    y^ = 5;
+    z^ = y;
+    delete z;
+    z = new int;
+    print z^;*/
     /*y^ = 4;
     print y^;
     print z;

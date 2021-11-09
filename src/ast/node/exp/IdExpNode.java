@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import ast.Dereferenceable;
 import ast.STentry;
-import ast.node.IdNode;
 import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
@@ -26,8 +25,8 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
       id=i;
   }
 
-    public Effect getStatus(int dereferenceLevel) {
-        return entry.getStatus(dereferenceLevel);
+  public Effect getIdStatus(int dereferenceLevel) {
+        return this.entry.getDereferenceLevelVariableStatus(dereferenceLevel);
     }
 
   @Override
@@ -61,8 +60,6 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
 	  
 	  //create result list
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-
-
       entry = env.lookUp(id);
       if (entry == null)
           res.add(new SemanticError("Id "+id+" in expNode not declared"));
@@ -104,7 +101,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
         ArrayList<SemanticError> errors = new ArrayList<>();
-        Effect actualStatus = entry.getStatus(getDerefLevel());
+        Effect actualStatus = entry.getDereferenceLevelVariableStatus(getDereferenceLevel());
 
         if (actualStatus.equals(new Effect(Effect.INITIALIZED))) {
             errors.add(new SemanticError(this.getID() + " used before writing value."));

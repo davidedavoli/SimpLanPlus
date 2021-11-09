@@ -35,9 +35,6 @@ public class STentry {
     catch(Exception e){
       this.variableStatus.add(new Effect(Effect.INITIALIZED));
     }
-
-
-
   }
 
   public STentry (int nestingLevel, int offset, String bFL, String eFL) {
@@ -71,12 +68,12 @@ public class STentry {
 		      s+"STentry: offset " + offset + "\n";
   }
 
-  public void setStatus(Effect effect, int dereferenceLevel) {
+  public void setDereferenceLevelVariableStatus(Effect effect, int dereferenceLevel) {
     this.variableStatus.set(dereferenceLevel, effect);
   }
 
-  public Effect getStatus(int dereferenceLevel) {
-    return variableStatus.get(dereferenceLevel);
+  public Effect getDereferenceLevelVariableStatus(int dereferenceLevel) {
+    return this.variableStatus.get(dereferenceLevel);
   }
 
 

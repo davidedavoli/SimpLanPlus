@@ -6,8 +6,9 @@ import semantic.Effect;
 
 public interface Dereferenceable {
 
-    int getDerefLevel();
+    int getDereferenceLevel();
     String getID();
     STentry getEntry();
 
+    Effect getIdStatus(int j);
 }

@@ -46,9 +46,9 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
 	  return inner.getInner();
   }
   
-  public int getDerefLevel(){
+  public int getDereferenceLevel(){
 	  if (inner!=null)
-		  return 1+inner.getDerefLevel();
+		  return 1+inner.getDereferenceLevel();
 	  else
 		  return 0;
   }
@@ -59,8 +59,13 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
 	  else
 		  return null; 
   }
-  
-  public int getNestingLevel(){
+
+    @Override
+    public Effect getIdStatus(int j) {
+        return this.inner.getIdStatus(j);
+    }
+
+    public int getNestingLevel(){
 	  if (inner!=null)
 		  return inner.getNestingLevel();
 	  else
@@ -76,7 +81,7 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
   }
   
   public String toPrint(String s) throws SimplanPlusException {
-	return s+"lhs: " + this.getDerefLevel()+" "+this.getID()+"\n";
+	return s+"lhs: " + this.getDereferenceLevel()+" "+this.getID()+"\n";
   }
   
   //valore di ritorno non utilizzato
@@ -105,7 +110,7 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
         errors.addAll(inner.checkEffects(env));
 
         STentry innerEntry = getEntry();
-        Effect actualStatus = innerEntry.getStatus(getDerefLevel()-1);
+        Effect actualStatus = innerEntry.getDereferenceLevelVariableStatus(getDereferenceLevel()-1);
 
         if (actualStatus.equals(new Effect(Effect.INITIALIZED))) {
             errors.add(new SemanticError(inner.getID() + " used before writing value."));

@@ -35,7 +35,7 @@ public class IdNode extends LhsNode implements Dereferenceable {
 	  return this;
   }
   
-  public int getDerefLevel() {
+  public int getDereferenceLevel() {
 	  return 0;
   }
   
@@ -107,10 +107,10 @@ public class IdNode extends LhsNode implements Dereferenceable {
         return new ArrayList<>();
     }
 
-    public void setStatus(Effect effect, int dereferenceLevel){
-        entry.setStatus(effect, dereferenceLevel);
+    public void setIdStatus(Effect effect, int dereferenceLevel){
+        this.entry.setDereferenceLevelVariableStatus(effect, dereferenceLevel);
     }
-    public Effect getStatus(int dereferenceLevel){
-        return entry.getStatus(dereferenceLevel);
+    public Effect getIdStatus(int dereferenceLevel){
+        return this.entry.getDereferenceLevelVariableStatus(dereferenceLevel);
     }
 }

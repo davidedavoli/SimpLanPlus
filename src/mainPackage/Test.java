@@ -1,6 +1,7 @@
 package mainPackage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import Interpreter.SVM;
@@ -145,6 +146,7 @@ public class Test {
 		String fileAbsName = dir + baseName + 6 + ext;
 		String fileName = baseName + 6 + ext;
 		compileFile(fileAbsName,fileName);
+
 		/*for(int number = 1; number<=numberOfTest;number++){
 			String fileAbsName = dir + baseName + number + ext;
 			String fileName = baseName + number + ext;

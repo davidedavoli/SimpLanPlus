@@ -32,9 +32,9 @@ public class LhsNode implements Node, Dereferenceable {
       return inner.getInner();
   }
 
-  public int getDerefLevel(){
+  public int getDereferenceLevel(){
       if (inner!=null)
-          return 1+inner.getDerefLevel();
+          return 1+inner.getDereferenceLevel();
       else
           return 0;
   }
@@ -46,7 +46,12 @@ public class LhsNode implements Node, Dereferenceable {
           return null;
   }
 
-  public int getNestingLevel(){
+    @Override
+    public Effect getIdStatus(int j) {
+        return this.inner.getIdStatus(j);
+    }
+
+    public int getNestingLevel(){
       if (inner!=null)
           return inner.getNestingLevel();
       else
@@ -59,7 +64,7 @@ public class LhsNode implements Node, Dereferenceable {
     }
 
     public String toPrint(String s) throws SimplanPlusException {
-        return s+"lhs: " + this.getDerefLevel()+" "+this.getID()+"\n";
+        return s+"lhs: " + this.getDereferenceLevel()+" "+this.getID()+"\n";
     }
 
     //valore di ritorno non utilizzato
@@ -79,8 +84,8 @@ public class LhsNode implements Node, Dereferenceable {
     public ArrayList<SemanticError> checkEffects(Environment env) {
         ArrayList<SemanticError> errors = new ArrayList<>();
         errors.addAll(inner.checkEffects(env));
-        System.out.println("DEREF LEVEL IN LHS " + getDerefLevel());
-        if (!inner.getEntry().getStatus(getDerefLevel()-1).equals(new Effect(Effect.READWRITE))) {
+        System.out.println("DEREF LEVEL IN LHS " + getDereferenceLevel());
+        if (!inner.getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()-1).equals(new Effect(Effect.READWRITE))) {
             errors.add(new SemanticError(inner.getID() + " has not all pointer to rw "));
         }
         return  errors;
@@ -98,7 +103,7 @@ public class LhsNode implements Node, Dereferenceable {
       return cgen.toString();
     }
 
-    public void setStatus(Effect effect,int level){
-        inner.setStatus(effect,level);
+    public void setIdStatus(Effect effect, int level){
+        this.inner.setIdStatus(effect,level);
     }
 }
