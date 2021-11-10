@@ -168,7 +168,7 @@ public class Environment {
 			idEntry.setDereferenceLevelVariableStatus(newStatus, variable.getDereferenceLevel());
 
 			if (newStatus.equals(new Effect(Effect.ERROR))) {
-				errors.add(new SemanticError(variable.getID() + " used after delete."));
+				errors.add(new SemanticError(variable.getID() + " used after delete(env)."));
 			}
 		} catch (Exception exception) {
 			errors.add(new SemanticError(variable.getID() + " not declared. Aborting."));

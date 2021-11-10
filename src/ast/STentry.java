@@ -77,11 +77,11 @@ public class STentry {
     //this.variableStatus.set(dereferenceLevel, effect);
   }
   public void reInitVariableStatus() {
-    setDereferenceLevelVariableStatus(Effect.DELETED, 0);
-    updatePointerStatusReference(Effect.DELETED, 0);
+    setDereferenceLevelVariableStatus(new Effect(Effect.DELETED), 0);
+    updatePointerStatusReference(new Effect(Effect.DELETED), 0);
     for (int i = 1; i < variableStatus.size(); i++) {
-      setDereferenceLevelVariableStatus(Effect.INITIALIZED, i);
-      updatePointerStatusReference(Effect.INITIALIZED, i);
+      setDereferenceLevelVariableStatus(new Effect(Effect.INITIALIZED), i);
+      updatePointerStatusReference(new Effect(Effect.INITIALIZED), i);
     }
   }
 

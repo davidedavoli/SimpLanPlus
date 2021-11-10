@@ -10,24 +10,45 @@ Pointer usage example
 
     duple^ = new int;
     duple^^ = 2;
+
+    /*print duple;
+    print duple^;
     print duple^^;
-    print triple^^^;
+    print triple;
+    print triple^;
+    print triple^^;
+    print triple^^^;*/
+
     triple^ = duple;
+
+    /*print duple^^;
+    print duple;
+    print duple^;
     print duple^^;
-    print triple^^^;
+    print triple;
+    print triple^;
+    print triple^^;
+    print triple^^^;*/
+
     delete duple;
     //print triple;
     triple = new ^^int;
     triple^ = new ^int;
     triple^^ = new int;
     triple^^^ = 55;
-    print triple^^^;
     duple = new ^int;
     duple^ = new int;
     duple^^ = 66;
+
+
     print duple;
     print duple^;
     print duple^^;
+    print triple;
+    print triple^;
+    print triple^^;
+    print triple^^^;
+
 
     /*^int y = new int;
     ^int z = new int;

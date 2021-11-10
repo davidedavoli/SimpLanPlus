@@ -84,13 +84,7 @@ public class Effect {
         }
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        Effect e = (Effect) obj;
+    public boolean equals(Effect e) {
         return status == e.status;
     }
 
