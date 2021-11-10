@@ -110,11 +110,24 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
         errors.addAll(inner.checkEffects(env));
 
         STentry innerEntry = getEntry();
-        Effect actualStatus = innerEntry.getDereferenceLevelVariableStatus(getDereferenceLevel()-1);
+        System.out.println("LHS EXP NODE LEVEL " + (getDereferenceLevel()));
+        Effect actualStatus = innerEntry.getDereferenceLevelVariableStatus(getDereferenceLevel());
 
         if (actualStatus.equals(new Effect(Effect.INITIALIZED))) {
-            errors.add(new SemanticError(inner.getID() + " used before writing value."));
+            errors.add(new SemanticError(inner.getID() + " used before writing value. LhsExpNode"));
         }
+
+        for(int i = 0; i < innerEntry.getMaxDereferenceLevel();i++){
+            Effect status = innerEntry.getDereferenceLevelVariableStatus(i);
+
+            if (status.equals(new Effect(Effect.DELETED))) {
+                errors.add(new SemanticError(this.getID() + " used after deleted. LhsExpNode"));
+            }
+        }
+
+        /*if(actualStatus.equals(new Effect(Effect.DELETED))) {
+            errors.add(new SemanticError(inner.getID() + " used after deleting."));
+        }*/
         errors.addAll(checkExpStatus(env));
 
         return errors;

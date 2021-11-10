@@ -63,18 +63,18 @@ public class DeletionNode implements Node {
 
       STentry idEntry = id.getEntry();
       if (
-              idEntry.getDereferenceLevelVariableStatus(1).equals(new Effect(Effect.DELETED))
+              idEntry.getDereferenceLevelVariableStatus(0).equals(new Effect(Effect.DELETED))
               ||
-              idEntry.getDereferenceLevelVariableStatus(1).equals(new Effect(Effect.ERROR))
+              idEntry.getDereferenceLevelVariableStatus(0).equals(new Effect(Effect.ERROR))
       ) {
         errors.add(new SemanticError(id.getID() + " already deleted."));
       } else {
-
         errors.addAll(env.checkStmStatus(
-                new LhsNode(id),
+                id,//new LhsNode(id),
                 Effect::sequenceEffect,
                 Effect.DELETED)
         );
+        idEntry.reInitVariableStatus();
       }
       System.out.println("ENTRY deleted " + id.getID() + " " + id.getEntry().getStatusList());
       return errors;

@@ -68,8 +68,21 @@ public class STentry {
 		      s+"STentry: offset " + offset + "\n";
   }
 
-  public void setDereferenceLevelVariableStatus(Effect effect, int dereferenceLevel) {
+  public void updatePointerStatusReference(Effect effect, int dereferenceLevel) {
     this.variableStatus.set(dereferenceLevel, effect);
+  }
+
+  public void setDereferenceLevelVariableStatus(Effect effect, int dereferenceLevel) {
+    this.variableStatus.get(dereferenceLevel).updateStatus(effect);
+    //this.variableStatus.set(dereferenceLevel, effect);
+  }
+  public void reInitVariableStatus() {
+    setDereferenceLevelVariableStatus(Effect.DELETED, 0);
+    updatePointerStatusReference(Effect.DELETED, 0);
+    for (int i = 1; i < variableStatus.size(); i++) {
+      setDereferenceLevelVariableStatus(Effect.INITIALIZED, i);
+      updatePointerStatusReference(Effect.INITIALIZED, i);
+    }
   }
 
   public Effect getDereferenceLevelVariableStatus(int dereferenceLevel) {
@@ -88,5 +101,14 @@ public class STentry {
   public void printStatus() {
     System.out.println(this.variableStatus);
   }
+
+  public void updatePointerStatus(List<Effect> newArrayList,Integer startIndex) {
+    List<Effect> newList = new ArrayList<>();
+    newList.addAll(this.variableStatus.subList(0,startIndex));
+    newList.addAll(newArrayList);
+    this.variableStatus.clear();
+    this.variableStatus.addAll(newList);
+  }
+
 
 }

@@ -103,12 +103,12 @@ public class IdNode extends LhsNode implements Dereferenceable {
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
         entry = env.lookUp(id);
-        nestinglevel = env.getNestingLevel();;
+        nestinglevel = env.getNestingLevel();
         return new ArrayList<>();
     }
 
     public void setIdStatus(Effect effect, int dereferenceLevel){
-        this.entry.setDereferenceLevelVariableStatus(effect, dereferenceLevel);
+        this.entry.updatePointerStatusReference(effect, dereferenceLevel);
     }
     public Effect getIdStatus(int dereferenceLevel){
         return this.entry.getDereferenceLevelVariableStatus(dereferenceLevel);

@@ -86,23 +86,17 @@ public class AssignmentNode implements Node {
         int lhsDerefLvl = lhs.getDereferenceLevel();
         int expDerefLvl = rhsPointer.getDereferenceLevel();
         int lhsMaxDerefLvl = lhs.getEntry().getMaxDereferenceLevel();
-        List<Effect> rhsStatusList = rhsPointer.getEntry().getStatusList();
         for (int i = lhsDerefLvl, j = expDerefLvl; i < lhsMaxDerefLvl; i++, j++) {
-          /*
-          if(rhsStatus.equals(new Effect(Effect.DEL))){
-            errors.add(new SemanticError("Assigning deleted variable."));
-          }*/
-          /*Effect status = rhsPointer.getEntry().getStatus(j);//rhsStatusList.get(j);
-          lhs.getEntry().setStatus(status,i);*/
-          Effect status = rhsPointer.getIdStatus(j);
+          Effect status = rhsPointer.getEntry().getDereferenceLevelVariableStatus(j);
           lhs.setIdStatus(status,i);
         }
       }
-      else if(exp instanceof NewNode) {
-        System.out.println("Istance of newNode");
-        lhs.getEntry().setDereferenceLevelVariableStatus(new Effect(Effect.READWRITE), 1);
+      /*else if(exp instanceof NewNode) {
+        System.out.println("Istance of newNode " +lhs.getDereferenceLevel());
 
-      }
+        lhs.getEntry().setDereferenceLevelVariableStatus(new Effect(Effect.READWRITE), lhs.getDereferenceLevel());
+
+      }*/
       else { // lhs is not in error status and exp is not a pointer.
         lhs.getEntry().setDereferenceLevelVariableStatus(new Effect(Effect.READWRITE), lhs.getDereferenceLevel());
       }

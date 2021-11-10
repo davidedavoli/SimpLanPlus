@@ -28,7 +28,7 @@ public class Effect {
 
 
     // Actual status of a variable.
-    private final int status;
+    private int status;
 
     private Effect(final int status) {
         this.status = status;
@@ -40,6 +40,9 @@ public class Effect {
 
     public Effect(final Effect effect) {
         this(effect.status);
+    }
+    public void updateStatus(Effect effect) {
+        this.status = effect.status;
     }
 
     public static Effect maxEffect(final Effect effect1, final Effect effect2) {
