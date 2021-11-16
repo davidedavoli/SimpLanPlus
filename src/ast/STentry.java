@@ -45,6 +45,16 @@ public class STentry {
     this.variableStatus = new ArrayList<>();
   }
 
+  public STentry(STentry entry) {
+    this.nestingLevel = entry.getNestingLevel();
+    this.offset = entry.getOffset();
+    this.type = entry.getType();
+    this.variableStatus = new ArrayList<>();
+    for (var status : entry.variableStatus) {
+      this.variableStatus.add(new Effect(status));
+    }
+  }
+
   public String getBeginFuncLabel() {
     return beginFuncLabel;
   }

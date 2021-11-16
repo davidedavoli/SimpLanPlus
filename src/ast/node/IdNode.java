@@ -102,7 +102,7 @@ public class IdNode extends LhsNode implements Dereferenceable {
     }
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
-        entry = env.lookUp(id);
+        entry = env.effectsLookUp(id);
         nestinglevel = env.getNestingLevel();
         return new ArrayList<>();
     }

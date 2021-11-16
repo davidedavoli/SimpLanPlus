@@ -143,8 +143,8 @@ public class Test {
 
 		int numberOfTest = Objects.requireNonNull(new File("examples/").list()).length;
 		System.out.println("NUMBER OF TEST IS " + numberOfTest);
-		String fileAbsName = dir + baseName + 6 + ext;
-		String fileName = baseName + 6 + ext;
+		String fileAbsName = dir + baseName + 8 + ext;
+		String fileName = baseName + 8 + ext;
 		compileFile(fileAbsName,fileName);
 
 		/*for(int number = 1; number<=numberOfTest;number++){

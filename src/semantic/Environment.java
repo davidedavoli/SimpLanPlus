@@ -18,6 +18,79 @@ public class Environment {
 	//livello ambiente con dichiarazioni piu' esterno � 0 (prima posizione ArrayList) invece che 1 (slides)
 	//il "fronte" della lista di tabelle � symTable.get(nestingLevel)
 
+	public Environment(ArrayList<HashMap<String,STentry>> symTable, int nestingLevel, int offset){
+		this.symTable = symTable;
+		this.nestingLevel = nestingLevel;
+		this.offset = offset;
+
+		for (var scope : symTable) {
+			final HashMap<String, STentry> copiedScope = new HashMap<>();
+			for (var id : scope.keySet()) {
+				copiedScope.put(id, new STentry(scope.get(id)));
+			}
+			this.symTable.add(copiedScope);
+		}
+
+	}
+	public Environment(Environment e) {
+		this.nestingLevel = e.nestingLevel;
+		this.offset = e.offset;
+		for (var scopeBlock : e.symTable) {
+			final HashMap<String, STentry> copiedScope = new HashMap<>();
+			for (var id : scopeBlock.keySet()) {
+				STentry entry = scopeBlock.get(id);
+				int offset = entry.getOffset();
+				TypeNode type = entry.getType();
+				int nestingLevel = entry.getNestingLevel();
+				copiedScope.put(id, new STentry(nestingLevel,type,offset));
+			}
+			this.symTable.add(copiedScope);
+		}
+	}
+
+	public Environment() {
+		this.symTable = new ArrayList<HashMap<String,STentry>>();
+		this.nestingLevel = -1;
+		this.offset = 0;
+
+	}
+
+	public static Environment max(Environment firstEnv, Environment secondEnv) {
+		var maxEnvironment = new Environment(new ArrayList<>(), firstEnv.nestingLevel, firstEnv.offset);
+		for (int scopeIndex = 0, size = firstEnv.symTable.size(); scopeIndex < size; scopeIndex++) {
+			var firstScope = firstEnv.symTable.get(scopeIndex);
+			var secondScope = secondEnv.symTable.get(scopeIndex);
+
+			final HashMap<String, STentry> maxScope = new HashMap<>();
+			for (var varId : firstScope.keySet()) {
+				var entryFirstEnv = firstScope.get(varId);
+				var entrySecondEnv = secondScope.get(varId);
+				if(entrySecondEnv == null){
+					maxScope.put(varId,entryFirstEnv);
+				}
+				else{
+					int nestingLevel = entryFirstEnv.getNestingLevel();
+					TypeNode type = entryFirstEnv.getType();
+					int offset = entryFirstEnv.getOffset();
+					var entry = new STentry(nestingLevel,type,offset);
+					var maxDeference = entry.getMaxDereferenceLevel();
+					for (int deferenceLevel = 0; deferenceLevel < maxDeference; deferenceLevel++){
+						var firstEffect = entryFirstEnv.getDereferenceLevelVariableStatus(deferenceLevel);
+						var secondEffect = entrySecondEnv.getDereferenceLevelVariableStatus(deferenceLevel);
+						entry.setDereferenceLevelVariableStatus(Effect.maxEffect(firstEffect,secondEffect),deferenceLevel);
+					}
+					maxScope.put(varId,entry);
+				}
+			}
+			maxEnvironment.symTable.add(maxScope);
+		}
+
+
+
+		return maxEnvironment;
+	}
+
+
 	/**
 	 * Getter
 	 */
@@ -174,6 +247,35 @@ public class Environment {
 			errors.add(new SemanticError(variable.getID() + " not declared. Aborting."));
 		}
 		return errors;
+	}
+
+	public void update(Environment newEnvironment) {
+		this.symTable.clear();
+		this.nestingLevel = newEnvironment.getNestingLevel();
+		this.offset = newEnvironment.getOffset();
+
+		for (var scope : newEnvironment.symTable) {
+			final HashMap<String, STentry> copiedScope = new HashMap<>();
+			for (var id : scope.keySet()) {
+				copiedScope.put(id, new STentry(scope.get(id)));
+			}
+			this.symTable.add(copiedScope);
+		}
+		System.out.println(symTable.get(0).get("x").getStatusList());
+	}
+
+	public STentry effectsLookUp(String id) {
+		for (int i = nestingLevel; i >= 0; i--) {
+			var ithScope = symTable.get(i);
+			var stEntry = ithScope.get(id);
+			if (stEntry != null) {
+				return stEntry;
+			}
+		}
+
+		System.err.println("Unexpected absence of ID " + id + " in the Symbol Table.");
+
+		return null; // Does not happen if preconditions are met.
 	}
 
 	/**

@@ -101,6 +101,9 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
         ArrayList<SemanticError> errors = new ArrayList<>();
+        System.out.println(env.getCurrentST());
+        entry = env.effectsLookUp(id);
+
         Effect actualStatus = entry.getDereferenceLevelVariableStatus(getDereferenceLevel());
         if (actualStatus.equals(Effect.INITIALIZED)) {
             errors.add(new SemanticError(this.getID() + " used before writing value. IdExpNode"));

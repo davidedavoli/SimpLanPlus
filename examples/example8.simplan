@@ -1,0 +1,24 @@
+{
+    /*^int x = new int;
+    ^int y = new int;
+    x^ = 5;
+    print x^;
+    if(false){
+        delete x;
+    }
+    else {
+        x^ = 6;
+    }
+    y = x;
+    print x^;*/
+    int x;
+    if(false){
+        x = 5;
+        print x;
+    }
+    else{
+        print 6;
+    }
+    print x;
+
+}
