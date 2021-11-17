@@ -50,7 +50,7 @@ public class Test {
 
 		ArrayList<SemanticError> err = ast.checkSemantics(env);
 
-
+		System.out.println("You had: "+err.size()+" semantic errors.");
 		if(err.size()>0){
 			return err;
 		}
@@ -85,7 +85,7 @@ public class Test {
 		SVMLexer lexerASM = new SVMLexer(inputASM);
 		CommonTokenStream tokensASM = new CommonTokenStream(lexerASM);
 
-		System.out.println("You had: "+lexerASM.lexicalErrors+" lexical errors syntax errors.");
+		System.out.println("You had: "+lexerASM.lexicalErrors+" lexical errors in SVM.");
 		if (lexerASM.lexicalErrors>0 ) System.exit(1);
 
 		return tokensASM;
@@ -97,10 +97,19 @@ public class Test {
 		SVMVisitorImpl visitorSVM = new SVMVisitorImpl();
 		visitorSVM.visit(parserASM.assembly());
 
-		System.out.println("You had: "+parserASM.getNumberOfSyntaxErrors()+" syntax errors.");
+		System.out.println("You had: "+parserASM.getNumberOfSyntaxErrors()+" syntax errors in SVM.");
 		if (parserASM.getNumberOfSyntaxErrors()>0) System.exit(1);
 
 		return visitorSVM;
+	}
+
+	private static void checkEffects(Node ast, Environment env){
+		ArrayList<SemanticError> effectErrors = ast.checkEffects(env);
+		System.out.println("You had: "+effectErrors.size()+" effects errors.");
+
+		if(effectErrors.size()>0){
+			System.exit(1);
+		}
 	}
 
 	private static void compileFile(String fileAbsName,String fileName) throws IOException, SimplanPlusException {
@@ -121,11 +130,8 @@ public class Test {
 		}
 
 		typeCheck(ast);
-		ArrayList<SemanticError> effectErrors = ast.checkEffects(env);
-		if( !effectErrors.isEmpty() ) {
-			System.out.println(effectErrors);
-			return;
-		}
+		checkEffects(ast,env);
+
 		codeGeneration(fileAsm,ast);
 
 		CommonTokenStream tokensASM = SVMLexer(fileAsm);
