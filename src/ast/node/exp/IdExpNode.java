@@ -50,6 +50,10 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
   public STentry getEntry() {
 	  return entry;
   }
+    public void setEntry(STentry entry) {
+        System.out.println("ST ENTRY SET IN IDEXP NODE");
+        this.entry = entry;
+    }
 
   public String toPrint(String s) throws SimplanPlusException {
 	return s+"Id:" + id + " at nestlev " + nestinglevel +"\n" + entry.toPrint(s+"  ") ;

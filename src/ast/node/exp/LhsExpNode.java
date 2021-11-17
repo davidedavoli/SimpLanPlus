@@ -59,6 +59,9 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
 	  else
 		  return null; 
   }
+    public void setEntry(STentry entry){
+        inner.setEntry(entry);
+    }
 
     @Override
     public Effect getIdStatus(int j) {
@@ -106,6 +109,12 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
         ArrayList<SemanticError> errors = new ArrayList<>();
+        /**
+         * Getting new entry if it was modified from some operation on environments
+         */
+        String id = inner.getID();
+        STentry actualEntry = env.effectsLookUp(id);
+        inner.setEntry(actualEntry);
 
         errors.addAll(inner.checkEffects(env));
 

@@ -83,6 +83,13 @@ public class LhsNode implements Node, Dereferenceable {
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
         ArrayList<SemanticError> errors = new ArrayList<>();
+        /**
+         * Getting new entry if it was modified from some operation on environments
+         */
+        String id = inner.getID();
+        STentry actualEntry = env.effectsLookUp(id);
+        inner.setEntry(actualEntry);
+
         errors.addAll(inner.checkEffects(env));
         System.out.println("DEREF LEVEL IN LHS " + getDereferenceLevel());
         if (!inner.getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()-1).equals(new Effect(Effect.READWRITE))) {

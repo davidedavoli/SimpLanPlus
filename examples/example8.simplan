@@ -12,13 +12,18 @@
     y = x;
     print x^;*/
     int x;
+    ^int c;
     if(false){
         x = 5;
+        c = new int;
+        c^ = 10;
         print x;
     }
     else{
         print 6;
     }
     print x;
+    print c;
+    print c^;
 
 }
