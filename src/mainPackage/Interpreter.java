@@ -10,7 +10,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class TestVM {
+public class Interpreter {
     public static void main (String argv[]) throws IOException {
         String fileName="VMsample";
         FileInputStream isASM = new FileInputStream(fileName+".asm");
