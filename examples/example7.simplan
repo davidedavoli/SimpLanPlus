@@ -6,3 +6,8 @@
     print z;
     print f;
 }
+/*
+ should print:
+     ;10
+     ;24
+ */

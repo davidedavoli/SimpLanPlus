@@ -28,6 +28,6 @@ Articolated fibonacci example
 }
 /*
 Should print:
-;34
+    ;34
 
 */

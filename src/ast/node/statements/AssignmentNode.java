@@ -78,29 +78,20 @@ public class AssignmentNode implements Node {
       else if (exp instanceof LhsExpNode) {
 
         List<Dereferenceable> rhsPointerList = exp.variables();
-
-        System.out.println("**************************");
-        System.out.println(rhsPointerList);
         var rhsPointer = rhsPointerList.get(0);
 
         int lhsDerefLvl = lhs.getDereferenceLevel();
         int expDerefLvl = rhsPointer.getDereferenceLevel();
         int lhsMaxDerefLvl = lhs.getEntry().getMaxDereferenceLevel();
+
         for (int i = lhsDerefLvl, j = expDerefLvl; i < lhsMaxDerefLvl; i++, j++) {
           Effect status = rhsPointer.getEntry().getDereferenceLevelVariableStatus(j);
           lhs.setIdStatus(status,i);
         }
       }
-      /*else if(exp instanceof NewNode) {
-        System.out.println("Istance of newNode " +lhs.getDereferenceLevel());
-
-        lhs.getEntry().setDereferenceLevelVariableStatus(new Effect(Effect.READWRITE), lhs.getDereferenceLevel());
-
-      }*/
       else { // lhs is not in error status and exp is not a pointer.
         lhs.getEntry().setDereferenceLevelVariableStatus(new Effect(Effect.READWRITE), lhs.getDereferenceLevel());
       }
-      System.out.println("ENTRY " + lhs.getID() + " " + lhs.getEntry().getStatusList());
       return errors;
     }
 
@@ -108,32 +99,13 @@ public class AssignmentNode implements Node {
   public String codeGeneration(Label labelManager) throws SimplanPlusException {
       StringBuilder cgen = new StringBuilder();
       cgen.append(exp.codeGeneration(labelManager)).append("\n");
-
-
-      //cgen.append("push $a0 // save exp on stack \n");
       cgen.append("//RITORNATO DA CGEN EXP\n");
+
       cgen.append(lhs.codeGeneration(labelManager)).append("\n");
-      //cgen.append("pop $a0 // put in $a0 top of stack \n");
-
-      //$a1 indirizzo di lhs
-
-      cgen.append("sw $a0 0($al) // 0($a1) = $a0 id=exp \n");
+      //$al indirizzo di lhs
+      cgen.append("sw $a0 0($al) // 0($al) = $a0 id=exp \n");
 
       return cgen.toString();
   }
 
-//@Override
-//public ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl) {
-//	
-//	//create result list
-//	ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-//	
-//	res.addAll(exp.delTypeCheck(env, nl));
-//	  
-//	int dl = lhs.getDerefLevel();
-//	
-//	
-//	return null;
-//}  
-    
 }  

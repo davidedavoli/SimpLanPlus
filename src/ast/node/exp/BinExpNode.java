@@ -62,7 +62,7 @@ public class BinExpNode extends ExpNode {
             case "/":
                 // Both must be integer type
                 if (!(lhsType instanceof IntTypeNode)) {
-                    System.out.println("Gli operandi non sono int, lanciare un'eccezione");
+                    throw new SimplanPlusException("Operands are not int in division");
                 }
                 return new IntTypeNode();
 
@@ -71,7 +71,7 @@ public class BinExpNode extends ExpNode {
             case ">":
             case ">=":
                 if (!(lhsType instanceof IntTypeNode)) {
-                    System.out.println("Gli operandi non sono int, lanciare un'eccezione");
+                    throw new SimplanPlusException("Operands are not int in >=");
                 }
                 return new BoolTypeNode();
             /**
@@ -86,7 +86,7 @@ public class BinExpNode extends ExpNode {
             case "&&":
             case "||":
                 if(!(lhsType instanceof  BoolTypeNode)){
-                    System.out.println("Gli operandi non sono bool, lanciare un'eccezione");
+                    throw new SimplanPlusException("Operands are not bool in division");
                 }
                 return new BoolTypeNode();
         }

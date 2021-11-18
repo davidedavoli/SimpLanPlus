@@ -40,7 +40,7 @@ mv $fp $al //put in $a1 (al) actual fp
 lw $al 0($al) //go up to chain
 addi $al $al -2 //put in $al address of Id
 
-sw $a0 0($al) // 0($a1) = $a0 id=exp 
+sw $a0 0($al) // 0($al) = $a0 id=exp 
 
 subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 

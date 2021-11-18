@@ -91,7 +91,6 @@ public class LhsNode implements Node, Dereferenceable {
         inner.setEntry(actualEntry);
 
         errors.addAll(inner.checkEffects(env));
-        System.out.println("DEREF LEVEL IN LHS " + getDereferenceLevel());
         if (!inner.getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()-1).equals(new Effect(Effect.READWRITE))) {
             errors.add(new SemanticError(inner.getID() + " has not all pointer to rw "));
         }

@@ -1,41 +1,48 @@
 {
-    /*^int x = new int;
-    ^int y = new int;
-    x^ = 5;
-    print x^;
-    if(false){
-        delete x;
+    void plusint(int c){
+        print false;
+        print c+1;
+        return;
     }
-    else {
-        x^ = 6;
+    int minusint(int c){
+        print true;
+        return c-1;
     }
-    y = x;
-    print x^;*/
 
     int x;
+    int f;
     ^int c = new int;
-     x = 8;
-     c = new int;
-     c^ = 10;
-     print x;
-     print c^;
 
-    /*if(false){
+    if(false){
         x = 5;
         c = new int;
         c^ = 10;
         print x;
+        f = 10;
     }
     else{
+        x = 8;
         print 6;
-    }*/
+    }
     print x;
-    //print c;
     c^ = 5;
     print c^;
     delete c;
     c = new int;
     c^ = 9;
+    plusint(c^);
+    print minusint(c^);
     print c^;
 
 }
+/*
+ should print:
+     ;6
+     ;8
+     ;5
+     ;0
+     ;10
+     ;1
+     ;8
+     ;9
+ */

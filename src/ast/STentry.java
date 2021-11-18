@@ -4,10 +4,9 @@ import ast.node.types.PointerTypeNode;
 import ast.node.types.TypeNode;
 import semantic.Effect;
 import semantic.SimplanPlusException;
-import ast.node.types.TypeUtils;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 public class STentry {
 
@@ -27,7 +26,7 @@ public class STentry {
     this.variableStatus = new ArrayList<>();
     //Effect initEffect = new Effect();
     try{
-      int deferenceLevel = ((PointerTypeNode) type).getDerefLevel();
+      int deferenceLevel = ((PointerTypeNode) type).getDereferenceLevel();
       for(int g=0; g <= deferenceLevel;g++){
         this.variableStatus.add(new Effect(Effect.INITIALIZED));
       }

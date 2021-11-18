@@ -28,10 +28,9 @@ public class PointerTypeNode implements TypeNode {
 	    return type;
   }
   
-  public int getDerefLevel(){
-      System.out.println("POINTER TYPE NODE" +type);
+  public int getDereferenceLevel(){
 	  if (type instanceof PointerTypeNode)
-		  return 1+((PointerTypeNode)type).getDerefLevel();
+		  return 1+((PointerTypeNode)type).getDereferenceLevel();
 	  else
 		  return 1;
   }

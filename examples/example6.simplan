@@ -10,28 +10,14 @@ Pointer usage example
 
     duple^ = new int;
     duple^^ = 2;
-
-    /*print duple;
-    print duple^;
-    print duple^^;
-    print triple;
-    print triple^;
-    print triple^^;
-    print triple^^^;*/
+    print triple^^^;
 
     triple^ = duple;
 
-    /*print duple^^;
-    print duple;
-    print duple^;
     print duple^^;
-    print triple;
-    print triple^;
-    print triple^^;
-    print triple^^^;*/
+    print triple^^^;
 
     delete duple;
-    //print triple;
     triple = new ^^int;
     triple^ = new ^int;
     triple^^ = new int;
@@ -41,65 +27,16 @@ Pointer usage example
     duple^^ = 66;
 
 
-    print duple;
-    print duple^;
     print duple^^;
-    print triple;
-    print triple^;
-    print triple^^;
     print triple^^^;
-
-
-    /*^int y = new int;
-    ^int z = new int;
-    z = y;
-    y^ = 5;
-    delete z;
-    y = new int;
-    print y;
-    print y^;
-
-    y^ = 5;
-    z^ = y;
-    delete z;
-    z = new int;
-    print z^;*/
-    /*y^ = 4;
-    print y^;
-    print z;
-    print z^;*/
-
-    //y^ = 6;
-    //print y^;
-
-
-    /*
-    ^^int z;
-    ^^^int c = new ^^int;
-    c^ = new ^int;
-    c^^ = new int;
-    c^^^ = 4;
-    z = c^;
-    print z;
-    print z^;
-    print z^^;
-    */
 
 }
 
 /*
 should print:
-;Pointer
-;Pointer
-;5
-;Pointer
-;Error?
-
-It print;
-;0
-;1
-;5
-;1
-;1
-
+    ;40
+    ;2
+    ;2
+    ;66
+    ;55
 */

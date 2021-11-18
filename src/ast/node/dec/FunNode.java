@@ -10,6 +10,7 @@ import ast.node.statements.BlockNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
+import ast.node.types.VoidTypeNode;
 import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
@@ -98,7 +99,7 @@ public class FunNode implements Node {
 				parTypes.add(arg.getType());
 				STentry oldEntry = env.newFunctionParameter(arg.getId(),arg.getType(),paroffset++);
 				if(oldEntry != null)
-					System.out.println("Parameter id '"+arg.getId()+"' already declared");
+					res.add(new SemanticError("Parameter id '"+arg.getId()+"' already declared"));
 			}
 
 			//set func type
@@ -120,8 +121,7 @@ public class FunNode implements Node {
 		RetEffType abs = new RetEffType(RetEffType.RetT.ABS);
 		RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
 
-		//!(type instanceof VoidTypeNode) &&
-		if ( body.retTypeCheck(this).leq(abs)) {
+		if ( body.retTypeCheck(this).leq(abs) && !(type instanceof VoidTypeNode)) {
 			res.add(new SemanticError("Possible absence of return value"));
 		}
       /*if ((type instanceof VoidTypeNode) && pres.leq(body.retTypeCheck())) {

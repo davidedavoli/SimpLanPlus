@@ -75,13 +75,9 @@ public class IfNode implements Node {
             errors.addAll(th.checkEffects(thenEnv));
 
             var elseEnv = new Environment(env);
-            System.out.println("thenEnv");
-            System.out.println(thenEnv.getCurrentST());
-            System.out.println("elseEnv");
-            System.out.println(elseEnv.getCurrentST());
             errors.addAll(el.checkEffects(elseEnv));
+
             env.update(Environment.max(thenEnv, elseEnv));
-            System.out.println(env.getCurrentST().get("x").getStatusList());
         } else {
             errors.addAll(th.checkEffects(env));
         }

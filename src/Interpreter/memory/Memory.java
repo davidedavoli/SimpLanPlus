@@ -1,5 +1,7 @@
 package Interpreter.memory;
 
+import semantic.SimplanPlusException;
+
 public class Memory {
     private Cell[] mem;
 
@@ -10,12 +12,11 @@ public class Memory {
         }
     }
 
-    public int read(int n){
+    public int read(int n) throws SimplanPlusException {
         return mem[n].read();
     }
 
     public int write(int add, int val){
-        System.out.println("WRITING " + val);
         return mem[add].write(val);
     }
 
@@ -31,5 +32,11 @@ public class Memory {
             }
         }
         return -1;
+    }
+
+    public void cleanMemory(int start, int end) {
+        for (int indexStack = start;indexStack < end; indexStack++){
+            mem[indexStack] = new Cell();
+        }
     }
 }

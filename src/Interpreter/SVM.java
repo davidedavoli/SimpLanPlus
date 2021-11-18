@@ -3,6 +3,7 @@ package Interpreter;
 import Interpreter.ast.Instruction;
 import Interpreter.memory.Memory;
 import Interpreter.parser.SVMParser;
+import semantic.SimplanPlusException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -195,8 +196,10 @@ public class SVM {
 
                         case SVMParser.HALT:
                             //to print the result
-                            System.out.println("\nResult: " + memory.read(sp) + "\n");
+                            System.out.println("HALTING PROGRAM...");
                             //printStack(20);
+                            //System.out.println("\nResult: " + memory.read(sp) + "\n");
+
                             return;
                     }
                 } catch (Exception e) {
@@ -226,8 +229,11 @@ public class SVM {
         }
     }
 
-    private int pop() {
-        return memory.read(sp++);
+    private Integer pop() throws Exception {
+        Integer val = memory.read(sp);
+        regStore("$sp",sp+1);
+
+        return val;
     }
 
     private int regRead(String reg) {
@@ -271,6 +277,9 @@ public class SVM {
             al = v;
         }
         else if (reg.equals("$sp")) {
+            if (v > sp){
+                memory.cleanMemory(sp,v);
+            }
             sp = v;
             if (sp <= hp) {
                 throw new Exception("Stack overflow!");
@@ -294,8 +303,9 @@ public class SVM {
 
     }
 
-    private void push(int v) {
-        memory.write(--sp, v);
+    private void push(int v) throws Exception {
+        regStore("$sp",sp-1);
+        memory.write(sp, v);
     }
 
     private boolean isRegister(String str) {
@@ -303,13 +313,13 @@ public class SVM {
         Matcher m = p.matcher(str);
         return m.matches();
     }
-    private void printStack(int numberOfVarToPrint){
+    private void printStack(int numberOfVarToPrint) throws SimplanPlusException {
         int ind = MEMSIZE-1;
         int to = ind-numberOfVarToPrint;
         System.out.println("Inizio print stack");
 
         while (ind > to){
-            System.out.println("CELL "+ ind + " Value: "+ memory.read(ind));
+            System.out.println("CELL "+ ind + " Value: "+memory.read(ind));
             ind--;
         }
         System.out.println("Fine print stack, current sp_addr: "+sp);

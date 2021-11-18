@@ -51,7 +51,6 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
 	  return entry;
   }
     public void setEntry(STentry entry) {
-        System.out.println("ST ENTRY SET IN IDEXP NODE");
         this.entry = entry;
     }
 
@@ -105,7 +104,6 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
         ArrayList<SemanticError> errors = new ArrayList<>();
-        System.out.println(env.getCurrentST());
         entry = env.effectsLookUp(id);
 
         Effect actualStatus = entry.getDereferenceLevelVariableStatus(getDereferenceLevel());

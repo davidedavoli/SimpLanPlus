@@ -174,9 +174,7 @@ public class Environment {
 		this.symTable.remove(this.nestingLevel--);
 		if(this.nestingLevel >= 0){
 			Optional<STentry> stEntry = this.symTable.get(this.nestingLevel).values().stream().min(Comparator.comparing(STentry::getOffset));
-			int offset = stEntry.map(STentry::getOffset).orElse(-1);
-			//System.out.println("NEW OFFSET HAS TO BE " + offset);
-			this.offset = offset ;
+			this.offset = stEntry.map(STentry::getOffset).orElse(-1);
 		}
 	}
 
@@ -261,7 +259,6 @@ public class Environment {
 			}
 			this.symTable.add(copiedScope);
 		}
-		System.out.println(symTable.get(0).get("x").getStatusList());
 	}
 
 	public STentry effectsLookUp(String id) {

@@ -76,7 +76,6 @@ public class DeletionNode implements Node {
         );
         idEntry.reInitVariableStatus();
       }
-      System.out.println("ENTRY deleted " + id.getID() + " " + id.getEntry().getStatusList());
       return errors;
     }
 

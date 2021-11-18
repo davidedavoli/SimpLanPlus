@@ -15,6 +15,6 @@ Normal fibonacci
 }
 /*
 Should print:
-;6765
+    ;6765
 
 */

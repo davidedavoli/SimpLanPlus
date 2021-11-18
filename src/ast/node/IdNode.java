@@ -44,7 +44,6 @@ public class IdNode extends LhsNode implements Dereferenceable {
   }
 
   public void setEntry(STentry entry) {
-      System.out.println("ST ENTRY SET IN ID NODE");
       this.entry = entry;
   }
   public STentry getEntry() {

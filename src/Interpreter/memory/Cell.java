@@ -24,7 +24,10 @@ public class Cell {
         pointed=true;
     }
 
-    public Integer read(){
+    public Integer read() throws SimplanPlusException {
+        if(val == null){
+            throw new SimplanPlusException("Value is not written in memory");
+        }
         return val;
     }
 

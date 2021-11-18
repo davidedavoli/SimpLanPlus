@@ -145,14 +145,14 @@ public class Test {
 
 		int numberOfTest = Objects.requireNonNull(new File("examples/").list()).length;
 		System.out.println("NUMBER OF TEST IS " + numberOfTest);
-		String fileAbsName = dir + baseName + 8 + ext;
+		/*String fileAbsName = dir + baseName + 8 + ext;
 		String fileName = baseName + 8 + ext;
-		compileFile(fileAbsName,fileName);
+		compileFile(fileAbsName,fileName);*/
 
-		/*for(int number = 1; number<=numberOfTest;number++){
+		for(int number = 1; number<=numberOfTest;number++){
 			String fileAbsName = dir + baseName + number + ext;
 			String fileName = baseName + number + ext;
 			compileFile(fileAbsName,fileName);
-		}*/
+		}
 	}
 }

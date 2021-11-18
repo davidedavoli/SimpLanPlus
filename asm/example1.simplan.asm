@@ -93,7 +93,7 @@ lw $al 0($al) //go up to chain
 lw $al 0($al) //go up to chain
 addi $al $al -1 //put in $al address of Id
 
-sw $a0 0($al) // 0($a1) = $a0 id=exp 
+sw $a0 0($al) // 0($al) = $a0 id=exp 
 
 //Start codegen of ast.node.exp.IdExpNode-ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
@@ -112,7 +112,7 @@ lw $al 0($al) //go up to chain
 lw $al 0($al) //go up to chain
 addi $al $al -2 //put in $al address of Id
 
-sw $a0 0($al) // 0($a1) = $a0 id=exp 
+sw $a0 0($al) // 0($al) = $a0 id=exp 
 
 push $fp
 //Start codegen of ast.node.exp.IdExpNode-ast.node.exp.single_exp.IntNode
