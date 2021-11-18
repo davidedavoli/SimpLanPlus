@@ -129,13 +129,6 @@ public class BlockNode implements Node {
         for (Node dec : declarations) {
             errors.addAll(dec.checkEffects(env));
         }
-        try {
-            System.out.println("ENTRO IN BLOCCO " + env.getNestingLevel());
-            System.out.println(env.getCurrentST().get("x").getStatusList());
-        }
-        catch(Exception e){
-
-        }
 
         for(Node stm: statements) {
             errors.addAll(stm.checkEffects(env));
@@ -143,13 +136,6 @@ public class BlockNode implements Node {
 
         if (!isFunction) {
             env.popBlockScope();
-        }
-        try {
-            System.out.println("ORA IN BLOCCO " + env.getNestingLevel());
-            System.out.println(env.getCurrentST().get("x").getStatusList());
-        }
-        catch(Exception e){
-
         }
         return errors;
     }

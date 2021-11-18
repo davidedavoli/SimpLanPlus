@@ -78,8 +78,6 @@ public class IfNode implements Node {
             errors.addAll(el.checkEffects(elseEnv));
 
             env.update(Environment.max(thenEnv, elseEnv));
-            System.out.println("IF");
-            System.out.println(env.getPrevCurrentST().get("x").getStatusList());
         } else {
             errors.addAll(th.checkEffects(env));
         }

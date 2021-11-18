@@ -1,8 +1,10 @@
 {
-    int x = 5;
+    int f;
     {
+
         int x;
-        if(true){   
+        f = 5;
+        if(true){
             x = 4;
         }
         else{
@@ -15,7 +17,8 @@
                 x = 7;
             }
             print x;
+            f = 10;
         }
     }
-    print x;
+    print f;
 }
