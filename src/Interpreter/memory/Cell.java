@@ -1,14 +1,17 @@
 package Interpreter.memory;
 
+import semantic.SimplanPlusException;
+
 public class Cell {
-    private int val;
+    private Integer val;
     private boolean pointed;
 
     Cell(){
         pointed=false;
+        val = null;
     }
 
-    public int write(int v){
+    public Integer write(int v){
         val = v;
         return val;
     }
@@ -21,7 +24,7 @@ public class Cell {
         pointed=true;
     }
 
-    public int read(){
+    public Integer read(){
         return val;
     }
 

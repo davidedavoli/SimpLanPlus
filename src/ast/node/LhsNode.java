@@ -68,7 +68,7 @@ public class LhsNode implements Node, Dereferenceable {
     }
 
     //valore di ritorno non utilizzato
-    public TypeNode typeCheck () throws SimplanPlusException {
+    public TypeNode typeCheck() throws SimplanPlusException {
         if (inner != null) {
             return inner.typeCheck().dereference();
         }

@@ -207,20 +207,19 @@ public class SVM {
                     for (Instruction ins:code){
                         if(ins == null)
                             break;
-                        else{
+                        if(cont == ip){
                             String literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
                             String str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
                             toPrint += cont+": "+ str +"\n";
-                        }
-                        if(cont == ip)
                             break;
+                        }
                         cont++;
 
                     }
 
                     e.printStackTrace();
                     System.out.println(toPrint);
-                    printStack(20);
+                    //printStack(20);
                     return;
                 }
             }

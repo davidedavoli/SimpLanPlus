@@ -11,9 +11,16 @@
     }
     y = x;
     print x^;*/
+
     int x;
-    ^int c;
-    if(false){
+    ^int c = new int;
+     x = 8;
+     c = new int;
+     c^ = 10;
+     print x;
+     print c^;
+
+    /*if(false){
         x = 5;
         c = new int;
         c^ = 10;
@@ -21,9 +28,14 @@
     }
     else{
         print 6;
-    }
+    }*/
     print x;
-    print c;
+    //print c;
+    c^ = 5;
+    print c^;
+    delete c;
+    c = new int;
+    c^ = 9;
     print c^;
 
 }

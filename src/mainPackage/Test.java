@@ -45,21 +45,20 @@ public class Test {
 		Node ast = visitor.visitMainBlock(parser.block(), true); //generazione AST
 		return ast;
 	}
-	private static ArrayList<SemanticError> checkErrorAst(Node ast, Environment env) throws SimplanPlusException {
+	private static void checkErrorAst(Node ast, Environment env) throws SimplanPlusException {
 		//SIMPLE CHECK FOR LEXER ERRORS
 
-		ArrayList<SemanticError> err = ast.checkSemantics(env);
+		ArrayList<SemanticError> semanticError = ast.checkSemantics(env);
 
-		System.out.println("You had: "+err.size()+" semantic errors.");
-		if(err.size()>0){
-			return err;
+		System.out.println("You had: "+semanticError.size()+" semantic errors.");
+		if(semanticError.size()>0){
+			for(SemanticError e : semanticError)
+				System.out.println("\t" + e);
+			System.exit(1);
 		}
-		else{
-			System.out.println("Visualizing AST...");
-			//System.out.println(ast.toPrint(""));
-		}
+		//System.out.println("Visualizing AST...");
+		//System.out.println(ast.toPrint(""));
 
-		return err;
 	}
 
 	private static void typeCheck(Node ast) throws SimplanPlusException {
@@ -86,6 +85,7 @@ public class Test {
 		CommonTokenStream tokensASM = new CommonTokenStream(lexerASM);
 
 		System.out.println("You had: "+lexerASM.lexicalErrors+" lexical errors in SVM.");
+
 		if (lexerASM.lexicalErrors>0 ) System.exit(1);
 
 		return tokensASM;
@@ -106,8 +106,9 @@ public class Test {
 	private static void checkEffects(Node ast, Environment env){
 		ArrayList<SemanticError> effectErrors = ast.checkEffects(env);
 		System.out.println("You had: "+effectErrors.size()+" effects errors.");
-
 		if(effectErrors.size()>0){
+			for(SemanticError e : effectErrors)
+				System.out.println("\t" + e);
 			System.exit(1);
 		}
 	}
@@ -120,15 +121,10 @@ public class Test {
 		Node ast = parser(tokens);
 		Environment env = new Environment();
 
-		ArrayList<SemanticError> err = checkErrorAst(ast, env);
-
-		if(err.size()>0){
-			System.out.println("You had: " +err.size()+" errors:");
-			for(SemanticError e : err)
-				System.out.println("\t" + e);
-			return;
-		}
-
+		/**
+		 * Check program error
+		 */
+		checkErrorAst(ast, env);
 		typeCheck(ast);
 		checkEffects(ast,env);
 

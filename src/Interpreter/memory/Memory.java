@@ -15,6 +15,7 @@ public class Memory {
     }
 
     public int write(int add, int val){
+        System.out.println("WRITING " + val);
         return mem[add].write(val);
     }
 
