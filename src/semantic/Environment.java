@@ -18,45 +18,30 @@ public class Environment {
 	//livello ambiente con dichiarazioni piu' esterno � 0 (prima posizione ArrayList) invece che 1 (slides)
 	//il "fronte" della lista di tabelle � symTable.get(nestingLevel)
 
-	public Environment(ArrayList<HashMap<String,STentry>> symTable, int nestingLevel, int offset){
-		this.symTable = symTable;
+	public Environment(int nestingLevel, int offset){
+		this.symTable = new ArrayList<>();
 		this.nestingLevel = nestingLevel;
 		this.offset = offset;
 
-		for (var scope : symTable) {
-			final HashMap<String, STentry> copiedScope = new HashMap<>();
-			for (var id : scope.keySet()) {
-				copiedScope.put(id, new STentry(scope.get(id)));
-			}
-			this.symTable.add(copiedScope);
-		}
-
 	}
 	public Environment(Environment e) {
-		this.nestingLevel = e.nestingLevel;
-		this.offset = e.offset;
+		this(e.nestingLevel,e.offset);
 		for (var scopeBlock : e.symTable) {
 			final HashMap<String, STentry> copiedScope = new HashMap<>();
 			for (var id : scopeBlock.keySet()) {
 				STentry entry = scopeBlock.get(id);
-				int offset = entry.getOffset();
-				TypeNode type = entry.getType();
-				int nestingLevel = entry.getNestingLevel();
-				copiedScope.put(id, new STentry(nestingLevel,type,offset));
+				copiedScope.put(id, new STentry(entry));
 			}
 			this.symTable.add(copiedScope);
 		}
 	}
 
 	public Environment() {
-		this.symTable = new ArrayList<HashMap<String,STentry>>();
-		this.nestingLevel = -1;
-		this.offset = 0;
-
+		this(-1,0);
 	}
 
 	public static Environment max(Environment firstEnv, Environment secondEnv) {
-		var maxEnvironment = new Environment(new ArrayList<>(), firstEnv.nestingLevel, firstEnv.offset);
+		var maxEnvironment = new Environment(firstEnv.nestingLevel, firstEnv.offset);
 		for (int scopeIndex = 0, size = firstEnv.symTable.size(); scopeIndex < size; scopeIndex++) {
 			var firstScope = firstEnv.symTable.get(scopeIndex);
 			var secondScope = secondEnv.symTable.get(scopeIndex);
