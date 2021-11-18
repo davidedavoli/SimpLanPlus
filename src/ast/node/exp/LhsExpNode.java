@@ -90,7 +90,7 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
   //valore di ritorno non utilizzato
   public TypeNode typeCheck () throws SimplanPlusException {
 	if (inner != null) {
-        return new PointerTypeNode(inner.typeCheck());
+        return inner.typeCheck().dereference();
     }
 	else //Questo caso non dovrebbe mai verificarsi per l'implementazione di Visitor.
 		return null;
