@@ -104,6 +104,9 @@ public class Environment {
 	public HashMap<String, STentry> getCurrentST() {
 		return this.symTable.get(this.nestingLevel);
 	}
+	public HashMap<String, STentry> getPrevCurrentST() {
+		return this.symTable.get(this.nestingLevel-1);
+	}
 	/**
 	 * End of Getter
 	 */
@@ -168,6 +171,7 @@ public class Environment {
 
 	public void popBlockScope(){
 		this.symTable.remove(this.nestingLevel--);
+
 	}
 
 	public void popFunScope(){

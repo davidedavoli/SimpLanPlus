@@ -124,8 +124,6 @@ public class VarNode implements Node {
         if(exp != null){
             errors.addAll(exp.checkEffects(env));
         }
-        HashMap<String, STentry> hm = new HashMap<> ();
-        hm.put(id.getID(), id.getEntry());
         env.addEntry(id.getID(), id.getEntry());
         return errors;
     }

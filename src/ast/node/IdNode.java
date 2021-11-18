@@ -109,6 +109,10 @@ public class IdNode extends LhsNode implements Dereferenceable {
     public void setIdStatus(Effect effect, int dereferenceLevel){
         this.entry.updatePointerStatusReference(effect, dereferenceLevel);
     }
+
+    public void declaredIdStatus(Effect effect, int dereferenceLevel){
+        this.entry.setDereferenceLevelVariableStatus(effect, dereferenceLevel);
+    }
     public Effect getIdStatus(int dereferenceLevel){
         return this.entry.getDereferenceLevelVariableStatus(dereferenceLevel);
     }

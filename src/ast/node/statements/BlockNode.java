@@ -129,6 +129,13 @@ public class BlockNode implements Node {
         for (Node dec : declarations) {
             errors.addAll(dec.checkEffects(env));
         }
+        try {
+            System.out.println("ENTRO IN BLOCCO " + env.getNestingLevel());
+            System.out.println(env.getCurrentST().get("x").getStatusList());
+        }
+        catch(Exception e){
+
+        }
 
         for(Node stm: statements) {
             errors.addAll(stm.checkEffects(env));
@@ -137,25 +144,16 @@ public class BlockNode implements Node {
         if (!isFunction) {
             env.popBlockScope();
         }
+        try {
+            System.out.println("ORA IN BLOCCO " + env.getNestingLevel());
+            System.out.println(env.getCurrentST().get("x").getStatusList());
+        }
+        catch(Exception e){
+
+        }
         return errors;
     }
 
-//  public ArrayList<SemanticError> delTypeCheck(DelEnv env, int n){
-//	  ArrayList<SemanticError> err = new ArrayList<SemanticError>();
-//	  
-//	  for (Node i: declarations) {
-//		  err.addAll(i.delTypeCheck(env, n));
-//	  }
-//	  
-//	  for (Node i: statements) {
-//		  if (!(i instanceof BlockNode))
-//			  err.addAll(i.delTypeCheck(env, n+1));
-//		  else
-//			  err.addAll(i.delTypeCheck(env, n));
-//	  }
-//
-//	  return err;
-//  }
   
   public String codeGeneration(Label labelManager) throws SimplanPlusException {
       StringBuilder cgen = new StringBuilder();

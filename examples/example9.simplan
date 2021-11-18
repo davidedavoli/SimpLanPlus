@@ -1,0 +1,14 @@
+{
+    int x = 5;
+    {
+        int x;
+        if(true){
+            x = 4;
+        }
+        else{
+            print 10;
+        }
+        print x;
+    }
+    print x;
+}
