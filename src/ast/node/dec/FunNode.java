@@ -1,6 +1,8 @@
 package ast.node.dec;
 import java.util.*;
+import java.util.function.Consumer;
 
+import ast.Dereferenceable;
 import ast.FuncBodyUtils;
 import ast.Label;
 import ast.STentry;
@@ -11,6 +13,7 @@ import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import ast.node.types.VoidTypeNode;
+import semantic.Effect;
 import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
@@ -20,7 +23,7 @@ public class FunNode implements Node {
   private String id;
   private TypeNode type;
   private ArrayList<TypeNode> partypes;
-  private ArrayList<Node> parlist = new ArrayList<Node>();
+  private ArrayList<ArgNode> parlist = new ArrayList<ArgNode>();
   //private ArrayList<Node> declist;
   private BlockNode body;
   private String beginFuncLabel = "";
@@ -132,10 +135,144 @@ public class FunNode implements Node {
 		return res;
 	}
 
+	/**
+	 * @param env
+	 * @return
+	 */
 	@Override
 	public ArrayList<SemanticError> checkEffects(Environment env) {
-	  return new ArrayList<>();
+	  ArrayList<SemanticError> errors = new ArrayList<>();
+
+	  // create a new entry in STable  with the function id
+	  env.addEntry(this.id, );
+
+		// put all the argNode to RW
+		List<List<Effect>> startingEffect = new ArrayList<>();
+		parlist.forEach(argNode -> {
+			// list of effect foreach arg
+			List<Effect> argEffect = new ArrayList<>();
+
+			// if pointers, put all the pointed var in RW
+			int maxDerefLvl = argNode.getId().getSTentry().getMaxDereferenceLevel();
+			for(int derefLvl = 0; derefLvl < maxDerefLvl; derefLvl++){
+				argEffect.add(new Effect(Effect.READWRITE));
+			}
+			startingEffect.add(argEffect);
+		});
+		errors.addAll(fixPointCheckEffect(env, startingEffect));
+
+	  return errors;
 	}
+
+	/**
+	 *
+	 * @param env
+	 * @param effects
+	 * @return
+	 */
+	private ArrayList<SemanticError> fixPointCheckEffect(Environment env, List<List<Effect>> effects) {
+	  ArrayList<SemanticError> errors = new ArrayList<>();
+
+	  // =====================================================================
+	  // 1. copy the old env, before analyze the body of the function
+		env.newScope();
+
+		// =====================================================================
+		// 2. put at RW all the formal parameters
+		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
+			var arg = parlist.get(argIndex);
+			env.addEntry(arg.getId(), arg.getId().getSTentry());
+			var argEntry = arg.getId().getSTentry();
+
+			// update the status
+			for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
+				// effects.get(argIndex).get(derefLvl) is the status of the argIndex-th argument at the dereference level derefLvl
+				// given as this method parameter.
+				argEntry.setVariableStatus(new Effect(effects.get(argIndex).get(derefLvl)), derefLvl);
+			}
+		}
+
+		// Adding the function to the current scope for non-mutual recursive calls.
+		STentry innerFunEntry = env.addUniqueNewDeclaration(funId.getIdentifier(), funType);
+		// setup for the analysis of the function's body
+		innerFunEntry.setFunctionNode(this);
+		body.disallowScopeCreation();
+
+		// keep the old effect
+		Environment old_env = new Environment(env);
+		List<List<Effect>> old_effects = new ArrayList<>();
+		for (var status : innerFunEntry.getFunctionStatus()) {
+			old_effects.add(new ArrayList<>(status));
+		}
+
+		// =====================================================================
+		// 3. Single execution of the function's body
+		errors.addAll(checkBodyAndUpdateArgs(env, innerFunEntry)); // env is updated after this call.
+
+		// =====================================================================
+		// 4. check if effects are changed after the body
+		boolean different_funType = !innerFunEntry.getFunctionStatus().equals(old_effects);
+
+		if (different_funType){
+			//effect are changed!
+			// replace the env and update status with the new effects
+
+			env.replace(old_env);
+
+			// lookUp should work??
+			var funEntry = env.safeLookup(funId.getIdentifier());
+
+			for (int argIndex = 0; argIndex < args.size(); argIndex++) {
+				var argEntry = env.safeLookup(args.get(argIndex).getId().getIdentifier());
+				var argStatuses = innerFunEntry.getFunctionStatus().get(argIndex);
+
+				for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
+					funEntry.setParamStatus(argIndex, argStatuses.get(derefLvl), derefLvl);
+				}
+			}
+
+			// they are the new starting effect
+			old_effects = new ArrayList<>(innerFunEntry.getFunctionStatus());
+
+			errors.addAll(checkBodyAndUpdateArgs(env, innerFunEntry));
+
+			// repeat until the effects are not modified
+			different_funType = !innerFunEntry.getFunctionStatus().equals(old_effects);
+		}
+
+		// =====================================================================
+		// 5. popScope and update the original env with the computed effect after fixpoint
+		env.popScope();
+
+		// Setting the computed statuses in the function arguments and saving them in the Symbol Table entry of the function funId.
+		var idEntry = env.safeLookup(funId.getIdentifier());
+		for (int argIndex = 0; argIndex < parlist.size(); argIndex++) {
+			//Update ID in previous scope
+			var argStatuses = innerFunEntry.getFunctionStatus().get(argIndex);
+
+			for (int derefLvl = 0; derefLvl < argStatuses.size(); derefLvl++) {
+				idEntry.setParamStatus(argIndex, argStatuses.get(derefLvl), derefLvl);
+			}
+		}
+
+		return errors;
+	}
+
+	private ArrayList<SemanticError> checkBodyAndUpdateArgs(Environment env, STentry innerFunEntry) throws SimplanPlusException {
+		ArrayList<SemanticError> errors = new ArrayList<>();
+
+		errors.addAll(body.checkSemantics(env));
+		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
+			var argEntry = env.lookUp(parlist.get(argIndex).getId());
+
+			for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
+				funId.getSTEntry().setParamStatus(argIndex, argEntry.getVariableStatus(derefLvl), derefLvl);
+				innerFunEntry.setParamStatus(argIndex, argEntry.getVariableStatus(derefLvl), derefLvl);
+			}
+		}
+		return errors;
+	};
+
 
 	public String codeGeneration(Label labelManager) throws SimplanPlusException {
 	  int declaration_size = 0;
