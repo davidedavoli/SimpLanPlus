@@ -88,7 +88,7 @@ public class IdNode extends LhsNode implements Dereferenceable {
   }
 
     @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) {
+    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 
         //create result list
         ArrayList<SemanticError> res = new ArrayList<SemanticError>();

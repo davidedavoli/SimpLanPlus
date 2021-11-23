@@ -76,7 +76,7 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
   }
   
   @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
+  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
   		//create result list
   		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
   		res.addAll(inner.checkSemantics(env));

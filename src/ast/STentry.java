@@ -54,6 +54,7 @@ public class STentry {
     }
   }
 
+
   public String getBeginFuncLabel() {
     return beginFuncLabel;
   }

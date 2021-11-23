@@ -59,7 +59,7 @@ public class LhsNode implements Node, Dereferenceable {
   }
 
     @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) {
+    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
         return inner.checkSemantics(env);
     }
 

@@ -123,7 +123,7 @@ public class Environment {
 
 
 
-	public STentry lookUp(final String id) {
+	public STentry lookUp(final String id) throws SimplanPlusException {
 		for (int i = nestingLevel; i >= 0; i--) {
 			HashMap<String, STentry> scope = symTable.get(i);
 			STentry stEntry = scope.get(id);
@@ -131,10 +131,11 @@ public class Environment {
 				return stEntry;
 			}
 		}
-		System.err.println("ID " + id + " is not in the ST.");
-
-		return null;
+		throw new SimplanPlusException("ID " + id + " is not in the ST.");
+		//System.err.println("ID " + id + " is not in the ST.");
 	}
+
+
 
 
 

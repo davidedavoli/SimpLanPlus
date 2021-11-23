@@ -144,22 +144,32 @@ public class FunNode implements Node {
 	  ArrayList<SemanticError> errors = new ArrayList<>();
 
 	  // create a new entry in STable  with the function id
-	  env.addEntry(this.id, );
+		// env.addEntry(funId.getIdentifier(), funId.getSTEntry());
+		STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel);
+	  	env.addEntry(this.id, entry);
 
 		// put all the argNode to RW
 		List<List<Effect>> startingEffect = new ArrayList<>();
-		parlist.forEach(argNode -> {
-			// list of effect foreach arg
-			List<Effect> argEffect = new ArrayList<>();
+		int argOffset = 1;
 
-			// if pointers, put all the pointed var in RW
-			int maxDerefLvl = argNode.getId().getSTentry().getMaxDereferenceLevel();
+
+		for (ArgNode argNode : parlist) {
+			List<Effect> argEffect = new ArrayList<>();
+//			env.newFunctionParameter(argNode.getId(), argNode.getType(), argOffset++);
+
+			// put all the pointed var in RW
+			int maxDerefLvl  = env.effectsLookUp(argNode.getId()).getMaxDereferenceLevel();
 			for(int derefLvl = 0; derefLvl < maxDerefLvl; derefLvl++){
-				argEffect.add(new Effect(Effect.READWRITE));
+				//argEffect.add(new Effect(Effect.READWRITE));
+				argEffect.add(new Effect(Effect.INITIALIZED));
 			}
 			startingEffect.add(argEffect);
-		});
+		}
+
+
 		errors.addAll(fixPointCheckEffect(env, startingEffect));
+
+
 
 	  return errors;
 	}
@@ -175,20 +185,25 @@ public class FunNode implements Node {
 
 	  // =====================================================================
 	  // 1. copy the old env, before analyze the body of the function
-		env.newScope();
+		env.createVoidScope();
 
 		// =====================================================================
+		int argOffset = 1;
 		// 2. put at RW all the formal parameters
 		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
 			var arg = parlist.get(argIndex);
-			env.addEntry(arg.getId(), arg.getId().getSTentry());
-			var argEntry = arg.getId().getSTentry();
+
+			env.newFunctionParameter(arg.getId(), arg.getType(), argOffset++);
+
+			STentry argEntry = env.effectsLookUp(arg.getId());
+			//env.addEntry(arg.getId(), arg.getId().getSTentry());
+			//var argEntry = arg.getId().getSTentry();
 
 			// update the status
 			for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
 				// effects.get(argIndex).get(derefLvl) is the status of the argIndex-th argument at the dereference level derefLvl
 				// given as this method parameter.
-				argEntry.setVariableStatus(new Effect(effects.get(argIndex).get(derefLvl)), derefLvl);
+				argEntry.setDereferenceLevelVariableStatus(new Effect(effects.get(argIndex).get(derefLvl)), derefLvl);
 			}
 		}
 
@@ -196,7 +211,10 @@ public class FunNode implements Node {
 		STentry innerFunEntry = env.addUniqueNewDeclaration(funId.getIdentifier(), funType);
 		// setup for the analysis of the function's body
 		innerFunEntry.setFunctionNode(this);
-		body.disallowScopeCreation();
+		// impedisce la creazione di blocchi nelle successive iterazioni
+		// controllare se serve, lo dovrebbe gia' fare nella visita dell'albero <=========
+		body.setIsFunction(true);
+
 
 		// keep the old effect
 		Environment old_env = new Environment(env);
@@ -213,7 +231,7 @@ public class FunNode implements Node {
 		// 4. check if effects are changed after the body
 		boolean different_funType = !innerFunEntry.getFunctionStatus().equals(old_effects);
 
-		if (different_funType){
+		while (different_funType){
 			//effect are changed!
 			// replace the env and update status with the new effects
 
@@ -242,7 +260,7 @@ public class FunNode implements Node {
 
 		// =====================================================================
 		// 5. popScope and update the original env with the computed effect after fixpoint
-		env.popScope();
+		env.popBlockScope();
 
 		// Setting the computed statuses in the function arguments and saving them in the Symbol Table entry of the function funId.
 		var idEntry = env.safeLookup(funId.getIdentifier());
@@ -261,7 +279,7 @@ public class FunNode implements Node {
 	private ArrayList<SemanticError> checkBodyAndUpdateArgs(Environment env, STentry innerFunEntry) throws SimplanPlusException {
 		ArrayList<SemanticError> errors = new ArrayList<>();
 
-		errors.addAll(body.checkSemantics(env));
+		errors.addAll(body.checkEffects(env));
 		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
 			var argEntry = env.lookUp(parlist.get(argIndex).getId());
 
