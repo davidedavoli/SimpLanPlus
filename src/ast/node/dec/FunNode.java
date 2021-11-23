@@ -28,12 +28,14 @@ public class FunNode implements Node {
   private BlockNode body;
   private String beginFuncLabel = "";
   private String endFuncLabel = "";
+  private int nestingLevel;
 
   public FunNode (String i, TypeNode t) {
     id=i;
     type=t;
 	beginFuncLabel = FuncBodyUtils.freshFunLabel();
 	endFuncLabel = FuncBodyUtils.endFreshFunLabel();
+	nestingLevel = -1;
 	//System.out.println("CREO FUNZIONE " +id);
   }
 
@@ -88,7 +90,7 @@ public class FunNode implements Node {
 		//env.offset = -2;
 		HashMap<String, STentry> hm = env.getCurrentST();
 		STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel);
-
+		nestingLevel = env.getNestingLevel();
 		if ( hm.put(id,entry) != null )
 			res.add(new SemanticError("Fun id '"+id+"' already declared"));
 		else{
@@ -104,13 +106,10 @@ public class FunNode implements Node {
 				if(oldEntry != null)
 					res.add(new SemanticError("Parameter id '"+arg.getId()+"' already declared"));
 			}
-
 			//set func type
-
 			partypes= parTypes;
 
 			entry.addType( new ArrowTypeNode(parTypes, type) );
-
 
 			res.addAll(body.checkSemantics(env));
 
@@ -305,6 +304,12 @@ public class FunNode implements Node {
 	  cgen.append("push $ra\n");
 
 	  cgen.append(body.codeGeneration(labelManager)).append("\n");
+
+	  RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
+	  if ((type instanceof VoidTypeNode) && !pres.leq(body.retTypeCheck(this))) {
+		  cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return \n");
+		  cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
+	  }
 	  cgen.append(endFuncLabel).append(":\n");
 
 	  cgen.append("lw $ra 0($sp)\n");

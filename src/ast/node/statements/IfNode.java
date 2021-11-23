@@ -61,7 +61,7 @@ public class IfNode implements Node {
 	  if (el!=null)
 		  return RetEffType.min(th_v, el_v);
 	  else
-		  return new RetEffType(RetEffType.RetT.ABS);
+		  return new RetEffType(th_v.getVal());//RetEffType.RetT.ABS);
   }
 
     @Override

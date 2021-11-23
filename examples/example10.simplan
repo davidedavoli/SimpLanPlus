@@ -1,0 +1,27 @@
+{
+    void d(){
+        print 10;
+    }
+
+    void f(int x){
+        if(x < 7){
+            print x;
+            f(x+1);
+        }
+        else{
+            print 0;
+        }
+
+        print 22;
+        d();
+    }
+
+    void g(int x){
+        f(x);
+
+    }
+
+
+    g(5);
+
+}

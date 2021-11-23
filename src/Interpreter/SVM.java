@@ -31,7 +31,7 @@ public class SVM {
         this.code = code;
     }
 
-    public void cpu() {
+    public void cpu() throws SimplanPlusException {
         while (true) {
             if (hp + 1 >= sp) {
                 System.out.println("\nError: Out of memory");
@@ -210,7 +210,13 @@ public class SVM {
                     for (Instruction ins:code){
                         if(ins == null)
                             break;
-                        if(cont == ip){
+                        if(cont > ip -10){
+                            String literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
+                            String str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
+                            toPrint += cont+": "+ str +"\n";
+                            //break;
+                        }
+                        else if(cont == ip){
                             String literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
                             String str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
                             toPrint += cont+": "+ str +"\n";
@@ -221,8 +227,7 @@ public class SVM {
                     }
 
                     e.printStackTrace();
-                    System.out.println(toPrint);
-                    //printStack(20);
+                    printStack(30);
                     return;
                 }
             }
@@ -287,7 +292,6 @@ public class SVM {
         }
         else if (reg.equals("$ra")) {
             ra = v;
-
         }
         else{
             switch (reg.charAt(1)) {
@@ -316,7 +320,7 @@ public class SVM {
     private void printStack(int numberOfVarToPrint) throws SimplanPlusException {
         int ind = MEMSIZE-1;
         int to = ind-numberOfVarToPrint;
-        System.out.println("Inizio print stack");
+        System.out.println("Stack attuale: "+sp+"Inizio print stack");
 
         while (ind > to){
             System.out.println("CELL "+ ind + " Value: "+memory.read(ind));

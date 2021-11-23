@@ -136,16 +136,16 @@ public class Compiler {
 		interpreterCode(visitorSVM.getCode(),fileName);
 	}
 
-	private static void interpreterCode(Instruction[] code,String filename){
+	private static void interpreterCode(Instruction[] code,String filename) throws SimplanPlusException {
 		System.out.println("Starting Virtual Machine for "+filename+"...");
 		SVM vm = new SVM(code);
 		vm.cpu();
 	}
 	public static void main(String[] args) throws Exception {
 
-
-		String fileAbsName = dir + baseName + 9 + ext;
-		String fileName = baseName + 9 + ext;
+		int number = 10;
+		String fileAbsName = dir + baseName + number + ext;
+		String fileName = baseName + number + ext;
 		compileFile(fileAbsName,fileName);
 
 		/*int numberOfTest = Objects.requireNonNull(new File("examples/").list()).length;
