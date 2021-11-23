@@ -47,7 +47,7 @@ public class FunNode implements Node {
 		return endFuncLabel;
 	}
 
-  public void addPar (Node p) {
+  public void addPar (ArgNode p) {
     parlist.add(p);
   }
 
