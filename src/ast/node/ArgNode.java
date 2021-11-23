@@ -12,17 +12,17 @@ import semantic.SimplanPlusException;
 
 public class ArgNode implements Node {
 
-  private String id;
+  private IdNode id;
   private TypeNode type;
   
-  public ArgNode (String i, TypeNode t) {
+  public ArgNode (IdNode i, TypeNode t) {
    id=i;
    type=t;
   }
   
-  public String getId(){
-	  return id;
-  }
+  //public String getId(){
+//	  return id;
+//  }
   
   public TypeNode getType(){
 	  return type;
@@ -57,5 +57,8 @@ public class ArgNode implements Node {
   public String codeGeneration(Label labelManager){
 		return "";
   }
-    
+
+    public IdNode getIdNode() {
+      return this.id;
+    }
 }  

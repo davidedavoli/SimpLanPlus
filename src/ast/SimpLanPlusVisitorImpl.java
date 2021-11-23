@@ -114,8 +114,10 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		//add argument declarations
 		//we are getting a shortcut here by constructing directly the ParNode
 		//this could be done differently by visiting instead the VardecContext
-		for(ArgContext arg : ctx.arg())
-			res.addPar( new ArgNode(arg.ID().getText(), (TypeNode)visit( arg.type() )) );//WARNING casting
+		for(ArgContext arg : ctx.arg()){
+			res.addPar( visitArg(arg));//WARNING casting
+		}
+
 		
 		//add body
 		BlockNode block = (BlockNode) visitBlock(ctx.block());
@@ -156,8 +158,10 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	}
 	
 	@Override
-	public Node visitArg(ArgContext ctx) {
-		return new ArgNode(ctx.ID().getText(), (TypeNode)  visit(ctx.type() )); //WARNING CASTING
+	public ArgNode visitArg(ArgContext ctx) {
+		TypeNode type = visitType(ctx.type());
+		IdNode id = new IdNode(ctx.ID().getText());
+		return new ArgNode(id, type);
 	}
 	
 	@Override

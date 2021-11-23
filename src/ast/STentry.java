@@ -1,6 +1,8 @@
 package ast;
 
-import ast.node.types.PointerTypeNode;
+import ast.node.Node;
+import ast.node.dec.FunNode;
+import ast.node.types.FunTypeNode;
 import ast.node.types.TypeNode;
 import semantic.Effect;
 import semantic.SimplanPlusException;
@@ -16,24 +18,51 @@ public class STentry {
 
   // status of variable
   private final List<Effect> variableStatus;
+  private final List<List<Effect>> parametersStatus;
+
+  //Fun entry
   private String beginFuncLabel = "";
   private String endFuncLabel = "";
-   
+  private FunNode funNode;
+
   public STentry (int nestingLevel, TypeNode type, int offset)  {
     this.nestingLevel = nestingLevel;
     this.type = type;
     this.offset = offset;
     this.variableStatus = new ArrayList<>();
+    this.parametersStatus = new ArrayList<>();
     //Effect initEffect = new Effect();
-    try{
-      int deferenceLevel = ((PointerTypeNode) type).getDereferenceLevel();
+
+    if (type instanceof FunTypeNode) {
+
+      for (var param : ((FunTypeNode) type).getArgumentsType()) {
+        List<Effect> paramStatus = new ArrayList<>();
+        //Check if is right to return 1 in node or to let it call the subclass method
+        int numberOfDereference = param.getDereferenceLevel();
+        for (int i = 0; i <= numberOfDereference; i++) {
+          paramStatus.add(new Effect(Effect.INITIALIZED));
+        }
+        this.parametersStatus.add(paramStatus);
+      }
+    }
+    else{
+     /* try{
+        //int deferenceLevel = ((PointerTypeNode) type).getDereferenceLevel();
+        int deferenceLevel = type.getDereferenceLevel();
+        for(int g=0; g <= deferenceLevel;g++){
+          this.variableStatus.add(new Effect(Effect.INITIALIZED));
+        }
+      }
+      catch(Exception e){
+        this.variableStatus.add(new Effect(Effect.INITIALIZED));
+
+      }*/
+      int deferenceLevel = type.getDereferenceLevel();
       for(int g=0; g <= deferenceLevel;g++){
         this.variableStatus.add(new Effect(Effect.INITIALIZED));
       }
     }
-    catch(Exception e){
-      this.variableStatus.add(new Effect(Effect.INITIALIZED));
-    }
+
   }
 
   public STentry (int nestingLevel, int offset, String bFL, String eFL) {
@@ -42,6 +71,7 @@ public class STentry {
     beginFuncLabel = bFL;
     endFuncLabel = eFL;
     this.variableStatus = new ArrayList<>();
+    this.parametersStatus = new ArrayList<>();
   }
 
   public STentry(STentry entry) {
@@ -49,9 +79,20 @@ public class STentry {
     this.offset = entry.getOffset();
     this.type = entry.getType();
     this.variableStatus = new ArrayList<>();
+    this.parametersStatus = new ArrayList<>();
+
+    for (var fnStatus : entry.parametersStatus) {
+      List<Effect> parameterListStatus = new ArrayList<>();
+      for (var status : fnStatus) {
+        parameterListStatus.add(new Effect(status));
+      }
+      this.parametersStatus.add(parameterListStatus);
+    }
+
     for (var status : entry.variableStatus) {
       this.variableStatus.add(new Effect(status));
     }
+    this.funNode = entry.funNode;
   }
 
 
@@ -121,4 +162,18 @@ public class STentry {
   }
 
 
+  public void setFunctionNode(FunNode funNode) {
+    this.funNode = funNode;
+  }
+  public FunNode getFunctionNode() {
+    return this.funNode;
+  }
+
+  public List<List<Effect>> getFunctionStatusList() {
+    return this.parametersStatus;
+  }
+
+  public void setParameterStatus(int parameterIndex, Effect effect, int dereferenceLevel) {
+    this.parametersStatus.get(parameterIndex).set(dereferenceLevel, new Effect(effect));
+  }
 }

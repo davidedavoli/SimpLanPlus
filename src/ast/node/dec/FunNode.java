@@ -1,18 +1,13 @@
 package ast.node.dec;
 import java.util.*;
-import java.util.function.Consumer;
 
-import ast.Dereferenceable;
 import ast.FuncBodyUtils;
 import ast.Label;
 import ast.STentry;
 import ast.node.ArgNode;
 import ast.node.Node;
 import ast.node.statements.BlockNode;
-import ast.node.types.ArrowTypeNode;
-import ast.node.types.RetEffType;
-import ast.node.types.TypeNode;
-import ast.node.types.VoidTypeNode;
+import ast.node.types.*;
 import semantic.Effect;
 import semantic.Environment;
 import semantic.SemanticError;
@@ -20,10 +15,11 @@ import semantic.SimplanPlusException;
 
 public class FunNode implements Node {
 
-  private String id;
-  private TypeNode type;
+  private final String id;
+  private final TypeNode type;
+  private FunTypeNode functionType; //just for ST
   private ArrayList<TypeNode> partypes;
-  private ArrayList<ArgNode> parlist = new ArrayList<ArgNode>();
+  private final ArrayList<Node> parlist = new ArrayList<>();
   //private ArrayList<Node> declist;
   private BlockNode body;
   private String beginFuncLabel = "";
@@ -36,7 +32,7 @@ public class FunNode implements Node {
 	beginFuncLabel = FuncBodyUtils.freshFunLabel();
 	endFuncLabel = FuncBodyUtils.endFreshFunLabel();
 	nestingLevel = -1;
-	//System.out.println("CREO FUNZIONE " +id);
+
   }
 
   public void addFunBlock(BlockNode b) {
@@ -59,13 +55,12 @@ public class FunNode implements Node {
 
 
 	public String toPrint(String s) throws SimplanPlusException {
-	String parlstr="";
+	StringBuilder parlstr= new StringBuilder();
 	for (Node par:parlist)
-	  parlstr+=par.toPrint(s+"  ");
+	  parlstr.append(par.toPrint(s + "  "));
     return s+"Fun:" + id +"\n"
 		   +type.toPrint(s+"  ")
 		   +parlstr
-	   	   //+declstr
            +body.toPrint(s+"  ") ;
   }
 
@@ -85,7 +80,7 @@ public class FunNode implements Node {
 	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 
 		//create result list
-		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+		ArrayList<SemanticError> res = new ArrayList<>();
 
 		//env.offset = -2;
 		HashMap<String, STentry> hm = env.getCurrentST();
@@ -96,18 +91,20 @@ public class FunNode implements Node {
 		else{
 			env.createVoidScope();
 
-			ArrayList<TypeNode> parTypes = new ArrayList<TypeNode>();
+			ArrayList<TypeNode> parTypes = new ArrayList<>();
 			int paroffset=1;
 			//check args
 			for(Node a : parlist){
 				ArgNode arg = (ArgNode) a;
 				parTypes.add(arg.getType());
-				STentry oldEntry = env.newFunctionParameter(arg.getId(),arg.getType(),paroffset++);
+				STentry oldEntry = env.newFunctionParameter(arg.getIdNode().getID(),arg.getType(),paroffset++);
+				arg.getIdNode().setEntry(env.lookUp(arg.getIdNode().getID()));
 				if(oldEntry != null)
-					res.add(new SemanticError("Parameter id '"+arg.getId()+"' already declared"));
+					res.add(new SemanticError("Parameter id '"+arg.getIdNode().getID()+"' already declared"));
 			}
 			//set func type
 			partypes= parTypes;
+			functionType = new FunTypeNode(partypes, type);
 
 			entry.addType( new ArrowTypeNode(parTypes, type) );
 
@@ -121,7 +118,7 @@ public class FunNode implements Node {
 		}
 
 		RetEffType abs = new RetEffType(RetEffType.RetT.ABS);
-		RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
+		//RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
 
 		if ( body.retTypeCheck(this).leq(abs) && !(type instanceof VoidTypeNode)) {
 			res.add(new SemanticError("Possible absence of return value"));
@@ -135,11 +132,11 @@ public class FunNode implements Node {
 	}
 
 	/**
-	 * @param env
-	 * @return
+	 * @param env Environment
+	 * @return ArrayList<SemanticError>
 	 */
 	@Override
-	public ArrayList<SemanticError> checkEffects(Environment env) {
+	public ArrayList<SemanticError> checkEffects(Environment env){
 	  ArrayList<SemanticError> errors = new ArrayList<>();
 
 	  // create a new entry in STable  with the function id
@@ -149,18 +146,16 @@ public class FunNode implements Node {
 
 		// put all the argNode to RW
 		List<List<Effect>> startingEffect = new ArrayList<>();
-		int argOffset = 1;
 
-
-		for (ArgNode argNode : parlist) {
+		for (Node par : parlist) {
+			ArgNode argNode = (ArgNode) par;
 			List<Effect> argEffect = new ArrayList<>();
-//			env.newFunctionParameter(argNode.getId(), argNode.getType(), argOffset++);
 
 			// put all the pointed var in RW
-			int maxDerefLvl  = env.effectsLookUp(argNode.getId()).getMaxDereferenceLevel();
+			int maxDerefLvl  = argNode.getIdNode().getEntry().getMaxDereferenceLevel();
 			for(int derefLvl = 0; derefLvl < maxDerefLvl; derefLvl++){
-				//argEffect.add(new Effect(Effect.READWRITE));
-				argEffect.add(new Effect(Effect.INITIALIZED));
+				argEffect.add(new Effect(Effect.READWRITE));
+				//argEffect.add(new Effect(Effect.INITIALIZED));
 			}
 			startingEffect.add(argEffect);
 		}
@@ -175,11 +170,11 @@ public class FunNode implements Node {
 
 	/**
 	 *
-	 * @param env
-	 * @param effects
-	 * @return
+	 * @param env Environment
+	 * @param effects List of effect
+	 * @return  ArrayList<SemanticError>
 	 */
-	private ArrayList<SemanticError> fixPointCheckEffect(Environment env, List<List<Effect>> effects) {
+	private ArrayList<SemanticError> fixPointCheckEffect(Environment env, List<List<Effect>> effects){
 	  ArrayList<SemanticError> errors = new ArrayList<>();
 
 	  // =====================================================================
@@ -190,11 +185,11 @@ public class FunNode implements Node {
 		int argOffset = 1;
 		// 2. put at RW all the formal parameters
 		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
-			var arg = parlist.get(argIndex);
+			var arg = (ArgNode) parlist.get(argIndex);
 
-			env.newFunctionParameter(arg.getId(), arg.getType(), argOffset++);
+			env.newFunctionParameter(arg.getIdNode().getID(), arg.getType(), argOffset++);
 
-			STentry argEntry = env.effectsLookUp(arg.getId());
+			STentry argEntry = env.effectsLookUp(arg.getIdNode().getID());
 			//env.addEntry(arg.getId(), arg.getId().getSTentry());
 			//var argEntry = arg.getId().getSTentry();
 
@@ -207,54 +202,59 @@ public class FunNode implements Node {
 		}
 
 		// Adding the function to the current scope for non-mutual recursive calls.
-		STentry innerFunEntry = env.addUniqueNewDeclaration(funId.getIdentifier(), funType);
-		// setup for the analysis of the function's body
-		innerFunEntry.setFunctionNode(this);
+		STentry effectsFunEntry = env.createFunDecEffects(id,functionType);
+		// add this node to recall this checkEffects
+		effectsFunEntry.setFunctionNode(this);
 		// impedisce la creazione di blocchi nelle successive iterazioni
-		// controllare se serve, lo dovrebbe gia' fare nella visita dell'albero <=========
+		// controllare se serve, nella visita dell'albero viene fatto ma
+		// in teoria serve rifarlo. Comunque metterlo a true non dovrebbe causare danni <=========
 		body.setIsFunction(true);
 
 
 		// keep the old effect
-		Environment old_env = new Environment(env);
-		List<List<Effect>> old_effects = new ArrayList<>();
-		for (var status : innerFunEntry.getFunctionStatus()) {
-			old_effects.add(new ArrayList<>(status));
+		Environment decFunEnv = new Environment(env);
+		List<List<Effect>> effectsCopy = new ArrayList<>();
+
+		for (var status : effectsFunEntry.getFunctionStatusList()) {
+			effectsCopy.add(new ArrayList<>(status));
 		}
 
 		// =====================================================================
 		// 3. Single execution of the function's body
-		errors.addAll(checkBodyAndUpdateArgs(env, innerFunEntry)); // env is updated after this call.
+		errors.addAll(checkBodyAndUpdateArgs(env, effectsFunEntry)); // env is updated after this call.
 
 		// =====================================================================
 		// 4. check if effects are changed after the body
-		boolean different_funType = !innerFunEntry.getFunctionStatus().equals(old_effects);
+		boolean different_funType = !effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
 
 		while (different_funType){
 			//effect are changed!
 			// replace the env and update status with the new effects
 
-			env.replace(old_env);
+			env.update(decFunEnv);
 
 			// lookUp should work??
-			var funEntry = env.safeLookup(funId.getIdentifier());
+			var funEntry = env.effectsLookUp(id);
 
-			for (int argIndex = 0; argIndex < args.size(); argIndex++) {
-				var argEntry = env.safeLookup(args.get(argIndex).getId().getIdentifier());
-				var argStatuses = innerFunEntry.getFunctionStatus().get(argIndex);
+			for (int argIndex = 0; argIndex < parlist.size(); argIndex++) {
+
+				var argNode = (ArgNode) parlist.get(argIndex);
+				var argEntry = env.effectsLookUp(argNode.getIdNode().getID());
+
+				var argStatusList = effectsFunEntry.getFunctionStatusList().get(argIndex);
 
 				for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
-					funEntry.setParamStatus(argIndex, argStatuses.get(derefLvl), derefLvl);
+					funEntry.setParameterStatus(argIndex, argStatusList.get(derefLvl), derefLvl);
 				}
 			}
 
 			// they are the new starting effect
-			old_effects = new ArrayList<>(innerFunEntry.getFunctionStatus());
+			effectsCopy = new ArrayList<>(effectsFunEntry.getFunctionStatusList());
 
-			errors.addAll(checkBodyAndUpdateArgs(env, innerFunEntry));
+			errors.addAll(checkBodyAndUpdateArgs(env, effectsFunEntry));
 
 			// repeat until the effects are not modified
-			different_funType = !innerFunEntry.getFunctionStatus().equals(old_effects);
+			different_funType = !effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
 		}
 
 		// =====================================================================
@@ -262,33 +262,33 @@ public class FunNode implements Node {
 		env.popBlockScope();
 
 		// Setting the computed statuses in the function arguments and saving them in the Symbol Table entry of the function funId.
-		var idEntry = env.safeLookup(funId.getIdentifier());
+		var idEntry = env.effectsLookUp(id);
 		for (int argIndex = 0; argIndex < parlist.size(); argIndex++) {
 			//Update ID in previous scope
-			var argStatuses = innerFunEntry.getFunctionStatus().get(argIndex);
+			var argStatuses = effectsFunEntry.getFunctionStatusList().get(argIndex);
 
 			for (int derefLvl = 0; derefLvl < argStatuses.size(); derefLvl++) {
-				idEntry.setParamStatus(argIndex, argStatuses.get(derefLvl), derefLvl);
+				idEntry.setParameterStatus(argIndex, argStatuses.get(derefLvl), derefLvl);
 			}
 		}
 
 		return errors;
 	}
 
-	private ArrayList<SemanticError> checkBodyAndUpdateArgs(Environment env, STentry innerFunEntry) throws SimplanPlusException {
+	private ArrayList<SemanticError> checkBodyAndUpdateArgs(Environment env, STentry innerFunEntry){
 		ArrayList<SemanticError> errors = new ArrayList<>();
-
 		errors.addAll(body.checkEffects(env));
 		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
-			var argEntry = env.lookUp(parlist.get(argIndex).getId());
-
+			ArgNode arg = (ArgNode) parlist.get(argIndex);
+			var argEntry = env.effectsLookUp(arg.getIdNode().getID());
+			STentry functionEntry = env.effectsLookUp(id);
 			for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
-				funId.getSTEntry().setParamStatus(argIndex, argEntry.getVariableStatus(derefLvl), derefLvl);
-				innerFunEntry.setParamStatus(argIndex, argEntry.getVariableStatus(derefLvl), derefLvl);
+				functionEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(derefLvl), derefLvl);
+				innerFunEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(derefLvl), derefLvl);
 			}
 		}
 		return errors;
-	};
+	}
 
 
 	public String codeGeneration(Label labelManager) throws SimplanPlusException {

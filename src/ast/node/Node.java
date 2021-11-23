@@ -29,4 +29,8 @@ public interface Node {
 
   ArrayList<SemanticError> checkEffects(Environment env);
 
+    default int getDereferenceLevel(){
+      return 0;
+    }
+
 }

@@ -51,6 +51,11 @@ public RetEffType retTypeCheck(FunNode funNode) {
 
     @Override
     public ArrayList<SemanticError> checkEffects(Environment env) {
+
+
+
+
+
         return new ArrayList<>();
     }
 

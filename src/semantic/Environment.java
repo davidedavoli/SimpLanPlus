@@ -5,6 +5,7 @@ import java.util.function.BiFunction;
 
 import ast.Dereferenceable;
 import ast.STentry;
+import ast.node.dec.FunNode;
 import ast.node.types.TypeNode;
 
 public class Environment {
@@ -58,8 +59,14 @@ public class Environment {
 					TypeNode type = entryFirstEnv.getType();
 					int offset = entryFirstEnv.getOffset();
 					var entry = new STentry(nestingLevel,type,offset);
+					entry.setFunctionNode(entryFirstEnv.getFunctionNode());
 					var maxDeference = entry.getMaxDereferenceLevel();
 					for (int deferenceLevel = 0; deferenceLevel < maxDeference; deferenceLevel++){
+						System.out.println("ID "+varId);
+
+						System.out.println("FIRST ENTRY "+entryFirstEnv.getFunctionStatusList());
+						System.out.println("FIRST ENTRY "+entryFirstEnv.getStatusList());
+						System.out.println("SECOND ENTRY "+entrySecondEnv);
 						var firstEffect = entryFirstEnv.getDereferenceLevelVariableStatus(deferenceLevel);
 						var secondEffect = entrySecondEnv.getDereferenceLevelVariableStatus(deferenceLevel);
 						entry.setDereferenceLevelVariableStatus(Effect.maxEffect(firstEffect,secondEffect),deferenceLevel);
@@ -263,6 +270,18 @@ public class Environment {
 		System.err.println("Unexpected absence of ID " + id + " in the Symbol Table.");
 
 		return null; // Does not happen if preconditions are met.
+	}
+
+	public STentry createFunDecEffects(final String id, final TypeNode type) {
+		STentry stEntry = new STentry(nestingLevel, type, -1);
+			STentry declaration = getCurrentST().put(id, stEntry);
+			if (declaration != null) {
+				System.err.println("Unexpected multiple assignment for ID: " + id + ". It was previously defined of type: "
+						+ declaration.getType() + ".");
+			}
+
+			return stEntry;
+
 	}
 
 	/**
