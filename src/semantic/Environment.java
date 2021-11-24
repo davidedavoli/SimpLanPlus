@@ -62,11 +62,6 @@ public class Environment {
 					entry.setFunctionNode(entryFirstEnv.getFunctionNode());
 					var maxDeference = entry.getMaxDereferenceLevel();
 					for (int deferenceLevel = 0; deferenceLevel < maxDeference; deferenceLevel++){
-						System.out.println("ID "+varId);
-
-						System.out.println("FIRST ENTRY "+entryFirstEnv.getFunctionStatusList());
-						System.out.println("FIRST ENTRY "+entryFirstEnv.getStatusList());
-						System.out.println("SECOND ENTRY "+entrySecondEnv);
 						var firstEffect = entryFirstEnv.getDereferenceLevelVariableStatus(deferenceLevel);
 						var secondEffect = entrySecondEnv.getDereferenceLevelVariableStatus(deferenceLevel);
 						entry.setDereferenceLevelVariableStatus(Effect.maxEffect(firstEffect,secondEffect),deferenceLevel);
@@ -192,8 +187,8 @@ public class Environment {
 		STentry oldEntry = ST.put(varId,newEntry);
 		return oldEntry;
 	}
-	public STentry createFunDec(String bFL, String eFL){
-		STentry entry = new STentry(this.nestingLevel,this.offset--,bFL,eFL);
+	public STentry createFunDec(String bFL, String eFL,TypeNode type){
+		STentry entry = new STentry(this.nestingLevel,this.offset--,bFL,eFL,type);
 		return entry;
 	}
 
@@ -279,8 +274,8 @@ public class Environment {
 				System.err.println("Unexpected multiple assignment for ID: " + id + ". It was previously defined of type: "
 						+ declaration.getType() + ".");
 			}
-
-			return stEntry;
+			declaration = getCurrentST().get(id);
+			return declaration;
 
 	}
 

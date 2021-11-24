@@ -17,7 +17,7 @@ public class FunNode implements Node {
 
   private final String id;
   private final TypeNode type;
-  private FunTypeNode functionType; //just for ST
+  private ArrowTypeNode functionType; //just for ST
   private ArrayList<TypeNode> partypes;
   private final ArrayList<Node> parlist = new ArrayList<>();
   //private ArrayList<Node> declist;
@@ -82,39 +82,39 @@ public class FunNode implements Node {
 		//create result list
 		ArrayList<SemanticError> res = new ArrayList<>();
 
+		ArrayList<TypeNode> parTypes = new ArrayList<>();
+		for(Node a : parlist){
+			ArgNode arg = (ArgNode) a;
+			parTypes.add(arg.getType());
+		}
+		//set func type
+		partypes=parTypes;
+
+		functionType = new ArrowTypeNode(partypes, type);
+
+
 		//env.offset = -2;
 		HashMap<String, STentry> hm = env.getCurrentST();
-		STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel);
+		STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel,functionType);
 		nestingLevel = env.getNestingLevel();
 		if ( hm.put(id,entry) != null )
 			res.add(new SemanticError("Fun id '"+id+"' already declared"));
 		else{
 			env.createVoidScope();
-
-			ArrayList<TypeNode> parTypes = new ArrayList<>();
 			int paroffset=1;
 			//check args
 			for(Node a : parlist){
 				ArgNode arg = (ArgNode) a;
-				parTypes.add(arg.getType());
 				STentry oldEntry = env.newFunctionParameter(arg.getIdNode().getID(),arg.getType(),paroffset++);
 				arg.getIdNode().setEntry(env.lookUp(arg.getIdNode().getID()));
 				if(oldEntry != null)
 					res.add(new SemanticError("Parameter id '"+arg.getIdNode().getID()+"' already declared"));
 			}
 			//set func type
-			partypes= parTypes;
-			functionType = new FunTypeNode(partypes, type);
-
-			entry.addType( new ArrowTypeNode(parTypes, type) );
-
 			res.addAll(body.checkSemantics(env));
 
 			//close scope
-
 			env.popFunScope();
-
-
 		}
 
 		RetEffType abs = new RetEffType(RetEffType.RetT.ABS);
@@ -141,7 +141,7 @@ public class FunNode implements Node {
 
 	  // create a new entry in STable  with the function id
 		// env.addEntry(funId.getIdentifier(), funId.getSTEntry());
-		STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel);
+		STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel,functionType);
 	  	env.addEntry(this.id, entry);
 
 		// put all the argNode to RW
@@ -203,6 +203,7 @@ public class FunNode implements Node {
 
 		// Adding the function to the current scope for non-mutual recursive calls.
 		STentry effectsFunEntry = env.createFunDecEffects(id,functionType);
+		System.out.println(effectsFunEntry.getType());
 		// add this node to recall this checkEffects
 		effectsFunEntry.setFunctionNode(this);
 		// impedisce la creazione di blocchi nelle successive iterazioni
@@ -278,14 +279,20 @@ public class FunNode implements Node {
 	private ArrayList<SemanticError> checkBodyAndUpdateArgs(Environment env, STentry innerFunEntry){
 		ArrayList<SemanticError> errors = new ArrayList<>();
 		errors.addAll(body.checkEffects(env));
+
 		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
 			ArgNode arg = (ArgNode) parlist.get(argIndex);
+
 			var argEntry = env.effectsLookUp(arg.getIdNode().getID());
 			STentry functionEntry = env.effectsLookUp(id);
+
 			for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
+
 				functionEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(derefLvl), derefLvl);
 				innerFunEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(derefLvl), derefLvl);
+
 			}
+			System.out.println("Setted function status list in env "+functionEntry.getFunctionStatusList());
 		}
 		return errors;
 	}
@@ -310,6 +317,7 @@ public class FunNode implements Node {
 		  cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return \n");
 		  cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
 	  }
+
 	  cgen.append(endFuncLabel).append(":\n");
 
 	  cgen.append("lw $ra 0($sp)\n");

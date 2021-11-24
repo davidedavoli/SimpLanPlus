@@ -1,8 +1,7 @@
 package ast;
 
-import ast.node.Node;
 import ast.node.dec.FunNode;
-import ast.node.types.FunTypeNode;
+import ast.node.types.ArrowTypeNode;
 import ast.node.types.TypeNode;
 import semantic.Effect;
 import semantic.SimplanPlusException;
@@ -33,9 +32,9 @@ public class STentry {
     this.parametersStatus = new ArrayList<>();
     //Effect initEffect = new Effect();
 
-    if (type instanceof FunTypeNode) {
+    if (type instanceof ArrowTypeNode) {
 
-      for (var param : ((FunTypeNode) type).getArgumentsType()) {
+      for (var param : ((ArrowTypeNode) type).getParList()) {
         List<Effect> paramStatus = new ArrayList<>();
         //Check if is right to return 1 in node or to let it call the subclass method
         int numberOfDereference = param.getDereferenceLevel();
@@ -65,13 +64,10 @@ public class STentry {
 
   }
 
-  public STentry (int nestingLevel, int offset, String bFL, String eFL) {
-    this.nestingLevel = nestingLevel;
-    this.offset = offset;
+  public STentry (int nestingLevel, int offset, String bFL, String eFL,TypeNode type) {
+    this (nestingLevel, type, offset);
     beginFuncLabel = bFL;
     endFuncLabel = eFL;
-    this.variableStatus = new ArrayList<>();
-    this.parametersStatus = new ArrayList<>();
   }
 
   public STentry(STentry entry) {

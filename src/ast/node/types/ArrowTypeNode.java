@@ -1,5 +1,6 @@
 package ast.node.types;
 import java.util.ArrayList;
+import java.util.List;
 
 import ast.node.Node;
 import ast.node.dec.FunNode;
@@ -10,10 +11,10 @@ import semantic.SimplanPlusException;
 
 public class ArrowTypeNode implements TypeNode {
 
-  private ArrayList<TypeNode> parlist; 
+  private List<TypeNode> parlist;
   private TypeNode ret;
   
-  public ArrowTypeNode (ArrayList<TypeNode> p, TypeNode r) {
+  public ArrowTypeNode (List<TypeNode> p, TypeNode r) {
     parlist=p;
     ret=r;
   }
@@ -33,7 +34,7 @@ public class ArrowTypeNode implements TypeNode {
     return ret;
   }
   
-  public ArrayList<TypeNode> getParList () { //
+  public List<TypeNode> getParList () { //
     return parlist;
   }
 

@@ -1,5 +1,6 @@
 package ast.node.statements;
 import java.util.ArrayList;
+import java.util.List;
 
 import ast.STentry;
 import ast.node.Node;
@@ -82,7 +83,7 @@ public RetEffType retTypeCheck(FunNode funNode) {
      else 
          throw new SimplanPlusException("Invocation of a non-function "+id);
      
-     ArrayList<TypeNode> p = t.getParList();
+     List<TypeNode> p = t.getParList();
      if ( !(p.size() == parlist.size()) )
          throw new SimplanPlusException("Wrong number of parameters in the invocation of "+id);
     
