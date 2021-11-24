@@ -1,6 +1,7 @@
 package ast.node.types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import ast.node.Node;
 import ast.node.dec.FunNode;
@@ -21,6 +22,16 @@ public class ArrowTypeNode implements TypeNode {
   
   public TypeNode dereference() throws SimplanPlusException {//TODO qualcosa di più elegante?
       throw new SimplanPlusException("Attempt to dereference a bool");
+  }
+
+  public String toString(){
+    String s="";
+    s=String.join("x", parlist.stream()
+            .map(item -> item.toString())
+            .collect(Collectors.toList()));
+    s+="->";
+    s+= ret.getClass().getName();
+    return s;
   }
     
   public String toPrint(String s) throws SimplanPlusException { //

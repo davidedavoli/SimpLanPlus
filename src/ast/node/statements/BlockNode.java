@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import ast.Label;
+import ast.node.types.VoidTypeNode;
 import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
@@ -22,6 +23,8 @@ public class BlockNode implements Node {
   private final Boolean isMain;
   private Boolean isFunction;
   private int current_nl;
+  private String missingReturnCode = "";
+
 
     public int getCurrent_nl() {
         return current_nl;
@@ -178,6 +181,10 @@ public class BlockNode implements Node {
                 cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
             }
       }
+      else{
+          cgen.append(this.missingReturnCode);
+          this.missingReturnCode = "";
+      }
 
       if (funDec.size() > 0)
          cgen.append("//CREO FUNZIONI\n");
@@ -188,8 +195,9 @@ public class BlockNode implements Node {
           cgen.append("//FINE FUNZIONI\n");
 	  return  cgen.toString();
 
-  } 
-  
-  
-    
-}  
+  }
+
+    public void addMissingReturnFunctionCode(String missingReturnCode) {
+        this.missingReturnCode = missingReturnCode;
+    }
+}

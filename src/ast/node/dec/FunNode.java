@@ -1,5 +1,6 @@
 package ast.node.dec;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import ast.FuncBodyUtils;
 import ast.Label;
@@ -52,7 +53,6 @@ public class FunNode implements Node {
   public BlockNode getBody() {
 		return body;
 	}
-
 
 	public String toPrint(String s) throws SimplanPlusException {
 	StringBuilder parlstr= new StringBuilder();
@@ -310,15 +310,24 @@ public class FunNode implements Node {
 	  cgen.append("mv $sp $fp\n");
 	  cgen.append("push $ra\n");
 
+
+		RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
+
+		if ((type instanceof VoidTypeNode) && !pres.leq(body.retTypeCheck(this))) {
+			System.out.println("Adding manual return in "+id);
+			StringBuilder missingReturnCode = new StringBuilder();
+
+			missingReturnCode.append("subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return \n");
+			missingReturnCode.append("lw $fp 0($fp) //Load old $fp pushed \n");
+			missingReturnCode.append("b ").append(endFuncLabel).append("\n");
+
+			body.addMissingReturnFunctionCode(missingReturnCode.toString());
+		}
+
 	  cgen.append(body.codeGeneration(labelManager)).append("\n");
 
-	  RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
-	  if ((type instanceof VoidTypeNode) && !pres.leq(body.retTypeCheck(this))) {
-		  cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return \n");
-		  cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
-	  }
-
 	  cgen.append(endFuncLabel).append(":\n");
+
 
 	  cgen.append("lw $ra 0($sp)\n");
 

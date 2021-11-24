@@ -15,10 +15,10 @@ li $a0 2
 
 print $a0
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return 
-lw $fp 0($fp) //Load old $fp pushed 
-b endFunction0
 
+subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return
+lw $fp 0($fp) //Load old $fp pushed
+b endFunction0
 endFunction0:
 lw $ra 0($sp)
 pop
@@ -43,9 +43,6 @@ mv $fp $al //put in $al actual fp
 push $al
 jal  Function2// jump to start of function and put in $ra next istruction
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return 
-lw $fp 0($fp) //Load old $fp pushed 
-b endFunction1
 //CREO FUNZIONI
 //BEGIN FUNCTION Function2
 Function2:
@@ -62,10 +59,10 @@ lw $al 0($al) //go up to chain
 push $al
 jal  Function0// jump to start of function and put in $ra next istruction
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return 
-lw $fp 0($fp) //Load old $fp pushed 
-b endFunction2
 
+subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return
+lw $fp 0($fp) //Load old $fp pushed
+b endFunction2
 endFunction2:
 lw $ra 0($sp)
 pop
@@ -79,6 +76,9 @@ jr $ra
 
 //FINE FUNZIONI
 
+subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return
+lw $fp 0($fp) //Load old $fp pushed
+b endFunction1
 endFunction1:
 lw $ra 0($sp)
 pop
