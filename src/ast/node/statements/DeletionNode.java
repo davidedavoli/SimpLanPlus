@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import ast.STentry;
 import ast.node.IdNode;
 import ast.node.LhsNode;
+import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.types.PointerTypeNode;
@@ -18,7 +19,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class DeletionNode implements Node {
+public class DeletionNode extends MetaNode {
 
   private IdNode id;
   private TypeNode type;
@@ -51,7 +52,7 @@ public class DeletionNode implements Node {
     return id.typeCheck();
   }
   
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

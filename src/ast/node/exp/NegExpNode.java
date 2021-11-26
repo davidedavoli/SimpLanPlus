@@ -55,7 +55,7 @@ public class NegExpNode extends ExpNode {
 		return cgen.toString();
 	}
 
-	public RetEffType retTypeCheck(FunNode funNode) {
+	public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

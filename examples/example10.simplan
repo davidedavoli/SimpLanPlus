@@ -1,5 +1,6 @@
 {
-    /*void g(^int x,bool b){
+    /*
+    void g(^int x,bool b){
         print x^;
         delete x;
         if(b){
@@ -12,8 +13,9 @@
 
     ^int a = new int;
     a^ = 10;
-    g(a,true);*/
+    g(a,true);
 
+    */
     void g(){
         print 2;
         //f();
@@ -22,12 +24,13 @@
     void f(){
         void d(){
             print 1;
-            g();
+            f();
         }
         print 0;
         d();
     }
 
     f();
+
 
 }

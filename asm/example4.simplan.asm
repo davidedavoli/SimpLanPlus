@@ -6,7 +6,7 @@ li $a0 1
 push $a0
 mv $fp $al //put in $al actual fp
 push $al
-jal  Function0// jump to start of function and put in $ra next istruction
+jal  Function26// jump to start of function and put in $ra next istruction
 
 push $a0
 
@@ -17,8 +17,8 @@ print $a0
 
 halt
 //CREO FUNZIONI
-//BEGIN FUNCTION Function0
-Function0:
+//BEGIN FUNCTION Function26
+Function26:
 mv $sp $fp
 push $ra
 li $a0 1
@@ -32,7 +32,7 @@ push $a0 // push e1
 push $fp
 mv $fp $al //put in $al actual fp
 push $al
-jal  Function1// jump to start of function and put in $ra next istruction
+jal  Function27// jump to start of function and put in $ra next istruction
 lw $a2 0($sp) //take e2 and $a2 take e1
 pop // remove e1 from the stack to preserve stack
 add $a0 $a2 $a0 // a0 = t1+a0
@@ -46,18 +46,18 @@ push $a0 // push e1
 push $fp
 mv $fp $al //put in $al actual fp
 push $al
-jal  Function1// jump to start of function and put in $ra next istruction
+jal  Function27// jump to start of function and put in $ra next istruction
 lw $a2 0($sp) //take e2 and $a2 take e1
 pop // remove e1 from the stack to preserve stack
 add $a0 $a2 $a0 // a0 = t1+a0
 
 subi $sp $fp 1 //Restore stackpointer as before block creation in return 
 lw $fp 0($fp) //Load old $fp pushed 
-b endFunction0
+b endFunction26
 
 //CREO FUNZIONI
-//BEGIN FUNCTION Function1
-Function1:
+//BEGIN FUNCTION Function27
+Function27:
 mv $sp $fp
 push $ra
 li $a0 0
@@ -80,10 +80,10 @@ add $a0 $a2 $a0 // a0 = t1+a0
 
 subi $sp $fp 1 //Restore stackpointer as before block creation in return 
 lw $fp 0($fp) //Load old $fp pushed 
-b endFunction1
+b endFunction27
 
 
-endFunction1:
+endFunction27:
 lw $ra 0($sp)
 pop
 addi $sp $sp 0//pop declaration 0
@@ -96,7 +96,7 @@ jr $ra
 
 //FINE FUNZIONI
 
-endFunction0:
+endFunction26:
 lw $ra 0($sp)
 pop
 addi $sp $sp 0//pop declaration 0

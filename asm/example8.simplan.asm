@@ -10,7 +10,7 @@ push $a0
 
 li $a0 0
 
-bc $a0 LABELthen1
+bc $a0 LABELthen11
 push 0
 push $fp //loadind new block
 mv $sp $fp //Load new $fp
@@ -29,8 +29,8 @@ print $a0
 
 subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 
-b LABELendIf2
-LABELthen1:
+b LABELendIf12
+LABELthen11:
 push 0
 push $fp //loadind new block
 mv $sp $fp //Load new $fp
@@ -80,7 +80,7 @@ sw $a0 0($al) // 0($al) = $a0 id=exp
 subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 
 
-LABELendIf2:
+LABELendIf12:
 
 mv $fp $al //put in $al actual fp
 lw $a0 -1($al) //put in $a0 value of Id
@@ -132,7 +132,7 @@ lw $a0 0($a0)
 push $a0
 mv $fp $al //put in $al actual fp
 push $al
-jal  Function0// jump to start of function and put in $ra next istruction
+jal  Function33// jump to start of function and put in $ra next istruction
 
 push $fp
 mv $fp $al //put in $al actual fp
@@ -142,7 +142,7 @@ lw $a0 0($a0)
 push $a0
 mv $fp $al //put in $al actual fp
 push $al
-jal  Function1// jump to start of function and put in $ra next istruction
+jal  Function34// jump to start of function and put in $ra next istruction
 
 print $a0
 
@@ -154,8 +154,8 @@ print $a0
 
 halt
 //CREO FUNZIONI
-//BEGIN FUNCTION Function0
-Function0:
+//BEGIN FUNCTION Function33
+Function33:
 mv $sp $fp
 push $ra
 li $a0 0
@@ -175,10 +175,10 @@ print $a0
 
 subi $sp $fp 1 //Restore stackpointer as before block creation in return 
 lw $fp 0($fp) //Load old $fp pushed 
-b endFunction0
+b endFunction33
 
 
-endFunction0:
+endFunction33:
 lw $ra 0($sp)
 pop
 addi $sp $sp 0//pop declaration 0
@@ -189,8 +189,8 @@ pop
 jr $ra
 // END OF plusint
 
-//BEGIN FUNCTION Function1
-Function1:
+//BEGIN FUNCTION Function34
+Function34:
 mv $sp $fp
 push $ra
 li $a0 1
@@ -208,10 +208,10 @@ sub $a0 $a2 $a0 // a0 = t1-a0
 
 subi $sp $fp 1 //Restore stackpointer as before block creation in return 
 lw $fp 0($fp) //Load old $fp pushed 
-b endFunction1
+b endFunction34
 
 
-endFunction1:
+endFunction34:
 lw $ra 0($sp)
 pop
 addi $sp $sp 0//pop declaration 0

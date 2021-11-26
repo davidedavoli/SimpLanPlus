@@ -80,7 +80,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
     return entry.getType();
   }
   
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

@@ -65,7 +65,7 @@ public class IdNode extends LhsNode implements Dereferenceable {
     return entry.getType();
   }
   
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
   

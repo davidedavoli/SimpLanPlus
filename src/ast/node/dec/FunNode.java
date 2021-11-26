@@ -6,6 +6,7 @@ import ast.FuncBodyUtils;
 import ast.Label;
 import ast.STentry;
 import ast.node.ArgNode;
+import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.statements.BlockNode;
 import ast.node.types.*;
@@ -14,7 +15,7 @@ import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class FunNode implements Node {
+public class FunNode extends MetaNode {
 
   private final String id;
   private final TypeNode type;
@@ -50,8 +51,11 @@ public class FunNode implements Node {
     parlist.add(p);
   }
 
-  public BlockNode getBody() {
+	public BlockNode getBody() {
 		return body;
+	}
+	public List<Node> getPars() {
+		return parlist;
 	}
 
 	public String toPrint(String s) throws SimplanPlusException {
@@ -70,7 +74,7 @@ public class FunNode implements Node {
     return new ArrowTypeNode(partypes, type);
   }
 
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 
@@ -120,7 +124,7 @@ public class FunNode implements Node {
 		RetEffType abs = new RetEffType(RetEffType.RetT.ABS);
 		//RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
 
-		if ( body.retTypeCheck(this).leq(abs) && !(type instanceof VoidTypeNode)) {
+		if ( body.retTypeCheck().leq(abs) && !(type instanceof VoidTypeNode)) {
 			res.add(new SemanticError("Possible absence of return value"));
 		}
       /*if ((type instanceof VoidTypeNode) && pres.leq(body.retTypeCheck())) {
@@ -313,7 +317,7 @@ public class FunNode implements Node {
 
 		RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
 
-		if ((type instanceof VoidTypeNode) && !pres.leq(body.retTypeCheck(this))) {
+		if ((type instanceof VoidTypeNode) && !pres.leq(body.retTypeCheck())) {
 			System.out.println("Adding manual return in "+id);
 			StringBuilder missingReturnCode = new StringBuilder();
 
@@ -347,4 +351,7 @@ public class FunNode implements Node {
 	  return cgen.toString();
   }
 
+	public String getId() {
+		return id;
+	}
 }

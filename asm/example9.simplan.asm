@@ -18,7 +18,7 @@ sw $a0 0($al) // 0($al) = $a0 id=exp
 
 li $a0 1
 
-bc $a0 LABELthen1
+bc $a0 LABELthen13
 push 0
 push $fp //loadind new block
 mv $sp $fp //Load new $fp
@@ -28,8 +28,8 @@ print $a0
 
 subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 
-b LABELendIf2
-LABELthen1:
+b LABELendIf14
+LABELthen13:
 push 0
 push $fp //loadind new block
 mv $sp $fp //Load new $fp
@@ -45,7 +45,7 @@ sw $a0 0($al) // 0($al) = $a0 id=exp
 subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 
 
-LABELendIf2:
+LABELendIf14:
 
 mv $fp $al //put in $al actual fp
 lw $a0 -1($al) //put in $a0 value of Id
@@ -59,9 +59,9 @@ subi $sp $sp 1 // non assegnato nulla
 
 li $a0 1
 
-bc $a0 LABELthen3
-b LABELendIf4
-LABELthen3:
+bc $a0 LABELthen15
+b LABELendIf16
+LABELthen15:
 push 0
 push $fp //loadind new block
 mv $sp $fp //Load new $fp
@@ -77,7 +77,7 @@ sw $a0 0($al) // 0($al) = $a0 id=exp
 subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 
 
-LABELendIf4:
+LABELendIf16:
 
 mv $fp $al //put in $al actual fp
 lw $a0 -1($al) //put in $a0 value of Id

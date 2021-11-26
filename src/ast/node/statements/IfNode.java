@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.node.LhsNode;
+import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.exp.ExpNode;
@@ -16,7 +17,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class IfNode implements Node {
+public class IfNode extends MetaNode {
 
   private ExpNode cond;
   private Node th;
@@ -54,9 +55,9 @@ public class IfNode implements Node {
 	  return res;
   }
   
-  public RetEffType retTypeCheck(FunNode funNode) {
-      RetEffType th_v=th.retTypeCheck(funNode);
-      RetEffType el_v=(el!=null)?el.retTypeCheck(funNode):new RetEffType(RetEffType.RetT.ABS);
+  public RetEffType retTypeCheck() {
+      RetEffType th_v=th.retTypeCheck();
+      RetEffType el_v=(el!=null)?el.retTypeCheck():new RetEffType(RetEffType.RetT.ABS);
       //do not remove these lines: retTypeCheck has a side-effect;
 	  if (el!=null)
 		  return RetEffType.min(th_v, el_v);

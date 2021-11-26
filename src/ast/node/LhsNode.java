@@ -13,7 +13,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class LhsNode implements Node, Dereferenceable {
+public class LhsNode extends MetaNode implements Dereferenceable {
 
   protected LhsNode inner;
 
@@ -76,7 +76,7 @@ public class LhsNode implements Node, Dereferenceable {
             return null;
     }
 
-    public RetEffType retTypeCheck(FunNode funNode) {
+    public RetEffType retTypeCheck() {
       return new RetEffType(RetEffType.RetT.ABS);
   }
 

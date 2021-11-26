@@ -42,8 +42,8 @@ public class CallExpNode extends ExpNode {
     }
 
     @Override
-    public RetEffType retTypeCheck(FunNode funNode) {
-        return inner.retTypeCheck(funNode);
+    public RetEffType retTypeCheck() {
+        return inner.retTypeCheck();
     }
 
     @Override

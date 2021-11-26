@@ -60,7 +60,7 @@ mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
 lw $al 0($al) //go up to chain
 push $al
-jal  Function0// jump to start of function and put in $ra next istruction
+jal  Function1// jump to start of function and put in $ra next istruction
 
 subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return 
 lw $fp 0($fp) //Load old $fp pushed 

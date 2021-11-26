@@ -10,7 +10,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class ArgNode implements Node {
+public class ArgNode extends MetaNode {
 
   private IdNode id;
   private TypeNode type;
@@ -38,13 +38,13 @@ public class ArgNode implements Node {
 	  return s+"Par:" + id +"\n"
 			 +type.toPrint(s+"  ") ; 
   }
-  
-  //non utilizzato
+
+    //non utilizzato
   public TypeNode typeCheck () {
      return null;
   }
   
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

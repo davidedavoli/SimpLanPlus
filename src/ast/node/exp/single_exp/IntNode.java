@@ -37,7 +37,7 @@ public class IntNode extends ExpNode {
  	  return new ArrayList<SemanticError>();
  	}
   
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

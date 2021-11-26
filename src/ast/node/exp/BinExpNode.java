@@ -238,7 +238,7 @@ public class BinExpNode extends ExpNode {
     }
 
     @Override
-    public RetEffType retTypeCheck(FunNode funNode) {
+    public RetEffType retTypeCheck() {
         return null;
     }
 }

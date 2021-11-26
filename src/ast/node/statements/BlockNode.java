@@ -1,6 +1,7 @@
 package ast.node.statements;
 
 import ast.STentry;
+import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.dec.VarNode;
@@ -16,7 +17,7 @@ import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class BlockNode implements Node {
+public class BlockNode extends MetaNode {
 
   private final ArrayList<Node> declarations;
   private final ArrayList<Node> statements;
@@ -113,10 +114,10 @@ public class BlockNode implements Node {
       return res;
   }
   
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  RetEffType tmp = new RetEffType(RetEffType.RetT.ABS);
 	  for (Node s:statements) {
-			  tmp= RetEffType.max(tmp, s.retTypeCheck(funNode));
+			  tmp= RetEffType.max(tmp, s.retTypeCheck());
 	  }
 	  return tmp;
   }

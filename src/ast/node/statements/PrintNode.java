@@ -2,6 +2,7 @@ package ast.node.statements;
 
 import java.util.ArrayList;
 
+import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.types.BoolTypeNode;
@@ -13,7 +14,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class PrintNode implements Node {
+public class PrintNode extends MetaNode {
 
   private Node val;
   
@@ -38,7 +39,7 @@ public class PrintNode implements Node {
  	  return val.checkSemantics(env);
  	}
   
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

@@ -3,6 +3,7 @@ package ast.node.exp;
 import ast.Dereferenceable;
 import ast.Label;
 import ast.node.LhsNode;
+import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
@@ -15,7 +16,7 @@ import semantic.SimplanPlusException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ExpNode implements Node {
+public abstract class ExpNode extends MetaNode {
     @Override
     public String toPrint(String indent) throws SimplanPlusException {
         return null;
@@ -37,7 +38,7 @@ public abstract class ExpNode implements Node {
     }
 
     @Override
-    public RetEffType retTypeCheck(FunNode funNode) {
+    public RetEffType retTypeCheck() {
         return null;
     }
 

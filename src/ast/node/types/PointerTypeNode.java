@@ -46,7 +46,7 @@ public class PointerTypeNode implements TypeNode {
  	}
   
   
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

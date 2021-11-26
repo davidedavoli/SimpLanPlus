@@ -32,7 +32,7 @@ public class BoolNode extends ExpNode {
   return new BoolTypeNode();
   }
 
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
     return new RetEffType(RetEffType.RetT.ABS);
   }
 

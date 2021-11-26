@@ -53,7 +53,7 @@ public class NotExpNode extends ExpNode {
 		return exp.variables();
 	}
   
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

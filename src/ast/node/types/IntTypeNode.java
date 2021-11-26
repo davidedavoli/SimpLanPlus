@@ -29,7 +29,7 @@ public class IntTypeNode implements TypeNode {
 		return "";
   }
   
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

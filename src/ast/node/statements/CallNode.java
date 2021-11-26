@@ -3,19 +3,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.STentry;
+import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.exp.ExpNode;
-import ast.node.types.ArrowTypeNode;
-import ast.node.types.RetEffType;
-import ast.node.types.TypeNode;
-import ast.node.types.TypeUtils;
+import ast.node.types.*;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class CallNode implements Node {
+public class CallNode extends MetaNode {
 
   private String id;
   private STentry entry;
@@ -45,7 +43,7 @@ public String toPrint(String s) throws SimplanPlusException {  //
            +parlstr;        
   }
 
-public RetEffType retTypeCheck(FunNode funNode) {
+public RetEffType retTypeCheck() {
 
 	  return new RetEffType(RetEffType.RetT.ABS);
 }
@@ -72,6 +70,18 @@ public RetEffType retTypeCheck(FunNode funNode) {
             nestinglevel = env.getNestingLevel();
             for(ExpNode arg : parlist)
                 res.addAll(arg.checkSemantics(env));
+        }
+
+        FunNode f = new FunNode("foo", new VoidTypeNode());
+        FunNode g;
+        ArrayList<Node> path = this.getAncestorsInstanceOf(f.getClass());
+        if(!path.isEmpty())
+            path.remove(0);//plain recursive functions are ok
+        for (Node parF: path) {
+            g = (FunNode) parF;
+            if(g.getId().equals(id)){
+                res.add(new SemanticError("call of ancestor function in (grand-)child "));
+            }
         }
 
 		return res;

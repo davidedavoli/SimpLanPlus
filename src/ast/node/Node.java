@@ -12,6 +12,7 @@ import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
 public interface Node {
+
   String toPrint(String indent) throws SimplanPlusException;
 
   //fa il type checking e ritorna: 
@@ -20,12 +21,14 @@ public interface Node {
   TypeNode typeCheck() throws SimplanPlusException;
   
   String codeGeneration(Label labelManager) throws SimplanPlusException;
-  
+
+
+
   ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException;
   
   //ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl);
 
-  RetEffType retTypeCheck(FunNode funNode);
+  RetEffType retTypeCheck();
 
   ArrayList<SemanticError> checkEffects(Environment env);
 

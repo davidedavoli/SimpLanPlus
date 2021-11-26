@@ -6,6 +6,7 @@ import java.util.List;
 import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.LhsNode;
+import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.exp.ExpNode;
@@ -20,7 +21,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class AssignmentNode implements Node {
+public class AssignmentNode extends MetaNode {
 
   private LhsNode lhs;
   private ExpNode exp;
@@ -62,7 +63,7 @@ public class AssignmentNode implements Node {
   }
 
 
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

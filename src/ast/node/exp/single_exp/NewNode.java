@@ -43,7 +43,7 @@ public class NewNode extends ExpNode {
 	    return new PointerTypeNode(type);
 	  }
 	  
-	  public RetEffType retTypeCheck(FunNode funNode) {
+	  public RetEffType retTypeCheck() {
 		  return new RetEffType(RetEffType.RetT.ABS);
 	  }
 

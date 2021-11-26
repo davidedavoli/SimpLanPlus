@@ -26,7 +26,7 @@ public class BoolTypeNode implements TypeNode {
     return null;
   }
   
-  public RetEffType retTypeCheck(FunNode funNode) {
+  public RetEffType retTypeCheck() {
 	  return new RetEffType(RetEffType.RetT.ABS);
   }
 

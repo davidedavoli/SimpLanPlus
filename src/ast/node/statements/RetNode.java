@@ -2,6 +2,7 @@ package ast.node.statements;
 
 import java.util.ArrayList;
 
+import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
@@ -13,7 +14,7 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
-public class RetNode implements Node {
+public class RetNode extends MetaNode {
 
   private Node val;
   private TypeNode etype;// expected type
@@ -44,6 +45,9 @@ public class RetNode implements Node {
           res.addAll(val.checkSemantics(env));
       }
       current_nl=env.getNestingLevel();
+
+      FunNode f = new FunNode("foo", new VoidTypeNode());
+      parent_f = (FunNode) this.getAncestorsInstanceOf(f.getClass()).get(0);
 	  return res;
  	}
 
@@ -58,8 +62,8 @@ public class RetNode implements Node {
             throw new SimplanPlusException("Wrong return type for function");
   }  
   
-  public RetEffType retTypeCheck(FunNode funNode) {
-        parent_f = funNode;
+  public RetEffType retTypeCheck() {
+//        parent_f = funNode;
 	    return new RetEffType(RetEffType.RetT.PRES);
   }
 

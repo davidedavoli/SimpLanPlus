@@ -2,6 +2,7 @@ package ast.node.dec;
 
 import ast.STentry;
 import ast.node.IdNode;
+import ast.node.MetaNode;
 import ast.node.Node;
     import ast.node.types.RetEffType;
     import ast.node.types.TypeNode;
@@ -16,7 +17,7 @@ import semantic.Environment;
     import semantic.SemanticError;
     import semantic.SimplanPlusException;
 
-public class VarNode implements Node {
+public class VarNode extends MetaNode {
 
     private IdNode id;
     private TypeNode type;
@@ -63,7 +64,7 @@ public class VarNode implements Node {
             +((exp==null)?"":exp.toPrint(s+"  "));
     }
 
-    public RetEffType retTypeCheck(FunNode funNode) {
+    public RetEffType retTypeCheck() {
     return new RetEffType(RetEffType.RetT.ABS);
     }
 
