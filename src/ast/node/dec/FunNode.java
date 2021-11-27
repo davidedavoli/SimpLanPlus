@@ -298,6 +298,7 @@ public class FunNode extends MetaNode {
 			}
 			System.out.println("Setted function status list in env "+functionEntry.getFunctionStatusList());
 		}
+		System.out.println(env);
 		return errors;
 	}
 

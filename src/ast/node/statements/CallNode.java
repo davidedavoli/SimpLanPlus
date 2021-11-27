@@ -84,6 +84,8 @@ public RetEffType retTypeCheck() {
             }
         }
 
+        System.out.println(env);
+
 		return res;
   }
   

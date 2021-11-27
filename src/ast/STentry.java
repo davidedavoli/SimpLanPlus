@@ -172,4 +172,19 @@ public class STentry {
   public void setParameterStatus(int parameterIndex, Effect effect, int dereferenceLevel) {
     this.parametersStatus.get(parameterIndex).set(dereferenceLevel, new Effect(effect));
   }
+
+  @Override
+  public String toString() {
+    return "STentry{" +
+            "\n\t\tnestingLevel=" + nestingLevel +
+            ", \n\t\ttype=" + type +
+            ", \n\t\toffset=" + offset +
+            ", \n\t\tvariableStatus=" + variableStatus +
+            ", \n\t\tparametersStatus=" + parametersStatus +
+            ", \n\t\tbeginFuncLabel='" + beginFuncLabel + '\'' +
+            ", \n\t\tendFuncLabel='" + endFuncLabel + '\'' +
+            ", \n\t\tfunNode=" + funNode +
+            '}';
+  }
+
 }

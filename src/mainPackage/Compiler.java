@@ -143,13 +143,13 @@ public class Compiler {
 	}
 	public static void main(String[] args) throws Exception {
 
-		/*
-		int number = 10;
+
+		int number = 11;
 		String fileAbsName = dir + baseName + number + ext;
 		String fileName = baseName + number + ext;
 		compileFile(fileAbsName,fileName);
-		 */
 
+		/*
 		int numberOfTest = Objects.requireNonNull(new File("examples/").list()).length;
 		System.out.println("NUMBER OF TEST IS " + numberOfTest);
 		for(int number = 1; number<=numberOfTest;number++){
@@ -157,5 +157,6 @@ public class Compiler {
 			String fileName = baseName + number + ext;
 			compileFile(fileAbsName,fileName);
 		}
+		 */
 	}
 }

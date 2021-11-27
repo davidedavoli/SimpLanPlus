@@ -279,6 +279,26 @@ public class Environment {
 
 	}
 
+	@Override
+	public String toString() {
+
+		String st = "";
+		String hs="";
+
+		for (HashMap<String, STentry> hm: symTable){
+			for (String k: hm.keySet()){
+				hs = new StringBuilder().append("\t").append(k).append("->").append(hm.get(k).toString()).append("\n").toString();
+			}
+			st+=hs+'\n';
+		}
+
+		return "Environment{" +
+				"\n\tsymTable=" + st +
+				", \n\tnestingLevel=" + nestingLevel +
+				", \n\toffset=" + offset +
+				'}';
+	}
+
 	/**
 	 *
 	 * End Stm status
