@@ -9,4 +9,6 @@ public interface Dereferenceable {
     STentry getEntry();
 
     Effect getIdStatus(int j);
+
+    Boolean isPointer();
 }

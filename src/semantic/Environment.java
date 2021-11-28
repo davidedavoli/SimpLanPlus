@@ -5,6 +5,7 @@ import java.util.function.BiFunction;
 
 import ast.Dereferenceable;
 import ast.STentry;
+import ast.node.types.ArrowTypeNode;
 import ast.node.types.TypeNode;
 import effect.Effect;
 import effect.EffectError;
@@ -78,6 +79,120 @@ public class Environment {
 		return maxEnvironment;
 	}
 
+	public static Environment parallelEnvironment(Environment firstEnv, Environment secondEnv) {
+		Environment resultingEnvironment = new Environment();
+
+		resultingEnvironment.createVoidScope();
+
+		Map<String, STentry> scope1 = firstEnv.symTable.get(firstEnv.symTable.size() - 1);
+		Map<String, STentry> scope2 = secondEnv.symTable.get(secondEnv.symTable.size() - 1);
+
+		for (var xInE1 : scope1.entrySet()) {
+			if (!scope2.containsKey(xInE1.getKey())) {
+
+				STentry entry = resultingEnvironment.createNewDeclaration(xInE1.getKey(),
+						xInE1.getValue().getType());
+
+
+				entry.setFunctionNode(xInE1.getValue().getFunctionNode());
+				for (int j = 0; j < xInE1.getValue().getMaxDereferenceLevel(); j++) {
+					entry.setDereferenceLevelVariableStatus(xInE1.getValue().getDereferenceLevelVariableStatus(j), j);
+				}
+			}
+		}
+
+		for (var xInE2 : scope2.entrySet()) {
+			if (!scope1.containsKey(xInE2.getKey())) {
+				STentry entry = resultingEnvironment.createNewDeclaration(xInE2.getKey(),
+						xInE2.getValue().getType());
+				entry.setFunctionNode(xInE2.getValue().getFunctionNode());
+				for (int j = 0; j < xInE2.getValue().getMaxDereferenceLevel(); j++) {
+					entry.setDereferenceLevelVariableStatus(xInE2.getValue().getDereferenceLevelVariableStatus(j), j);
+				}
+			}
+		}
+
+		for (var xInE1 : scope1.entrySet()) {
+			for (var xInE2 : scope2.entrySet()) {
+				if (xInE1.getKey().equals(xInE2.getKey())) {
+					STentry entry = resultingEnvironment.createNewDeclaration(xInE1.getKey(),
+							xInE1.getValue().getType());
+					entry.setFunctionNode(xInE1.getValue().getFunctionNode());
+					for (int j = 0; j < xInE2.getValue().getMaxDereferenceLevel(); j++) {
+						entry.setDereferenceLevelVariableStatus(Effect.parallelEffect(xInE1.getValue().getDereferenceLevelVariableStatus(j), xInE2.getValue().getDereferenceLevelVariableStatus(j)), j);
+					}
+				}
+			}
+		}
+
+		return resultingEnvironment;
+	}
+
+	public static Environment updateEnvironment(Environment env1, Environment env2) {
+		Environment returnedEnvironment;
+
+		if (env2.symTable.size() == 0 || env1.symTable.size() == 0) {
+			return new Environment(env1);
+		}
+
+		HashMap<String, STentry> headScope1 = env1.symTable.get(env1.symTable.size() - 1);
+		HashMap<String, STentry> headScope2 = env2.symTable.get(env2.symTable.size() - 1);
+
+		if (headScope2.keySet().isEmpty()) {
+			// \sigma' = \emptySet
+			return new Environment(env1);
+		}
+
+		var u = headScope2.entrySet().stream().findFirst().get();
+		env2.removeFirstIdentifier(u.getKey());
+		//primo caso
+		if (headScope1.containsKey(u.getKey())) {
+			headScope1.put(u.getKey(), u.getValue());
+
+			returnedEnvironment = updateEnvironment(env1, env2);
+		} else {
+			//secondo caso
+			Environment envWithOnlyU = new Environment();
+			envWithOnlyU.createVoidScope();
+			STentry tmpEntry = envWithOnlyU.createNewDeclaration(u.getKey(), u.getValue().getType());
+			tmpEntry.setFunctionNode(u.getValue().getFunctionNode());
+			for (int j = 0; j < u.getValue().getMaxDereferenceLevel(); j++) {
+				tmpEntry.setDereferenceLevelVariableStatus(u.getValue().getDereferenceLevelVariableStatus(j), j);
+			}
+
+			env1.popBlockScope();
+			Environment tmpEnv = updateEnvironment(env1, envWithOnlyU);
+			tmpEnv.createScope(headScope1);
+
+			returnedEnvironment = updateEnvironment(tmpEnv, env2);
+		}
+
+		return returnedEnvironment;
+	}
+
+	private void removeFirstIdentifier(String id) {
+		for (int i = symTable.size() - 1; i >= 0; i--) {
+			if (symTable.get(i).containsKey(id)) {
+				symTable.get(i).remove(id);
+				return;
+			}
+		}
+	}
+
+	public ArrayList<EffectError> getEffectErrors() {
+		ArrayList<EffectError> errors = new ArrayList<>();
+		for (var scope : symTable) {
+			for (var entry : scope.entrySet()) {
+				for (int i = 0; i < entry.getValue().getMaxDereferenceLevel(); i++) {
+					if (entry.getValue().getDereferenceLevelVariableStatus(i).equals(Effect.ERROR)) {
+						errors.add(new EffectError("The dereferenced pointer " + entry.getKey() + "^".repeat(i) + " is used after deletion."));
+					}
+				}
+			}
+		}
+
+		return errors;
+	}
 
 	/**
 	 * Getter
@@ -149,6 +264,7 @@ public class Environment {
 	 */
 	public void createVoidScope(){
 		this.nestingLevel++;
+		offset = 0;
 		this.symTable.add(new HashMap<String, STentry>());
 	}
 
@@ -268,15 +384,20 @@ public class Environment {
 		return null; // Does not happen if preconditions are met.
 	}
 
-	public STentry createFunDecEffects(final String id, final TypeNode type) {
-		STentry stEntry = new STentry(nestingLevel, type, -1);
-			STentry declaration = getCurrentST().put(id, stEntry);
-			if (declaration != null) {
-				System.err.println("Unexpected multiple assignment for ID: " + id + ". It was previously defined of type: "
-						+ declaration.getType() + ".");
-			}
-			declaration = getCurrentST().get(id);
-			return declaration;
+	public STentry createNewDeclaration(final String id, final TypeNode type) {
+		STentry stEntry;
+		if (type instanceof ArrowTypeNode) {
+			stEntry = new STentry(nestingLevel, type, -1);
+		} else {
+			stEntry = new STentry(nestingLevel, type, offset++);
+		}
+		STentry declaration = getCurrentST().put(id, stEntry);
+		if (declaration != null) {
+			System.err.println("Unexpected multiple assignment for ID: " + id + ". It was previously defined of type: "
+					+ declaration.getType() + ".");
+		}
+		declaration = getCurrentST().get(id);
+		return declaration;
 
 	}
 

@@ -1,11 +1,28 @@
 {
+      /*
+       [ [c0] ]
+       [c0,c1,c2,c3,c4]
+
+
+       [ [c0,c1] ]
+       [c0,c1,c2,c3,c4]
+
+       [ [c0,c1,c2] ]
+        c4-> valore puntato
+        c0 -> c2
+        c1 -> c3
+        c2 -> c4
+       [c0,c1,c2,c3,c4]
+       */
+
+
     void plusint(int c){
         print false;
         print c+1;
         return;
     }
     int minusint(int c){
-        print true;
+        print 1;
         return c-1;
     }
 
@@ -13,7 +30,7 @@
     int f;
     ^int c = new int;
 
-    if(false){
+    if(true){
         x = 5;
         c = new int;
         c^ = 10;

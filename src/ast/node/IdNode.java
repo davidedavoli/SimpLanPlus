@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.types.ArrowTypeNode;
+import ast.node.types.PointerTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import effect.Effect;
@@ -115,5 +116,8 @@ public class IdNode extends LhsNode implements Dereferenceable {
     }
     public Effect getIdStatus(int dereferenceLevel){
         return this.entry.getDereferenceLevelVariableStatus(dereferenceLevel);
+    }
+    public Boolean isPointer() {
+        return entry.getType() instanceof PointerTypeNode;
     }
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.types.ArrowTypeNode;
+import ast.node.types.PointerTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import effect.Effect;
@@ -29,6 +30,9 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
         return this.entry.getDereferenceLevelVariableStatus(dereferenceLevel);
     }
 
+    public Boolean isPointer() {
+        return entry.getType() instanceof PointerTypeNode;
+    }
   @Override
   public String getID(){
 	  return this.id;
@@ -110,6 +114,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
         if (actualStatus.equals(Effect.INITIALIZED)) {
             errors.add(new EffectError(this.getID() + " used before writing value. IdExpNode"));
         }
+        System.out.println(entry.getStatusList());
         errors.addAll(checkExpStatus(env));
         for(int i=0;i<entry.getMaxDereferenceLevel();i++){
             Effect status = entry.getDereferenceLevelVariableStatus(i);

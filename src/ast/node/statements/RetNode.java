@@ -47,7 +47,7 @@ public class RetNode extends MetaNode {
       }
       current_nl=env.getNestingLevel();
 
-      FunNode f = new FunNode("foo", new VoidTypeNode(),parent_f.getIdNode());
+      FunNode f = new FunNode("foo", new VoidTypeNode(),null);//parent_f.getIdNode());
       parent_f = (FunNode) this.getAncestorsInstanceOf(f.getClass()).get(0);
 	  return res;
  	}

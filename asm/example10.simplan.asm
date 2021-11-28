@@ -21,6 +21,10 @@ sw $a0 0($al) // 0($al) = $a0 id=exp
 
 push $fp
 mv $fp $al //put in $al actual fp
+lw $a0 -1($al) //put in $a0 value of Id
+
+push $a0
+mv $fp $al //put in $al actual fp
 push $al
 jal  Function0// jump to start of function and put in $ra next istruction
 
@@ -46,8 +50,7 @@ Function0:
 mv $sp $fp
 push $ra
 mv $fp $al //put in $a1 (al) actual fp
-lw $al 0($al) //go up to chain
-addi $al $al -1 //put in $al address of Id
+addi $al $al 1 //put in $al address of Id
 
 free $a0 //free address in $a0
 
@@ -59,7 +62,7 @@ endFunction0:
 lw $ra 0($sp)
 pop
 addi $sp $sp 0//pop declaration 0
-addi $sp $sp 0// pop parameters0
+addi $sp $sp 1// pop parameters1
 pop
 lw $fp 0($sp)
 pop

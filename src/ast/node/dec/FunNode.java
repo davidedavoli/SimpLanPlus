@@ -104,6 +104,10 @@ public class FunNode extends MetaNode {
 		HashMap<String, STentry> hm = env.getCurrentST();
 		STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel,functionType);
 		functionIdNode.setEntry(entry);
+		functionIdNode.getEntry().setFunctionNode(this);
+		functionIdNode.getEntry().setBeginLabel(beginFuncLabel);
+		functionIdNode.getEntry().setEndLabel(endFuncLabel);
+
 		nestingLevel = env.getNestingLevel();
 		if ( hm.put(id,entry) != null )
 			res.add(new SemanticError("Fun id '"+id+"' already declared"));
@@ -148,9 +152,11 @@ public class FunNode extends MetaNode {
 	  ArrayList<EffectError> errors = new ArrayList<>();
 
 	  // create a new entry in STable  with the function id
-		
+
 	  	env.addEntry(this.id, functionIdNode.getEntry());
 		functionIdNode.getEntry().setFunctionNode(this);
+		functionIdNode.getEntry().setBeginLabel(beginFuncLabel);
+		functionIdNode.getEntry().setEndLabel(endFuncLabel);
 
 		// put all the argNode to RW
 		List<List<Effect>> startingEffect = new ArrayList<>();
@@ -197,28 +203,19 @@ public class FunNode extends MetaNode {
 			env.newFunctionParameter(arg.getIdNode().getID(), arg.getType(), argOffset++);
 
 			STentry argEntry = env.effectsLookUp(arg.getIdNode().getID());
-			//env.addEntry(arg.getId(), arg.getId().getSTentry());
-			//var argEntry = arg.getId().getSTentry();
 
 			// update the status
 			for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
-				// effects.get(argIndex).get(derefLvl) is the status of the argIndex-th argument at the dereference level derefLvl
-				// given as this method parameter.
 				argEntry.setDereferenceLevelVariableStatus(new Effect(effects.get(argIndex).get(derefLvl)), derefLvl);
 			}
 		}
 
 		// Adding the function to the current scope for non-mutual recursive calls.
-		STentry effectsFunEntry = env.createFunDecEffects(id,functionType);
+		STentry effectsFunEntry = env.createNewDeclaration(id,functionType);
 		// add this node to recall this checkEffects
 		effectsFunEntry.setFunctionNode(this);
-		// impedisce la creazione di blocchi nelle successive iterazioni
-		// controllare se serve, nella visita dell'albero viene fatto ma
-		// in teoria serve rifarlo. Comunque metterlo a true non dovrebbe causare danni <=========
 		body.setIsFunction(true);
 
-
-		// keep the old effect
 		Environment decFunEnv = new Environment(env);
 		List<List<Effect>> effectsCopy = new ArrayList<>();
 
@@ -226,21 +223,16 @@ public class FunNode extends MetaNode {
 			effectsCopy.add(new ArrayList<>(status));
 		}
 
-		// =====================================================================
-		// 3. Single execution of the function's body
-		errors.addAll(checkBodyAndUpdateArgs(env, effectsFunEntry)); // env is updated after this call.
+		errors.addAll(checkBodyAndUpdateArgs(env, effectsFunEntry));
 
-		// =====================================================================
-		// 4. check if effects are changed after the body
 		boolean different_funType = !effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
 
 		while (different_funType){
-			//effect are changed!
+			// effect are changed!
 			// replace the env and update status with the new effects
 
 			env.replaceWithNewEnv(decFunEnv);
 
-			// lookUp should work??
 			var funEntry = env.effectsLookUp(id);
 
 			for (int argIndex = 0; argIndex < parlist.size(); argIndex++) {
@@ -255,23 +247,17 @@ public class FunNode extends MetaNode {
 				}
 			}
 
-			// they are the new starting effect
 			effectsCopy = new ArrayList<>(effectsFunEntry.getFunctionStatusList());
 
 			errors.addAll(checkBodyAndUpdateArgs(env, effectsFunEntry));
 
-			// repeat until the effects are not modified
 			different_funType = !effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
 		}
 
-		// =====================================================================
-		// 5. popScope and update the original env with the computed effect after fixpoint
 		env.popBlockScope();
 
-		// Setting the computed statuses in the function arguments and saving them in the Symbol Table entry of the function funId.
 		var idEntry = env.effectsLookUp(id);
 		for (int argIndex = 0; argIndex < parlist.size(); argIndex++) {
-			//Update ID in previous scope
 			var argStatuses = effectsFunEntry.getFunctionStatusList().get(argIndex);
 
 			for (int dereferenceLevel = 0; dereferenceLevel < argStatuses.size(); dereferenceLevel++) {
@@ -292,10 +278,10 @@ public class FunNode extends MetaNode {
 			var argEntry = env.effectsLookUp(arg.getIdNode().getID());
 			STentry functionEntry = env.effectsLookUp(id);
 
-			for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
+			for (int dereferenceLevel = 0; dereferenceLevel < argEntry.getMaxDereferenceLevel(); dereferenceLevel++) {
 
-				functionEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(derefLvl), derefLvl);
-				innerFunEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(derefLvl), derefLvl);
+				functionEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(dereferenceLevel), dereferenceLevel);
+				innerFunEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(dereferenceLevel), dereferenceLevel);
 
 			}
 		}

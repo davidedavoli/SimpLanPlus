@@ -45,6 +45,9 @@ public class LhsNode extends MetaNode implements Dereferenceable {
       else
           return null;
   }
+    public Boolean isPointer() {
+        return inner.isPointer();
+    }
 
     @Override
     public Effect getIdStatus(int j) {

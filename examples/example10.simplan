@@ -1,12 +1,16 @@
 {
     ^int x;
-    void f(){
-       delete x;
+    void f(^int c){
+        void g(){
+            delete x;
+        }
+       delete c;
+       g()
     }
 
     x = new int;
     x^ = 10;
-    f();
+    f(x);
     print x^;
     x^ = 11;
 

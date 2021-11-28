@@ -1,12 +1,12 @@
 package ast.node.statements;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import ast.Dereferenceable;
 import ast.STentry;
-import ast.node.ArgNode;
-import ast.node.IdNode;
-import ast.node.MetaNode;
-import ast.node.Node;
+import ast.node.*;
 import ast.node.dec.FunNode;
 import ast.node.exp.ExpNode;
 import ast.node.exp.LhsExpNode;
@@ -78,34 +78,128 @@ public RetEffType retTypeCheck() {
                 startingEffect.add(parameterEffect);
             }
 
-            System.out.println("ID FUN ENTRY "+id.getEntry());
             effectErrors.addAll(functionNode.fixPointCheckEffect(env, startingEffect));
         }
 
         if (!effectErrors.isEmpty()) {
             return effectErrors;
         }
+        List<List<Effect>> functionEffects = id.getEntry().getFunctionStatusList();
 
-        //All exp to rw
+        /**
+         * Non pointer parameters
+         */
+        List<Integer> indexOfNoPointerParameters = new ArrayList<>();
+        for(int index=0; index< parameterlist.size(); index++){
+            ExpNode parameter = parameterlist.get(index);
+            if ( !( (parameter instanceof Dereferenceable) && ((Dereferenceable) parameter).isPointer() ) ) {
+                indexOfNoPointerParameters.add(index);
+            }
+        }
+        /**
+         * Variable in the expression of parameter
+         */
+        List<Dereferenceable> indexOfExpressionParameter = new ArrayList<>();
+        for (ExpNode parameter : parameterlist) {
+            if ( !( (parameter instanceof Dereferenceable) && ((Dereferenceable) parameter).isPointer() ) ) {
+                indexOfExpressionParameter.addAll(parameter.variables());
+            }
+        }
 
-        //fix point
+        /**
+         * Checkin error on non pointer parameters
+         */
+        for (int index : indexOfNoPointerParameters) {
+            List<Effect> actualEffectsList = functionEffects.get(index);
+            for(Effect effect : actualEffectsList ){
+                if(effect.equals(Effect.ERROR))
+                    effectErrors.add(new EffectError("The parameter " + parameterlist.get(index) + " from function: " + id.getID() + " is in Error status."));
+            }
+        }
 
-
-
-        // Check if error list is empty
-
-        // Check error inside not pointer parameter of fun
-
-        // Creating env 1 putting RW to all variables inside the
+        // Setting all variables inside expressions to be read/write.
+        Environment e1 = new Environment(env); // Creating a copy of the environment.
         // exp of the parameter
-
+        for (var variable : indexOfExpressionParameter) {
+            var entryInE1 = e1.effectsLookUp(variable.getID());
+            entryInE1.setDereferenceLevelVariableStatus(Effect.sequenceEffect(entryInE1.getDereferenceLevelVariableStatus(0), Effect.READWRITE), 0);
+        }
 
         // Creating env 2 by getting all pointer/dereference of var
-        // from param and doing the seq with env and effects list
-        // of the stentry function
+        Environment e2 = new Environment();
 
-        // Updating e1,e2
-        // Replace with new env
+        /**
+         * Non pointer parameters
+         */
+        List<Integer> indexOfPointerParameters = new ArrayList<>();
+        for(int index=0; index< parameterlist.size(); index++){
+            ExpNode parameter = parameterlist.get(index);
+            if( (parameter instanceof Dereferenceable) && ((Dereferenceable) parameter).isPointer() ){
+                indexOfPointerParameters.add(index);
+            }
+        }
+
+        List<Environment> parEnvironments = new ArrayList<>();
+
+        for (var i : indexOfPointerParameters) {
+            // [u1 |-> seq] par [u2 |-> seq] par ... par [um |-> seq]
+            // {[u1 |-> seq], [u2 |-> seq], ..., [um |-> seq]}
+            Environment tmpEnvironment = new Environment();
+            tmpEnvironment.createVoidScope();
+
+            Dereferenceable pointer = parameterlist.get(i).variables().get(0);
+
+            STentry entry = tmpEnvironment.createNewDeclaration(pointer.getID(), pointer.getEntry().getType());
+
+            /*if(pointer.getEntry().getMaxDereferenceLevel() > functionEffects.get(i).size()) {
+                //Dereference from the back
+                for (int parameterDereferenceLevel = 0; parameterDereferenceLevel < functionEffects.get(i).size(); parameterDereferenceLevel++) {
+                    int offset = parameterDereferenceLevel + (pointer.getEntry().getMaxDereferenceLevel() - functionEffects.get(i).size());
+                    if (offset > functionEffects.get(i).size()) {
+                        break;
+                    }
+                    Effect u_iEffect = env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(offset);
+                    Effect x_iEffect = functionEffects.get(i).get(offset);
+                    Effect seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
+
+                    entry.setDereferenceLevelVariableStatus(seq, offset);
+                }
+            }
+            else{
+                for (int dereferenceLevel = 0; dereferenceLevel < pointer.getEntry().getMaxDereferenceLevel(); dereferenceLevel++) {
+                    Effect u_iEffect = env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(dereferenceLevel);
+                    Effect x_iEffect = functionEffects.get(i).get(dereferenceLevel);
+                    Effect seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
+
+                    entry.setDereferenceLevelVariableStatus(seq, dereferenceLevel);
+                }
+            }*/
+            int actualDereference = 0;
+            /*if(pointer.getEntry().getMaxDereferenceLevel() > functionEffects.get(i).size()) {
+                actualDereference = pointer.getEntry().getMaxDereferenceLevel() - functionEffects.get(i).size();
+                System.out.println(actualDereference);
+            }*/
+
+            for (int dereferenceLevel = 0; dereferenceLevel < pointer.getEntry().getMaxDereferenceLevel()-actualDereference; dereferenceLevel++) {
+                Effect u_iEffect = env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(dereferenceLevel);
+                Effect x_iEffect = functionEffects.get(i).get(dereferenceLevel);
+                Effect seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
+
+                entry.setDereferenceLevelVariableStatus(seq, dereferenceLevel);
+            }
+            parEnvironments.add(tmpEnvironment);
+        }
+
+        if (parEnvironments.size() > 0) {
+            e2 = parEnvironments.get(0);
+            for (int i = 1; i < parEnvironments.size(); i++) {
+                e2 = Environment.parallelEnvironment(e2, parEnvironments.get(i));
+            }
+        }
+
+        Environment updatedEnv = Environment.updateEnvironment(e1, e2);
+        env.replaceWithNewEnv(updatedEnv);
+        effectErrors.addAll(env.getEffectErrors());
 
         return effectErrors;
     }

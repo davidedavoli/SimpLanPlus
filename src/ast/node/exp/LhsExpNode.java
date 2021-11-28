@@ -41,6 +41,9 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
 	  return inner.getInner();
   }
   */
+  public Boolean isPointer() {
+      return inner.isPointer();
+  }
   
   public LhsExpNode getInner() {
 	  return inner.getInner();

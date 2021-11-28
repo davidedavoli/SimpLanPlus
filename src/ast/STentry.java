@@ -187,4 +187,11 @@ public class STentry {
             '}';
   }
 
+  public void setBeginLabel(String beginFuncLabel) {
+    this.beginFuncLabel = beginFuncLabel;
+  }
+
+  public void setEndLabel(String endFuncLabel) {
+    this.endFuncLabel = endFuncLabel;
+  }
 }
