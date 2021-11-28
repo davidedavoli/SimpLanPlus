@@ -114,7 +114,6 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	public Node visitDecFun(DecFunContext ctx) {
 		//initialize @res with the visits to the type and its ID
 		FunNode res =null;
-		//System.out.println("VISITOR "+ctx.ID().getText());
 		if (ctx.type()!=null)
 			res = new FunNode(ctx.ID().getText(), (TypeNode) visit(ctx.type()));//WARNING casting
 		else

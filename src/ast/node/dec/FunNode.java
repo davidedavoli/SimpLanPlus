@@ -207,7 +207,6 @@ public class FunNode extends MetaNode {
 
 		// Adding the function to the current scope for non-mutual recursive calls.
 		STentry effectsFunEntry = env.createFunDecEffects(id,functionType);
-		System.out.println(effectsFunEntry.getType());
 		// add this node to recall this checkEffects
 		effectsFunEntry.setFunctionNode(this);
 		// impedisce la creazione di blocchi nelle successive iterazioni
@@ -319,7 +318,6 @@ public class FunNode extends MetaNode {
 		RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
 
 		if ((type instanceof VoidTypeNode) && !pres.leq(body.retTypeCheck())) {
-			System.out.println("Adding manual return in "+id);
 			StringBuilder missingReturnCode = new StringBuilder();
 
 			missingReturnCode.append("subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return \n");

@@ -144,7 +144,7 @@ public class Compiler {
 	public static void main(String[] args) throws Exception {
 
 
-		int number = 11;
+		int number = 10;
 		String fileAbsName = dir + baseName + number + ext;
 		String fileName = baseName + number + ext;
 		compileFile(fileAbsName,fileName);

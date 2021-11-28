@@ -72,19 +72,7 @@ public RetEffType retTypeCheck() {
                 res.addAll(arg.checkSemantics(env));
         }
 
-        FunNode f = new FunNode("foo", new VoidTypeNode());
-        FunNode g;
-        ArrayList<Node> path = this.getAncestorsInstanceOf(f.getClass());
-        if(!path.isEmpty())
-            path.remove(0);//plain recursive functions are ok
-        for (Node parF: path) {
-            g = (FunNode) parF;
-            if(g.getId().equals(id)){
-                res.add(new SemanticError("call of ancestor function in (grand-)child "));
-            }
-        }
-
-        System.out.println(env);
+        res.addAll(checkAncestorCall());
 
 		return res;
   }
@@ -136,4 +124,21 @@ public RetEffType retTypeCheck() {
     public ArrayList<ExpNode> getParlist() {
         return parlist;
     }
+
+    private ArrayList<SemanticError> checkAncestorCall(){
+      ArrayList<SemanticError> res = new ArrayList<>();
+        FunNode f = new FunNode("foo", new VoidTypeNode());
+        FunNode g;
+        ArrayList<Node> path = this.getAncestorsInstanceOf(f.getClass());
+        if(!path.isEmpty())
+            path.remove(0);//plain recursive functions are ok
+        for (Node parF: path) {
+            g = (FunNode) parF;
+            if(g.getId().equals(id)){
+                res.add(new SemanticError("call of ancestor function in (grand-)child "));
+            }
+        }
+        return res;
+    }
+
 }

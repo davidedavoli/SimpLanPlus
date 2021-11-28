@@ -1,36 +1,15 @@
 {
-    /*
-    void g(^int x,bool b){
-        print x^;
-        delete x;
-        if(b){
-            g(x,false);
-        }
-
-
-
-    }
-
-    ^int a = new int;
-    a^ = 10;
-    g(a,true);
-
-    */
-    void g(){
-        print 2;
-        //f();
-    }
-
+    ^int x;
     void f(){
-        void d(){
-            print 1;
-            f();
-        }
-        print 0;
-        d();
+       delete x;
     }
 
+    x = new int;
+    x^ = 10;
     f();
+    print x^;
+    x^ = 11;
+
 
 
 }
