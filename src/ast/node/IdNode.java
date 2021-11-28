@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 import ast.Dereferenceable;
 import ast.STentry;
-import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import semantic.Effect;
+import effect.Effect;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -100,10 +100,10 @@ public class IdNode extends LhsNode implements Dereferenceable {
         return res;
     }
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
+    public ArrayList<EffectError> checkEffects (Environment env) {
         entry = env.effectsLookUp(id);
         nestinglevel = env.getNestingLevel();
-        return new ArrayList<>();
+        return new ArrayList<EffectError>();
     }
 
     public void setIdStatus(Effect effect, int dereferenceLevel){

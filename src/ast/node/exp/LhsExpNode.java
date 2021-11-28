@@ -7,10 +7,10 @@ import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.LhsNode;
 import ast.node.dec.FunNode;
-import ast.node.types.PointerTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import semantic.Effect;
+import effect.Effect;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -107,8 +107,8 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
         return variable;
     }
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
-        ArrayList<SemanticError> errors = new ArrayList<>();
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
         /**
          * Getting new entry if it was modified from some operation on environments
          */
@@ -122,12 +122,12 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
         Effect actualStatus = innerEntry.getDereferenceLevelVariableStatus(getDereferenceLevel()-1);
 
         if (actualStatus.equals(new Effect(Effect.INITIALIZED))) {
-            errors.add(new SemanticError(inner.getID() + " used before writing value. LhsExpNode"));
+            errors.add(new EffectError(inner.getID() + " used before writing value. LhsExpNode"));
         }
         for(int i=0;i<innerEntry.getMaxDereferenceLevel();i++){
             Effect status = innerEntry.getDereferenceLevelVariableStatus(i);
             if (status.equals(new Effect(Effect.DELETED))) {
-                errors.add(new SemanticError(inner.getID() + " used after deliting. LhsExpNode"));
+                errors.add(new EffectError(inner.getID() + " used after deliting. LhsExpNode"));
             }
         }
         errors.addAll(checkExpStatus(env));

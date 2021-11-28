@@ -6,6 +6,7 @@ import ast.node.types.TypeNode;
 
 import java.util.ArrayList;
 
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -30,7 +31,7 @@ public interface Node {
 
   RetEffType retTypeCheck();
 
-  ArrayList<SemanticError> checkEffects(Environment env);
+  ArrayList<EffectError> checkEffects(Environment env);
 
     default int getDereferenceLevel(){
       return 0;

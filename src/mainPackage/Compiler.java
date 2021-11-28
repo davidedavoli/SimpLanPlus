@@ -20,6 +20,7 @@ import parser.SimpLanPlusParser;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
+import effect.EffectError;
 import semantic.SimplanPlusException;
 
 
@@ -67,10 +68,10 @@ public class Compiler {
 	}
 
 	private static void checkEffects(Node ast, Environment env){
-		ArrayList<SemanticError> effectErrors = ast.checkEffects(env);
+		ArrayList<EffectError> effectErrors = ast.checkEffects(env);
 		System.out.println("You had: "+effectErrors.size()+" effects errors.");
 		if(effectErrors.size()>0){
-			for(SemanticError e : effectErrors)
+			for(EffectError e : effectErrors)
 				System.out.println("\t" + e);
 			System.exit(1);
 		}

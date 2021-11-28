@@ -3,6 +3,7 @@ package ast.node.types;
 import java.util.ArrayList;
 
 import ast.node.dec.FunNode;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -31,7 +32,7 @@ public class BoolTypeNode implements TypeNode {
   }
 
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
+    public ArrayList<EffectError> checkEffects (Environment env) {
         return new ArrayList<>();
     }
 

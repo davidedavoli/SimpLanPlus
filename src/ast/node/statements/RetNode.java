@@ -9,6 +9,7 @@ import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
 import ast.node.types.VoidTypeNode;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -46,7 +47,7 @@ public class RetNode extends MetaNode {
       }
       current_nl=env.getNestingLevel();
 
-      FunNode f = new FunNode("foo", new VoidTypeNode());
+      FunNode f = new FunNode("foo", new VoidTypeNode(),parent_f.getIdNode());
       parent_f = (FunNode) this.getAncestorsInstanceOf(f.getClass()).get(0);
 	  return res;
  	}
@@ -68,11 +69,10 @@ public class RetNode extends MetaNode {
   }
 
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
-        ArrayList<SemanticError> errors = new ArrayList<>();
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
         if (val != null) {
             errors.addAll(val.checkEffects(env));
-
         }
 
         return errors;

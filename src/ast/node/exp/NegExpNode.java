@@ -11,6 +11,7 @@ import ast.node.types.IntTypeNode;
 import ast.node.types.TypeUtils;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -65,8 +66,8 @@ public class NegExpNode extends ExpNode {
 	}
 
 	@Override
-	public ArrayList<SemanticError> checkEffects(Environment env) {
-		ArrayList<SemanticError> errors = new ArrayList<>();
+	public ArrayList<EffectError> checkEffects (Environment env) {
+		ArrayList<EffectError> errors = new ArrayList<>();
 		errors.addAll(exp.checkEffects(env));
 		errors.addAll(checkExpStatus(env));
 		return errors;

@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import ast.Label;
 import ast.node.types.VoidTypeNode;
+import effect.EffectError;
 import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
@@ -123,8 +124,8 @@ public class BlockNode extends MetaNode {
   }
 
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
-        ArrayList<SemanticError> errors = new ArrayList<>();
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
 
         if (!isFunction) {
             env.createVoidScope();

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 import ast.Dereferenceable;
 import ast.STentry;
-import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import semantic.Effect;
+import effect.Effect;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -102,19 +102,19 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
   }
 
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
-        ArrayList<SemanticError> errors = new ArrayList<>();
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
         entry = env.effectsLookUp(id);
 
         Effect actualStatus = entry.getDereferenceLevelVariableStatus(getDereferenceLevel());
         if (actualStatus.equals(Effect.INITIALIZED)) {
-            errors.add(new SemanticError(this.getID() + " used before writing value. IdExpNode"));
+            errors.add(new EffectError(this.getID() + " used before writing value. IdExpNode"));
         }
         errors.addAll(checkExpStatus(env));
         for(int i=0;i<entry.getMaxDereferenceLevel();i++){
             Effect status = entry.getDereferenceLevelVariableStatus(i);
             if (status.equals(new Effect(Effect.DELETED))) {
-                errors.add(new SemanticError(this.getID() + " used after deliting. IdExpNode"));
+                errors.add(new EffectError(this.getID() + " used after deliting. IdExpNode"));
             }
         }
 

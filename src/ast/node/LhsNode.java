@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 import ast.Dereferenceable;
 import ast.STentry;
-import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import semantic.Effect;
+import effect.Effect;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -81,8 +81,8 @@ public class LhsNode extends MetaNode implements Dereferenceable {
   }
 
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
-        ArrayList<SemanticError> errors = new ArrayList<>();
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
         /**
          * Getting new entry if it was modified from some operation on environments
          */
@@ -92,7 +92,7 @@ public class LhsNode extends MetaNode implements Dereferenceable {
 
         errors.addAll(inner.checkEffects(env));
         if (!inner.getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()-1).equals(new Effect(Effect.READWRITE))) {
-            errors.add(new SemanticError(inner.getID() + " has not all pointer to rw "));
+            errors.add(new EffectError(inner.getID() + " has not all pointer to rw "));
         }
         return  errors;
     }

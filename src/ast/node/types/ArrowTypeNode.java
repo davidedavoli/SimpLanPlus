@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import ast.node.Node;
 import ast.node.dec.FunNode;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -65,7 +66,7 @@ public class ArrowTypeNode implements TypeNode {
   }
 
   @Override
-  public ArrayList<SemanticError> checkEffects(Environment env) {
+  public ArrayList<EffectError> checkEffects (Environment env) {
     return new ArrayList<>();
   }
 

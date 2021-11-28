@@ -114,10 +114,11 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	public Node visitDecFun(DecFunContext ctx) {
 		//initialize @res with the visits to the type and its ID
 		FunNode res =null;
+		IdNode id = new IdNode(ctx.ID().getText());
 		if (ctx.type()!=null)
-			res = new FunNode(ctx.ID().getText(), (TypeNode) visit(ctx.type()));//WARNING casting
+			res = new FunNode(ctx.ID().getText(), (TypeNode) visit(ctx.type()),id);//WARNING casting
 		else
-			res = new FunNode(ctx.ID().getText(), new VoidTypeNode());//WARNING casting
+			res = new FunNode(ctx.ID().getText(), new VoidTypeNode(),id);//WARNING casting
 
 		//add argument declarations
 		//we are getting a shortcut here by constructing directly the ParNode
@@ -287,7 +288,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		//this corresponds to a function invocation
 		//declare the result
 		MetaNode res;
-
+		IdNode id = new IdNode(ctx.ID().getText());
 		//get the invocation arguments
 		ArrayList<ExpNode> args = new ArrayList<ExpNode>();
 
@@ -295,7 +296,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 			args.add((ExpNode) visit(exp));
 
 		//instantiate the invocation
-		res = new CallNode(ctx.ID().getText(), args);
+		res = new CallNode(id, args);
 
 		for(ExpNode exp : args)
 			exp.setParent(res);

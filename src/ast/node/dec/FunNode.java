@@ -1,23 +1,25 @@
 package ast.node.dec;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import ast.FuncBodyUtils;
 import ast.Label;
 import ast.STentry;
 import ast.node.ArgNode;
+import ast.node.IdNode;
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.statements.BlockNode;
 import ast.node.types.*;
-import semantic.Effect;
+import effect.Effect;
+import effect.EffectError;
 import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
 public class FunNode extends MetaNode {
 
-  private final String id;
+	private final String id;
+	private final IdNode functionIdNode;
   private final TypeNode type;
   private ArrowTypeNode functionType; //just for ST
   private ArrayList<TypeNode> partypes;
@@ -28,8 +30,9 @@ public class FunNode extends MetaNode {
   private String endFuncLabel = "";
   private int nestingLevel;
 
-  public FunNode (String i, TypeNode t) {
+  public FunNode (String i, TypeNode t, IdNode functionIdNode) {
     id=i;
+	this.functionIdNode = functionIdNode;
     type=t;
 	beginFuncLabel = FuncBodyUtils.freshFunLabel();
 	endFuncLabel = FuncBodyUtils.endFreshFunLabel();
@@ -100,6 +103,7 @@ public class FunNode extends MetaNode {
 		//env.offset = -2;
 		HashMap<String, STentry> hm = env.getCurrentST();
 		STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel,functionType);
+		functionIdNode.setEntry(entry);
 		nestingLevel = env.getNestingLevel();
 		if ( hm.put(id,entry) != null )
 			res.add(new SemanticError("Fun id '"+id+"' already declared"));
@@ -140,13 +144,13 @@ public class FunNode extends MetaNode {
 	 * @return ArrayList<SemanticError>
 	 */
 	@Override
-	public ArrayList<SemanticError> checkEffects(Environment env){
-	  ArrayList<SemanticError> errors = new ArrayList<>();
+	public ArrayList<EffectError> checkEffects (Environment env){
+	  ArrayList<EffectError> errors = new ArrayList<>();
 
 	  // create a new entry in STable  with the function id
-		// env.addEntry(funId.getIdentifier(), funId.getSTEntry());
-		STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel,functionType);
-	  	env.addEntry(this.id, entry);
+		
+	  	env.addEntry(this.id, functionIdNode.getEntry());
+		functionIdNode.getEntry().setFunctionNode(this);
 
 		// put all the argNode to RW
 		List<List<Effect>> startingEffect = new ArrayList<>();
@@ -156,10 +160,9 @@ public class FunNode extends MetaNode {
 			List<Effect> argEffect = new ArrayList<>();
 
 			// put all the pointed var in RW
-			int maxDerefLvl  = argNode.getIdNode().getEntry().getMaxDereferenceLevel();
-			for(int derefLvl = 0; derefLvl < maxDerefLvl; derefLvl++){
+			int maxDereferenceLevel  = argNode.getIdNode().getEntry().getMaxDereferenceLevel();
+			for(int dereferenceLevel = 0; dereferenceLevel < maxDereferenceLevel; dereferenceLevel++){
 				argEffect.add(new Effect(Effect.READWRITE));
-				//argEffect.add(new Effect(Effect.INITIALIZED));
 			}
 			startingEffect.add(argEffect);
 		}
@@ -178,8 +181,8 @@ public class FunNode extends MetaNode {
 	 * @param effects List of effect
 	 * @return  ArrayList<SemanticError>
 	 */
-	private ArrayList<SemanticError> fixPointCheckEffect(Environment env, List<List<Effect>> effects){
-	  ArrayList<SemanticError> errors = new ArrayList<>();
+	public ArrayList<EffectError> fixPointCheckEffect(Environment env, List<List<Effect>> effects){
+	  ArrayList<EffectError> errors = new ArrayList<>();
 
 	  // =====================================================================
 	  // 1. copy the old env, before analyze the body of the function
@@ -235,7 +238,7 @@ public class FunNode extends MetaNode {
 			//effect are changed!
 			// replace the env and update status with the new effects
 
-			env.update(decFunEnv);
+			env.replaceWithNewEnv(decFunEnv);
 
 			// lookUp should work??
 			var funEntry = env.effectsLookUp(id);
@@ -271,16 +274,16 @@ public class FunNode extends MetaNode {
 			//Update ID in previous scope
 			var argStatuses = effectsFunEntry.getFunctionStatusList().get(argIndex);
 
-			for (int derefLvl = 0; derefLvl < argStatuses.size(); derefLvl++) {
-				idEntry.setParameterStatus(argIndex, argStatuses.get(derefLvl), derefLvl);
+			for (int dereferenceLevel = 0; dereferenceLevel < argStatuses.size(); dereferenceLevel++) {
+				idEntry.setParameterStatus(argIndex, argStatuses.get(dereferenceLevel), dereferenceLevel);
 			}
 		}
 
 		return errors;
 	}
 
-	private ArrayList<SemanticError> checkBodyAndUpdateArgs(Environment env, STentry innerFunEntry){
-		ArrayList<SemanticError> errors = new ArrayList<>();
+	private ArrayList<EffectError> checkBodyAndUpdateArgs(Environment env, STentry innerFunEntry){
+		ArrayList<EffectError> errors = new ArrayList<>();
 		errors.addAll(body.checkEffects(env));
 
 		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
@@ -295,9 +298,7 @@ public class FunNode extends MetaNode {
 				innerFunEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(derefLvl), derefLvl);
 
 			}
-			System.out.println("Setted function status list in env "+functionEntry.getFunctionStatusList());
 		}
-		System.out.println(env);
 		return errors;
 	}
 
@@ -352,5 +353,9 @@ public class FunNode extends MetaNode {
 
 	public String getId() {
 		return id;
+	}
+
+	public IdNode getIdNode() {
+		return functionIdNode;
 	}
 }

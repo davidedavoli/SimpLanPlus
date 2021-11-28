@@ -8,6 +8,7 @@ import ast.node.types.BoolTypeNode;
 import ast.node.types.IntTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -226,8 +227,8 @@ public class BinExpNode extends ExpNode {
         return variables;
     }
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
-        ArrayList<SemanticError> errors = new ArrayList<>();
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
 
         errors.addAll(lhs.checkEffects(env));
         errors.addAll(rhs.checkEffects(env));

@@ -11,7 +11,8 @@ import ast.node.Node;
     import java.util.HashMap;
 
     import ast.node.types.TypeUtils;
-import semantic.Effect;
+import effect.Effect;
+import effect.EffectError;
 import semantic.Environment;
     import ast.Label;
     import semantic.SemanticError;
@@ -120,8 +121,8 @@ public class VarNode extends MetaNode {
     }
 
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
-        ArrayList<SemanticError> errors = new ArrayList<>();
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
         if(exp != null){
             errors.addAll(exp.checkEffects(env));
         }

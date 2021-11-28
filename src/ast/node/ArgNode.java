@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -49,7 +50,7 @@ public class ArgNode extends MetaNode {
   }
 
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
+    public ArrayList<EffectError> checkEffects (Environment env) {
         return new ArrayList<>();
     }
 

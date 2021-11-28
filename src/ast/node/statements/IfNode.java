@@ -1,17 +1,15 @@
 package ast.node.statements;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import ast.node.LhsNode;
 import ast.node.MetaNode;
 import ast.node.Node;
-import ast.node.dec.FunNode;
 import ast.node.exp.ExpNode;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
@@ -66,8 +64,8 @@ public class IfNode extends MetaNode {
   }
 
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
-        ArrayList<SemanticError> errors = new ArrayList<>();
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
 
         errors.addAll(cond.checkEffects(env));
 
@@ -78,7 +76,7 @@ public class IfNode extends MetaNode {
             var elseEnv = new Environment(env);
             errors.addAll(el.checkEffects(elseEnv));
 
-            env.update(Environment.max(thenEnv, elseEnv));
+            env.replaceWithNewEnv(Environment.max(thenEnv, elseEnv));
         } else {
             errors.addAll(th.checkEffects(env));
         }

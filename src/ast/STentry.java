@@ -3,7 +3,7 @@ package ast;
 import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.TypeNode;
-import semantic.Effect;
+import effect.Effect;
 import semantic.SimplanPlusException;
 
 import java.util.ArrayList;

@@ -1,8 +1,6 @@
 package ast;
 
-import ast.node.LhsNode;
-import ast.node.exp.IdExpNode;
-import semantic.Effect;
+import effect.Effect;
 
 public interface Dereferenceable {
 

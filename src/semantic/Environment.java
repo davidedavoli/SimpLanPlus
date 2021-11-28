@@ -5,8 +5,9 @@ import java.util.function.BiFunction;
 
 import ast.Dereferenceable;
 import ast.STentry;
-import ast.node.dec.FunNode;
 import ast.node.types.TypeNode;
+import effect.Effect;
+import effect.EffectError;
 
 public class Environment {
 	
@@ -213,13 +214,13 @@ public class Environment {
 	 * @param {BiFunction} function from effect that has to be invoke
 	 * @param {int} effect to be applayed
 	 */
-	public ArrayList<SemanticError> checkStmStatus(
+	public ArrayList<EffectError> checkStmStatus(
 		Dereferenceable variable,
 		BiFunction<Effect,Effect,Effect> effectFun,
 		Effect effect
 	) {
 
-		ArrayList<SemanticError> errors = new ArrayList<>();
+		ArrayList<EffectError> errors = new ArrayList<>();
 
 		try {
 			STentry idEntry = lookUp(variable.getID());
@@ -231,15 +232,15 @@ public class Environment {
 			idEntry.setDereferenceLevelVariableStatus(newStatus, variable.getDereferenceLevel());
 
 			if (newStatus.equals(new Effect(Effect.ERROR))) {
-				errors.add(new SemanticError(variable.getID() + " used after delete(env)."));
+				errors.add(new EffectError(variable.getID() + " used after delete(env)."));
 			}
 		} catch (Exception exception) {
-			errors.add(new SemanticError(variable.getID() + " not declared. Aborting."));
+			errors.add(new EffectError(variable.getID() + " not declared. Aborting."));
 		}
 		return errors;
 	}
 
-	public void update(Environment newEnvironment) {
+	public void replaceWithNewEnv(Environment newEnvironment) {
 		this.symTable.clear();
 		this.nestingLevel = newEnvironment.getNestingLevel();
 		this.offset = newEnvironment.getOffset();

@@ -1,4 +1,4 @@
-package semantic;
+package effect;
 
 /**
  * Effect type and function for semantic analysis

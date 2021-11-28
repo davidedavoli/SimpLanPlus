@@ -8,6 +8,7 @@ import ast.node.dec.FunNode;
 import ast.node.statements.CallNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
+import effect.EffectError;
 import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
@@ -47,7 +48,7 @@ public class CallExpNode extends ExpNode {
     }
 
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
+    public ArrayList<EffectError> checkEffects (Environment env) {
         return inner.checkEffects(env);
     }
 

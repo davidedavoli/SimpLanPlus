@@ -2,13 +2,11 @@ package ast.node.exp;
 
 import ast.Dereferenceable;
 import ast.Label;
-import ast.node.LhsNode;
 import ast.node.MetaNode;
-import ast.node.Node;
-import ast.node.dec.FunNode;
 import ast.node.types.RetEffType;
 import ast.node.types.TypeNode;
-import semantic.Effect;
+import effect.Effect;
+import effect.EffectError;
 import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
@@ -43,15 +41,15 @@ public abstract class ExpNode extends MetaNode {
     }
 
     @Override
-    public ArrayList<SemanticError> checkEffects(Environment env) {
+    public ArrayList<EffectError> checkEffects (Environment env) {
         return new ArrayList<>();
     }
 
 
     public abstract List<Dereferenceable> variables();
 
-    protected ArrayList<SemanticError> checkExpStatus(Environment env) {
-        ArrayList<SemanticError> errors = new ArrayList<>();
+    protected ArrayList<EffectError> checkExpStatus(Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
 
         variables().forEach(var -> errors.addAll(env.checkStmStatus(var, Effect::sequenceEffect, Effect.READWRITE)));
 

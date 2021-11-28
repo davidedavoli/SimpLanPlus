@@ -11,7 +11,8 @@ import ast.node.exp.ExpNode;
 import ast.node.types.BoolTypeNode;
   import ast.node.types.RetEffType;
   import ast.node.types.TypeNode;
-  import semantic.Environment;
+import effect.EffectError;
+import semantic.Environment;
   import ast.Label;
   import semantic.SemanticError;
 
@@ -37,7 +38,7 @@ public class BoolNode extends ExpNode {
   }
 
   @Override
-  public ArrayList<SemanticError> checkEffects(Environment env) {
+  public ArrayList<EffectError> checkEffects (Environment env) {
     return new ArrayList<>();
   }
 
