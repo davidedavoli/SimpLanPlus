@@ -11,6 +11,7 @@ Example of annidate recursive function from collegues project that not worked fo
                 print a;
                 print b;
                 return;
+                x=2;
             }
             else {
                 print x;

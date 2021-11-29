@@ -18,6 +18,8 @@ import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
+import javax.crypto.AEADBadTagException;
+
 public class BlockNode extends MetaNode {
 
   private final ArrayList<Node> declarations;
@@ -76,10 +78,11 @@ public class BlockNode extends MetaNode {
       }
 
 
-      if(statements.size() > 0){
-    	  //if there are children then check semantics for every child and save the results
-    	  for(Node n : statements)
-    		  res.addAll(n.checkSemantics(env));
+      if(statements.size() > 0) {
+          //if there are children then check semantics for every child and save the results
+          for (Node n : statements)
+              res.addAll(n.checkSemantics(env));
+          res.addAll(this.checkCodeAfterRet());
       }
 
       //check semantics in the exp body      
@@ -91,8 +94,22 @@ public class BlockNode extends MetaNode {
       //return the result
       return res;
 	}
-  
-  public TypeNode typeCheck () throws SimplanPlusException {
+
+    private List<SemanticError> checkCodeAfterRet() {
+        ArrayList<SemanticError> res = new ArrayList<>();
+        boolean ret_passed= false;
+        for(Node n : statements) {
+            if (ret_passed){
+                res.add(new SemanticError("Code after return statement"));
+                break;
+            }
+            if (n instanceof RetNode)
+                ret_passed = true;
+        }
+        return res;
+    }
+
+    public TypeNode typeCheck () throws SimplanPlusException {
 	  //ne siamo sicuri?
 	TypeNode last =null;
     for (Node dec:declarations)
