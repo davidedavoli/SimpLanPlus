@@ -170,6 +170,7 @@ public class SVM {
 
                         case SVMParser.NEW:
                             address = memory.allocate();
+
                             if (address >= hp) hp = address + 1;
                             if (address == -1 || hp > sp) {
                                 System.out.println("Memory is full!!");

@@ -100,7 +100,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
       for (int i = 0; i<nestinglevel-entry.getNestingLevel(); i++)
           cgen.append("lw $al 0($al) //go up to chain\n");
 
-      cgen.append("lw $a0 ").append(entry.getOffset()).append("($al) //put in $a0 value of Id\n");
+      cgen.append("lw $a0 ").append(entry.getOffset()).append("($al) //put in $a0 value of Id ").append(id).append("\n");
 
       return cgen.toString();
   }
@@ -114,7 +114,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
         if (actualStatus.equals(Effect.INITIALIZED)) {
             errors.add(new EffectError(this.getID() + " used before writing value. IdExpNode"));
         }
-        System.out.println(entry.getStatusList());
+        //System.out.println("id: "+id+" "+entry.getStatusList());
         errors.addAll(checkExpStatus(env));
         for(int i=0;i<entry.getMaxDereferenceLevel();i++){
             Effect status = entry.getDereferenceLevelVariableStatus(i);

@@ -36,9 +36,10 @@ public class AssignmentNode extends MetaNode {
 	  //create result list
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
 
-      STentry entry = env.lookUp(lhs.getID());
-      if (entry == null)
-          res.add(new SemanticError("Id "+lhs.getID()+" not declared"));
+      //TODO Should not be performed because IDNode and IdExpNode alreay do it
+      //STentry entry = env.lookUp(lhs.getID());
+      //if (entry == null)
+      //    res.add(new SemanticError("Id "+lhs.getID()+" not declared"));
 
 	  res.addAll(lhs.checkSemantics(env));
       res.addAll(exp.checkSemantics(env));
@@ -102,7 +103,7 @@ public class AssignmentNode extends MetaNode {
 
       cgen.append(lhs.codeGeneration(labelManager)).append("\n");
       //$al indirizzo di lhs
-      cgen.append("sw $a0 0($al) // 0($al) = $a0 id=exp \n");
+      cgen.append("sw $a0 0($al) // 0($al) = $a0 ").append(lhs.getID()).append("=exp\n");
 
       return cgen.toString();
   }

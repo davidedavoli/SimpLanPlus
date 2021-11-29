@@ -5,7 +5,7 @@
             delete x;
         }
        delete c;
-       g()
+       g();
     }
 
     x = new int;

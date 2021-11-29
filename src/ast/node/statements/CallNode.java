@@ -52,7 +52,6 @@ public RetEffType retTypeCheck() {
     @Override
     public ArrayList<EffectError> checkEffects(Environment env) {
         ArrayList<EffectError> effectErrors = new ArrayList<>();
-
         effectErrors.addAll(id.checkEffects(env));
         parameterlist.forEach((p) -> effectErrors.addAll(p.checkEffects(env)));
         //Get all actual parameter status
@@ -84,7 +83,9 @@ public RetEffType retTypeCheck() {
         if (!effectErrors.isEmpty()) {
             return effectErrors;
         }
+        id.setEntry(env.effectsLookUp(id.getID()));
         List<List<Effect>> functionEffects = id.getEntry().getFunctionStatusList();
+
 
         /**
          * Non pointer parameters
@@ -151,42 +152,33 @@ public RetEffType retTypeCheck() {
 
             STentry entry = tmpEnvironment.createNewDeclaration(pointer.getID(), pointer.getEntry().getType());
 
-            /*if(pointer.getEntry().getMaxDereferenceLevel() > functionEffects.get(i).size()) {
-                //Dereference from the back
-                for (int parameterDereferenceLevel = 0; parameterDereferenceLevel < functionEffects.get(i).size(); parameterDereferenceLevel++) {
-                    int offset = parameterDereferenceLevel + (pointer.getEntry().getMaxDereferenceLevel() - functionEffects.get(i).size());
-                    if (offset > functionEffects.get(i).size()) {
-                        break;
-                    }
-                    Effect u_iEffect = env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(offset);
-                    Effect x_iEffect = functionEffects.get(i).get(offset);
-                    Effect seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
-
-                    entry.setDereferenceLevelVariableStatus(seq, offset);
-                }
-            }
-            else{
-                for (int dereferenceLevel = 0; dereferenceLevel < pointer.getEntry().getMaxDereferenceLevel(); dereferenceLevel++) {
-                    Effect u_iEffect = env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(dereferenceLevel);
-                    Effect x_iEffect = functionEffects.get(i).get(dereferenceLevel);
-                    Effect seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
-
-                    entry.setDereferenceLevelVariableStatus(seq, dereferenceLevel);
-                }
-            }*/
             int actualDereference = 0;
-            /*if(pointer.getEntry().getMaxDereferenceLevel() > functionEffects.get(i).size()) {
+            if(pointer.getEntry().getMaxDereferenceLevel() > functionEffects.get(i).size()) {
                 actualDereference = pointer.getEntry().getMaxDereferenceLevel() - functionEffects.get(i).size();
                 System.out.println(actualDereference);
-            }*/
+            }
+            /**
+             * actualDereference = 5-2 = 3
+             [ [0:c0,1:c1] ]
+             0:c0->3:c3, 1:c1->4:c4
+             [0:c0,1:c1,2:c2,3:c3,4:c4]
 
-            for (int dereferenceLevel = 0; dereferenceLevel < pointer.getEntry().getMaxDereferenceLevel()-actualDereference; dereferenceLevel++) {
-                Effect u_iEffect = env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(dereferenceLevel);
+             */
+            System.out.println("FUNCTION "+functionEffects.get(i));
+            System.out.println("ENV "+env.effectsLookUp(pointer.getID()).getStatusList());
+            for (int dereferenceLevel = 0; dereferenceLevel < functionEffects.get(i).size()/*pointer.getEntry().getMaxDereferenceLevel()-actualDereference*/; dereferenceLevel++) {
+                Effect u_iEffect = env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(dereferenceLevel+actualDereference);
                 Effect x_iEffect = functionEffects.get(i).get(dereferenceLevel);
                 Effect seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
 
                 entry.setDereferenceLevelVariableStatus(seq, dereferenceLevel);
             }
+
+            /*for(int index = 0;index<actualDereference;index++){
+                System.out.println("SETTING "+index+" status");
+                entry.setDereferenceLevelVariableStatus(env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(index), index+actualDereference);
+            }*/
+            System.out.println("SEQUENCE "+entry.getStatusList());
             parEnvironments.add(tmpEnvironment);
         }
 
@@ -211,7 +203,7 @@ public RetEffType retTypeCheck() {
 
         entry = env.lookUp(id.getID());
         if (entry == null)
-            res.add(new SemanticError("Id "+id+" not declared"));
+            res.add(new SemanticError("Id "+id.getID()+" not declared in call node"));
         else{
             nestinglevel = env.getNestingLevel();
             for(ExpNode arg : parameterlist)

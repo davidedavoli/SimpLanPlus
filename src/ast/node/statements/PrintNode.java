@@ -5,10 +5,7 @@ import java.util.ArrayList;
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
-import ast.node.types.BoolTypeNode;
-import ast.node.types.IntTypeNode;
-import ast.node.types.RetEffType;
-import ast.node.types.TypeNode;
+import ast.node.types.*;
 import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
@@ -29,7 +26,8 @@ public class PrintNode extends MetaNode {
   
   public TypeNode typeCheck() throws SimplanPlusException {
     TypeNode valType = val.typeCheck();
-    if (!(valType instanceof BoolTypeNode || valType instanceof IntTypeNode))
+    if(valType instanceof PointerTypeNode)
+   // if (!(valType instanceof BoolTypeNode || valType instanceof IntTypeNode))
       throw new SimplanPlusException("Print of a pointer");
     return valType;
   }  

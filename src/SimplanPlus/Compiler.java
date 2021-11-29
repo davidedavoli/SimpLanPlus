@@ -1,7 +1,6 @@
-package mainPackage;
+package SimplanPlus;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import Interpreter.SVM;
@@ -145,18 +144,19 @@ public class Compiler {
 	public static void main(String[] args) throws Exception {
 
 
-		int numberSingle = 8;
-		String fileAbsNameSingle = dir + baseName + numberSingle + ext;
+		int numberSingle = 33;
+		String dire = "tommasoExamples/";
+		String fileAbsNameSingle = dire + baseName + numberSingle + ext;
 		String fileNameSingle = baseName + numberSingle + ext;
 		compileFile(fileAbsNameSingle,fileNameSingle);
 
 
-		int numberOfTest = Objects.requireNonNull(new File("examples/").list()).length;
-		System.out.println("NUMBER OF TEST IS " + numberOfTest);
+		int numberOfTest = Objects.requireNonNull(new File(dire).list()).length;
+		//System.out.println("NUMBER OF TEST IS " + numberOfTest);
 		for(int number = 1; number<=numberOfTest;number++){
-			String fileAbsName = dir + baseName + number + ext;
+			String fileAbsName = dire + baseName + number + ext;
 			String fileName = baseName + number + ext;
-			//compileFile(fileAbsName,fileName);
+		//	compileFile(fileAbsName,fileName);
 		}
 
 	}

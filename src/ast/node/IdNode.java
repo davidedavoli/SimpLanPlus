@@ -59,6 +59,10 @@ public class IdNode extends LhsNode implements Dereferenceable {
   
   @Override
   public TypeNode typeCheck () {
+      if(entry == null){
+          System.out.println("TypeCheck: Entry of identifier "+ id +" is null");
+          System.exit(0);
+      }
 	if (entry.getType() instanceof ArrowTypeNode) { //
 	  System.out.println("Wrong usage of function identifier");
       System.exit(0);
@@ -95,7 +99,7 @@ public class IdNode extends LhsNode implements Dereferenceable {
         ArrayList<SemanticError> res = new ArrayList<SemanticError>();
         entry = env.lookUp(id);
         if (entry == null)
-            res.add(new SemanticError("Id "+id+" not declared"));
+            res.add(new SemanticError("Id "+id+" not declared in idNode"));
         else
             nestinglevel = env.getNestingLevel();
         return res;

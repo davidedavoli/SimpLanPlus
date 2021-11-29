@@ -184,7 +184,7 @@ public class STentry {
             ", \n\t\tbeginFuncLabel='" + beginFuncLabel + '\'' +
             ", \n\t\tendFuncLabel='" + endFuncLabel + '\'' +
             ", \n\t\tfunNode=" + funNode +
-            '}';
+            "\n\t}";
   }
 
   public void setBeginLabel(String beginFuncLabel) {

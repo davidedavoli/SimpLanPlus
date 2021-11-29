@@ -16,38 +16,21 @@
        */
 
 
-    void plusint(int c){
-        print false;
-        print c+1;
+    void plusint(^int c){
+        print c^+1;
         return;
     }
     int minusint(int c){
-        print 1;
         return c-1;
     }
-
-    int x;
-    int f;
     ^int c = new int;
-
-    if(true){
-        x = 5;
-        c = new int;
-        c^ = 10;
-        print x;
-        f = 10;
-    }
-    else{
-        x = 8;
-        print 6;
-    }
-    print x;
     c^ = 5;
-    print c^;
-    delete c;
     c = new int;
     c^ = 9;
-    plusint(c^);
+    //prova(c);
+    print c^;
+    plusint(c);
+    print c^;
     print minusint(c^);
     print c^;
 

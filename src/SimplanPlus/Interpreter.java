@@ -1,4 +1,4 @@
-package mainPackage;
+package SimplanPlus;
 
 import Interpreter.SVM;
 import Interpreter.ast.SVMVisitorImpl;

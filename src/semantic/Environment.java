@@ -241,7 +241,7 @@ public class Environment {
 
 
 
-	public STentry lookUp(final String id) throws SimplanPlusException {
+	public STentry lookUp(final String id) {
 		for (int i = nestingLevel; i >= 0; i--) {
 			HashMap<String, STentry> scope = symTable.get(i);
 			STentry stEntry = scope.get(id);
@@ -249,8 +249,9 @@ public class Environment {
 				return stEntry;
 			}
 		}
-		throw new SimplanPlusException("ID " + id + " is not in the ST.");
+		//throw new SimplanPlusException("ID " + id + " is not in the ST.");
 		//System.err.println("ID " + id + " is not in the ST.");
+		return null;
 	}
 
 
@@ -387,9 +388,10 @@ public class Environment {
 	public STentry createNewDeclaration(final String id, final TypeNode type) {
 		STentry stEntry;
 		if (type instanceof ArrowTypeNode) {
-			stEntry = new STentry(nestingLevel, type, -1);
+			//TODO This offset doesn't change anything?
+			stEntry = new STentry(nestingLevel, type, 0);
 		} else {
-			stEntry = new STentry(nestingLevel, type, offset++);
+			stEntry = new STentry(nestingLevel, type, --offset);
 		}
 		STentry declaration = getCurrentST().put(id, stEntry);
 		if (declaration != null) {
@@ -404,21 +406,21 @@ public class Environment {
 	@Override
 	public String toString() {
 
-		String st = "";
+		StringBuilder st = new StringBuilder();
 		String hs="";
-
+		System.out.println("SYM " +symTable);
 		for (HashMap<String, STentry> hm: symTable){
 			for (String k: hm.keySet()){
-				hs = new StringBuilder().append("\t").append(k).append("->").append(hm.get(k).toString()).append("\n").toString();
+				hs = "\t" + k + "->" + hm.get(k).toString() + "\n";
 			}
-			st+=hs+'\n';
+			st.append(hs).append('\n');
 		}
 
 		return "Environment{" +
-				"\n\tsymTable=" + st +
-				", \n\tnestingLevel=" + nestingLevel +
+				"\n\tsymTable=\n\t\t" + symTable +
+				"\tnestingLevel=" + nestingLevel +
 				", \n\toffset=" + offset +
-				'}';
+				"\n\t}";
 	}
 
 	/**

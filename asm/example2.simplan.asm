@@ -11,7 +11,7 @@ jal  Function8// jump to start of function and put in $ra next istruction
 push $a0
 
 mv $fp $al //put in $al actual fp
-lw $a0 -1($al) //put in $a0 value of Id
+lw $a0 -1($al) //put in $a0 value of Id x
 
 print $a0
 
@@ -23,7 +23,7 @@ mv $sp $fp
 push $ra
 //Start codegen of ast.node.exp.IdExpNode==ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
-lw $a0 1($al) //put in $a0 value of Id
+lw $a0 1($al) //put in $a0 value of Id n
 push $a0 // push e1
 li $a0 0
 lw $a2 0($sp) //take e2 and $a2 take e1
@@ -33,7 +33,7 @@ eq $a0 $a2 $a0 // $a0 = $a2 == $a0
 bc $a0 LABELthen3
 //Start codegen of ast.node.exp.IdExpNode==ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
-lw $a0 1($al) //put in $a0 value of Id
+lw $a0 1($al) //put in $a0 value of Id n
 push $a0 // push e1
 li $a0 1
 lw $a2 0($sp) //take e2 and $a2 take e1
@@ -49,7 +49,7 @@ push $fp
 //Start codegen of ast.node.exp.IdExpNode-ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
-lw $a0 1($al) //put in $a0 value of Id
+lw $a0 1($al) //put in $a0 value of Id n
 push $a0 // push e1
 li $a0 2
 lw $a2 0($sp) //take e2 and $a2 take e1
@@ -68,7 +68,7 @@ push $fp
 //Start codegen of ast.node.exp.IdExpNode-ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
-lw $a0 1($al) //put in $a0 value of Id
+lw $a0 1($al) //put in $a0 value of Id n
 push $a0 // push e1
 li $a0 1
 lw $a2 0($sp) //take e2 and $a2 take e1
@@ -135,7 +135,7 @@ mv $sp $fp
 push $ra
 //Start codegen of ast.node.exp.IdExpNode==ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
-lw $a0 1($al) //put in $a0 value of Id
+lw $a0 1($al) //put in $a0 value of Id a
 push $a0 // push e1
 li $a0 0
 lw $a2 0($sp) //take e2 and $a2 take e1
@@ -152,13 +152,13 @@ push $a0 // push e1
 push $fp
 mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
-lw $a0 2($al) //put in $a0 value of Id
+lw $a0 2($al) //put in $a0 value of Id b
 
 push $a0
 //Start codegen of ast.node.exp.IdExpNode-ast.node.exp.single_exp.IntNode
 mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
-lw $a0 1($al) //put in $a0 value of Id
+lw $a0 1($al) //put in $a0 value of Id a
 push $a0 // push e1
 li $a0 1
 lw $a2 0($sp) //take e2 and $a2 take e1
@@ -189,7 +189,7 @@ push $fp //loadind new block
 mv $sp $fp //Load new $fp
 mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
-lw $a0 2($al) //put in $a0 value of Id
+lw $a0 2($al) //put in $a0 value of Id b
 
 lw $fp 0($fp) //Load old $fp pushed 
 subi $sp $fp 1 //Restore stackpointer as before block creation in return 
