@@ -19,17 +19,11 @@ import semantic.SimplanPlusException;
 public class LhsExpNode extends ExpNode implements Dereferenceable {
 
     protected LhsExpNode inner;
-    protected LhsNode lhs;
 
   public LhsExpNode (LhsExpNode i) {
 	  inner=i;
   }
 
-    public LhsExpNode(LhsExpNode i, LhsNode visitLhs) {
-        inner = i;
-        lhs = visitLhs;
-
-    }
 
     public String getID() {
 	  return inner.getID();
@@ -50,6 +44,7 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
   }
   
   public int getDereferenceLevel(){
+      System.out.println("inner "+ inner);
 	  if (inner!=null)
 		  return 1+inner.getDereferenceLevel();
 	  else

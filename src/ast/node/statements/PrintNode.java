@@ -45,6 +45,7 @@ public class PrintNode extends MetaNode {
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
       ArrayList<EffectError> errors = new ArrayList<>();
+      System.out.println("PRINT");
       errors.addAll(val.checkEffects(env));
       return errors;
     }

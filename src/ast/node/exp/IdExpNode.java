@@ -112,7 +112,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
 
         Effect actualStatus = entry.getDereferenceLevelVariableStatus(getDereferenceLevel());
         System.out.println("ID exp status "+entry.getStatusList());
-        System.out.println("ID exp status "+entry.getStatusList().get(getDereferenceLevel()));
+        System.out.println("ID exp status "+getDereferenceLevel());
         if (actualStatus.equals(Effect.INITIALIZED)) {
             errors.add(new EffectError(this.getID() + " used before writing value. IdExpNode"));
         }

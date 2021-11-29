@@ -102,11 +102,13 @@ public class AssignmentNode extends MetaNode {
 
         }
         env.addEntry(lhs.getID(),lhs.getEntry());
-        System.out.println(lhs.getEntry().getStatusList());
+        System.out.println("return "+returnedEffectList);
         //lhs.setEntry(lhs.getEntry());
       }
       else { // lhs is not in error status and exp is not a pointer.
         lhs.getEntry().setDereferenceLevelVariableStatus(new Effect(Effect.READWRITE), lhs.getDereferenceLevel());
+        System.out.println("new "+ lhs.getDereferenceLevel()+": "+lhs.getEntry().getStatusList());
+
       }
       return errors;
     }
