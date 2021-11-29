@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.Dereferenceable;
-import ast.node.LhsNode;
-import ast.node.Node;
-import ast.node.dec.FunNode;
 import ast.node.types.IntTypeNode;
 import ast.node.types.TypeUtils;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.EffectError;
 import semantic.Environment;
@@ -56,8 +53,8 @@ public class NegExpNode extends ExpNode {
 		return cgen.toString();
 	}
 
-	public RetEffType retTypeCheck() {
-	  return new RetEffType(RetEffType.RetT.ABS);
+	public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
 	@Override

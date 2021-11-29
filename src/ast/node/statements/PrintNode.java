@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import ast.node.MetaNode;
 import ast.node.Node;
-import ast.node.dec.FunNode;
+import ast.node.exp.ExpNode;
 import ast.node.types.*;
 import effect.EffectError;
 import semantic.Environment;
@@ -38,8 +38,8 @@ public class PrintNode extends MetaNode {
  	  return val.checkSemantics(env);
  	}
   
-  public RetEffType retTypeCheck() {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
     @Override

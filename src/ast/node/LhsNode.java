@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import ast.Dereferenceable;
 import ast.STentry;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.Effect;
 import effect.EffectError;
@@ -79,8 +79,8 @@ public class LhsNode extends MetaNode implements Dereferenceable {
             return null;
     }
 
-    public RetEffType retTypeCheck() {
-      return new RetEffType(RetEffType.RetT.ABS);
+    public HasReturn retTypeCheck() {
+      return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
     @Override

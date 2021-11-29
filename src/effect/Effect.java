@@ -50,6 +50,20 @@ public class Effect {
         return new Effect(maxStatus);
     }
 
+    public static Effect maxEffectNoCopy(final Effect effect1, final Effect effect2) {
+        int maxStatus = Math.max(effect1.status, effect2.status);
+        switch (maxStatus){
+            case INIT:
+                return Effect.INITIALIZED;
+            case RW:
+                return Effect.READWRITE;
+            case DEL:
+                return Effect.DELETED;
+            default:
+                return Effect.ERROR;
+        }
+    }
+
     public static Effect sequenceEffect(final Effect effect1, final Effect effect2) {
 
         if (maxEffect(effect1, effect2).status <= RW)

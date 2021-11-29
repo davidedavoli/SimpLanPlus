@@ -5,20 +5,17 @@ import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.dec.VarNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import ast.Label;
-import ast.node.types.VoidTypeNode;
 import effect.EffectError;
 import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
-
-import javax.crypto.AEADBadTagException;
 
 public class BlockNode extends MetaNode {
 
@@ -132,13 +129,14 @@ public class BlockNode extends MetaNode {
       return res;
   }
   
-  public RetEffType retTypeCheck() {
-	  RetEffType tmp = new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+	  HasReturn tmp = new HasReturn(HasReturn.hasReturnType.ABS);
 	  for (Node s:statements) {
-			  tmp= RetEffType.max(tmp, s.retTypeCheck());
+			  tmp= HasReturn.max(tmp, s.retTypeCheck());
 	  }
 	  return tmp;
   }
+
 
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {

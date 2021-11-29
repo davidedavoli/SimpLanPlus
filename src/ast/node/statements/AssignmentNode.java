@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.Dereferenceable;
-import ast.STentry;
 import ast.node.LhsNode;
 import ast.node.MetaNode;
+import ast.node.dec.FunNode;
+import ast.node.exp.CallExpNode;
 import ast.node.exp.ExpNode;
 import ast.node.exp.LhsExpNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
 import effect.Effect;
@@ -62,8 +63,8 @@ public class AssignmentNode extends MetaNode {
   }
 
 
-  public RetEffType retTypeCheck() {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
     @Override
@@ -88,6 +89,21 @@ public class AssignmentNode extends MetaNode {
           Effect status = rhsPointer.getEntry().getDereferenceLevelVariableStatus(j);
           lhs.setIdStatus(status,i);
         }
+      }
+      else if(exp instanceof CallExpNode){
+        List<Effect> returnedEffectList = ((CallExpNode) exp).innerEntry().getReturnList();
+
+        int lhsDereferenceLevel = lhs.getDereferenceLevel();
+
+        for (int i = lhsDereferenceLevel, j = 0; i < returnedEffectList.size(); i++, j++) {
+          Effect status = returnedEffectList.get(j);
+          //lhs.setIdStatus(status,i);
+          lhs.getEntry().setDereferenceLevelVariableStatus(status,i);
+
+        }
+        env.addEntry(lhs.getID(),lhs.getEntry());
+        System.out.println(lhs.getEntry().getStatusList());
+        //lhs.setEntry(lhs.getEntry());
       }
       else { // lhs is not in error status and exp is not a pointer.
         lhs.getEntry().setDereferenceLevelVariableStatus(new Effect(Effect.READWRITE), lhs.getDereferenceLevel());

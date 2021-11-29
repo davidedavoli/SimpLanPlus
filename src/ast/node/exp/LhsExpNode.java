@@ -7,7 +7,7 @@ import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.LhsNode;
 import ast.node.dec.FunNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.Effect;
 import effect.EffectError;
@@ -99,8 +99,8 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
 		return null;
   }
   
-  public RetEffType retTypeCheck(FunNode funNode) {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck(FunNode funNode) {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
     public List<Dereferenceable> variables() {
         List<Dereferenceable> variable = new ArrayList<>();

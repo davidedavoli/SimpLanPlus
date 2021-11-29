@@ -26,7 +26,8 @@ public class Cell {
 
     public Integer read() throws SimplanPlusException {
         if(val == null){
-            throw new SimplanPlusException("Value is not written in memory");
+            System.err.println("Value is not written in memory");
+            System.exit(1);
         }
         return val;
     }

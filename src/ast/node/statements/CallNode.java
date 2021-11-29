@@ -1,8 +1,6 @@
 package ast.node.statements;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import ast.Dereferenceable;
 import ast.STentry;
@@ -28,6 +26,9 @@ public class CallNode extends MetaNode {
   private Boolean isAlreadyCalled;
 
 
+  public STentry getEntry(){
+      return this.entry;
+  }
   
   public CallNode(IdNode id, ArrayList<ExpNode> args) {
 	this.id=id;
@@ -44,9 +45,9 @@ public String toPrint(String s) throws SimplanPlusException {  //
            +parlstr;        
   }
 
-public RetEffType retTypeCheck() {
+public HasReturn retTypeCheck() {
 
-	  return new RetEffType(RetEffType.RetT.ABS);
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
 }
 
     @Override
@@ -160,13 +161,13 @@ public RetEffType retTypeCheck() {
             /**
              * actualDereference = 5-2 = 3
              [ [0:c0,1:c1] ]
+
              0:c0->3:c3, 1:c1->4:c4
+
              [0:c0,1:c1,2:c2,3:c3,4:c4]
 
              */
-            System.out.println("FUNCTION "+functionEffects.get(i));
-            System.out.println("ENV "+env.effectsLookUp(pointer.getID()).getStatusList());
-            for (int dereferenceLevel = 0; dereferenceLevel < functionEffects.get(i).size()/*pointer.getEntry().getMaxDereferenceLevel()-actualDereference*/; dereferenceLevel++) {
+            for (int dereferenceLevel = 0; dereferenceLevel < functionEffects.get(i).size(); dereferenceLevel++) {
                 Effect u_iEffect = env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(dereferenceLevel+actualDereference);
                 Effect x_iEffect = functionEffects.get(i).get(dereferenceLevel);
                 Effect seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
@@ -178,7 +179,6 @@ public RetEffType retTypeCheck() {
                 System.out.println("SETTING "+index+" status");
                 entry.setDereferenceLevelVariableStatus(env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(index), index+actualDereference);
             }*/
-            System.out.println("SEQUENCE "+entry.getStatusList());
             parEnvironments.add(tmpEnvironment);
         }
 

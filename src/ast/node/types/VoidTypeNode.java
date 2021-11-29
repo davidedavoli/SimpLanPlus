@@ -2,7 +2,6 @@ package ast.node.types;
 
 import java.util.ArrayList;
 
-import ast.node.dec.FunNode;
 import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
@@ -28,8 +27,8 @@ public class VoidTypeNode implements TypeNode {
     return null;
   }
   
-  public RetEffType retTypeCheck() {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
     @Override

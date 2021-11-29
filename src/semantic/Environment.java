@@ -408,7 +408,6 @@ public class Environment {
 
 		StringBuilder st = new StringBuilder();
 		String hs="";
-		System.out.println("SYM " +symTable);
 		for (HashMap<String, STentry> hm: symTable){
 			for (String k: hm.keySet()){
 				hs = "\t" + k + "->" + hm.get(k).toString() + "\n";

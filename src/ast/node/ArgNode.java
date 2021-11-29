@@ -2,8 +2,7 @@ package ast.node;
 
 import java.util.ArrayList;
 
-import ast.node.dec.FunNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.EffectError;
 import semantic.Environment;
@@ -45,8 +44,8 @@ public class ArgNode extends MetaNode {
      return null;
   }
   
-  public RetEffType retTypeCheck() {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
     @Override

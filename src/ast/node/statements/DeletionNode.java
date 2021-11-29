@@ -8,7 +8,7 @@ import ast.STentry;
 import ast.node.IdNode;
 import ast.node.MetaNode;
 import ast.node.types.PointerTypeNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.Effect;
 import effect.EffectError;
@@ -50,8 +50,8 @@ public class DeletionNode extends MetaNode {
     return id.typeCheck();
   }
   
-  public RetEffType retTypeCheck() {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
     @Override

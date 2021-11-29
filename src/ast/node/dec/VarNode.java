@@ -4,7 +4,7 @@ import ast.STentry;
 import ast.node.IdNode;
 import ast.node.MetaNode;
 import ast.node.Node;
-    import ast.node.types.RetEffType;
+    import ast.node.types.HasReturn;
     import ast.node.types.TypeNode;
 
     import java.util.ArrayList;
@@ -65,8 +65,8 @@ public class VarNode extends MetaNode {
             +((exp==null)?"":exp.toPrint(s+"  "));
     }
 
-    public RetEffType retTypeCheck() {
-    return new RetEffType(RetEffType.RetT.ABS);
+    public HasReturn retTypeCheck() {
+    return new HasReturn(HasReturn.hasReturnType.ABS);
     }
 
 

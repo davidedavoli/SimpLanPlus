@@ -2,11 +2,9 @@ package ast.node.exp;
 
 import ast.Dereferenceable;
 import ast.Label;
-import ast.node.LhsNode;
-import ast.node.Node;
-import ast.node.dec.FunNode;
+import ast.STentry;
 import ast.node.statements.CallNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.EffectError;
 import semantic.Environment;
@@ -26,7 +24,9 @@ public class CallExpNode extends ExpNode {
     public String toPrint(String indent) throws SimplanPlusException {
         return inner.toPrint(indent);
     }
-
+    public STentry innerEntry(){
+        return inner.getEntry();
+    }
     @Override
     public TypeNode typeCheck() throws SimplanPlusException {
         return inner.typeCheck();
@@ -43,7 +43,7 @@ public class CallExpNode extends ExpNode {
     }
 
     @Override
-    public RetEffType retTypeCheck() {
+    public HasReturn retTypeCheck() {
         return inner.retTypeCheck();
     }
 

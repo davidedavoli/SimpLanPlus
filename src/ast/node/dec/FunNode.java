@@ -1,6 +1,8 @@
 package ast.node.dec;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import ast.Dereferenceable;
 import ast.FuncBodyUtils;
 import ast.Label;
 import ast.STentry;
@@ -8,7 +10,11 @@ import ast.node.ArgNode;
 import ast.node.IdNode;
 import ast.node.MetaNode;
 import ast.node.Node;
+import ast.node.exp.ExpNode;
+import ast.node.exp.IdExpNode;
+import ast.node.exp.LhsExpNode;
 import ast.node.statements.BlockNode;
+import ast.node.statements.RetNode;
 import ast.node.types.*;
 import effect.Effect;
 import effect.EffectError;
@@ -24,7 +30,7 @@ public class FunNode extends MetaNode {
   private ArrowTypeNode functionType; //just for ST
   private ArrayList<TypeNode> partypes;
   private final ArrayList<Node> parlist = new ArrayList<>();
-  //private ArrayList<Node> declist;
+  private List<Effect> returnEffect = new ArrayList<>();
   private BlockNode body;
   private String beginFuncLabel = "";
   private String endFuncLabel = "";
@@ -77,8 +83,8 @@ public class FunNode extends MetaNode {
     return new ArrowTypeNode(partypes, type);
   }
 
-  public RetEffType retTypeCheck() {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
 
@@ -129,19 +135,28 @@ public class FunNode extends MetaNode {
 			env.popFunScope();
 		}
 
-		RetEffType abs = new RetEffType(RetEffType.RetT.ABS);
-		//RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
+		HasReturn noReturn = new HasReturn(HasReturn.hasReturnType.ABS);
+		//RetEffType isReturn = new RetEffType(RetEffType.RetT.PRES);
 
-		if ( body.retTypeCheck().leq(abs) && !(type instanceof VoidTypeNode)) {
+		if ( body.retTypeCheck().leq(noReturn) && !(type instanceof VoidTypeNode)) {
 			res.add(new SemanticError("Possible absence of return value"));
 		}
-      /*if ((type instanceof VoidTypeNode) && pres.leq(body.retTypeCheck())) {
+      /*if ((type instanceof VoidTypeNode) && isReturn.leq(body.retTypeCheck())) {
     	  res.add(new SemanticError("Return statement in void function"));
       }*/
 
 
 		return res;
 	}
+
+	public List<RetNode> returnNodeInBlock(){
+
+		return body.getGrandChildren().stream()
+				.filter( metaNode -> metaNode instanceof RetNode)
+				.map(metaNode -> (RetNode)metaNode)
+				.collect(Collectors.toList());
+	}
+
 
 	/**
 	 * @param env Environment
@@ -152,7 +167,6 @@ public class FunNode extends MetaNode {
 	  ArrayList<EffectError> errors = new ArrayList<>();
 
 	  // create a new entry in STable  with the function id
-
 	  	env.addEntry(this.id, functionIdNode.getEntry());
 		functionIdNode.getEntry().setFunctionNode(this);
 		functionIdNode.getEntry().setBeginLabel(beginFuncLabel);
@@ -264,13 +278,53 @@ public class FunNode extends MetaNode {
 				idEntry.setParameterStatus(argIndex, argStatuses.get(dereferenceLevel), dereferenceLevel);
 			}
 		}
+		List<Effect> maxReturnEffect = getMaxEffect();
+
+		idEntry.setResultList(maxReturnEffect);
 
 		return errors;
 	}
 
+	public List<Effect> getMaxEffect(){
+		List<RetNode> listOfReturnNodeFunction = returnNodeInBlock();
+		List<List<Effect>> returnNodeEffect= new ArrayList<>();
+		for (RetNode returnNode: listOfReturnNodeFunction){
+			ExpNode returnValue = returnNode.getValNode();
+			if(returnValue != null){
+
+				if(returnValue instanceof  Dereferenceable){
+					Dereferenceable returnValueDereference = (Dereferenceable) returnValue;
+					returnNodeEffect.add(returnValueDereference.getEntry().getStatusList());
+				}
+				else{
+					List<Effect> expNodeEffect = new ArrayList<>();
+					expNodeEffect.add(Effect.READWRITE);
+					returnNodeEffect.add(expNodeEffect);
+				}
+			}
+
+		}
+		List<Effect> maxReturnEffect = returnNodeEffect.get(0);
+		for(int i=1;i<returnNodeEffect.size()-1;i++){
+
+			for(int j=0;j<returnNodeEffect.get(i).size();j++){
+				Effect maxEffect = Effect.maxEffect(
+						maxReturnEffect.get(j),
+						returnNodeEffect.get(i).get(j)
+				);
+				maxReturnEffect.set(j,maxEffect);
+
+			}
+		}
+		return  maxReturnEffect;
+	}
 	private ArrayList<EffectError> checkBodyAndUpdateArgs(Environment env, STentry innerFunEntry){
 		ArrayList<EffectError> errors = new ArrayList<>();
 		errors.addAll(body.checkEffects(env));
+		List<Effect> maxReturnEffect = getMaxEffect();
+
+		innerFunEntry.setResultList(maxReturnEffect);
+		//System.out.println("max Effect returning from function check body "+innerFunEntry.getReturnList());
 
 		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
 			ArgNode arg = (ArgNode) parlist.get(argIndex);
@@ -284,6 +338,7 @@ public class FunNode extends MetaNode {
 				innerFunEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(dereferenceLevel), dereferenceLevel);
 
 			}
+			functionEntry.setResultList(maxReturnEffect);
 		}
 		return errors;
 	}
@@ -302,9 +357,9 @@ public class FunNode extends MetaNode {
 	  cgen.append("push $ra\n");
 
 
-		RetEffType pres = new RetEffType(RetEffType.RetT.PRES);
+		HasReturn returnEffect = new HasReturn(HasReturn.hasReturnType.PRES);
 
-		if ((type instanceof VoidTypeNode) && !pres.leq(body.retTypeCheck())) {
+		if ((type instanceof VoidTypeNode) && !returnEffect.leq(body.retTypeCheck())) {
 			StringBuilder missingReturnCode = new StringBuilder();
 
 			missingReturnCode.append("subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return \n");

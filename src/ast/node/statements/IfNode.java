@@ -6,7 +6,7 @@ import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.exp.ExpNode;
 import ast.node.types.BoolTypeNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
 import effect.EffectError;
@@ -53,14 +53,14 @@ public class IfNode extends MetaNode {
 	  return res;
   }
   
-  public RetEffType retTypeCheck() {
-      RetEffType th_v=th.retTypeCheck();
-      RetEffType el_v=(el!=null)?el.retTypeCheck():new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+      HasReturn th_v=th.retTypeCheck();
+      HasReturn el_v=(el!=null)?el.retTypeCheck():new HasReturn(HasReturn.hasReturnType.ABS);
       //do not remove these lines: retTypeCheck has a side-effect;
 	  if (el!=null)
-		  return RetEffType.min(th_v, el_v);
+		  return HasReturn.min(th_v, el_v);
 	  else
-		  return new RetEffType(th_v.getVal());//RetEffType.RetT.ABS);
+		  return new HasReturn(th_v.getVal());//RetEffType.RetT.ABS);
   }
 
     @Override

@@ -6,7 +6,7 @@ import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.PointerTypeNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.Effect;
 import effect.EffectError;
@@ -84,8 +84,8 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
     return entry.getType();
   }
   
-  public RetEffType retTypeCheck() {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
   public String codeGeneration(Label labelManager) throws SimplanPlusException {
@@ -111,6 +111,8 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
         entry = env.effectsLookUp(id);
 
         Effect actualStatus = entry.getDereferenceLevelVariableStatus(getDereferenceLevel());
+        System.out.println("ID exp status "+entry.getStatusList());
+        System.out.println("ID exp status "+entry.getStatusList().get(getDereferenceLevel()));
         if (actualStatus.equals(Effect.INITIALIZED)) {
             errors.add(new EffectError(this.getID() + " used before writing value. IdExpNode"));
         }

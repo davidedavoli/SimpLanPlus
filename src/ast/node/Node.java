@@ -1,7 +1,6 @@
 package ast.node;
 
-import ast.node.dec.FunNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public interface Node {
   
   //ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl);
 
-  RetEffType retTypeCheck();
+  HasReturn retTypeCheck();
 
   ArrayList<EffectError> checkEffects(Environment env);
 

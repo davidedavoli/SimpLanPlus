@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import ast.node.Node;
-import ast.node.dec.FunNode;
 import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
@@ -61,8 +60,8 @@ public class ArrowTypeNode implements TypeNode {
     return null;
   }
   
-  public RetEffType retTypeCheck() {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
   @Override

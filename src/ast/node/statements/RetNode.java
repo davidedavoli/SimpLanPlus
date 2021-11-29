@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
-import ast.node.types.RetEffType;
+import ast.node.exp.ExpNode;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
 import ast.node.types.VoidTypeNode;
@@ -25,6 +26,11 @@ public class RetNode extends MetaNode {
     public RetNode (Node v, TypeNode e) {
     val=v;
     etype=e;
+  }
+
+  public ExpNode getValNode(){
+        return (ExpNode) this.val;
+
   }
   
   
@@ -63,9 +69,9 @@ public class RetNode extends MetaNode {
             throw new SimplanPlusException("Wrong return type for function");
   }  
   
-  public RetEffType retTypeCheck() {
+  public HasReturn retTypeCheck() {
 //        parent_f = funNode;
-	    return new RetEffType(RetEffType.RetT.PRES);
+	    return new HasReturn(HasReturn.hasReturnType.PRES);
   }
 
     @Override

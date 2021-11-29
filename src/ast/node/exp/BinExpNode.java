@@ -1,12 +1,9 @@
 package ast.node.exp;
 
 import ast.Dereferenceable;
-import ast.node.LhsNode;
-import ast.node.Node;
-import ast.node.dec.FunNode;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.IntTypeNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.EffectError;
 import semantic.Environment;
@@ -239,7 +236,7 @@ public class BinExpNode extends ExpNode {
     }
 
     @Override
-    public RetEffType retTypeCheck() {
+    public HasReturn retTypeCheck() {
         return null;
     }
 }

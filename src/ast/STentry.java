@@ -15,8 +15,9 @@ public class STentry {
   private TypeNode type;
   private final int offset;
 
-  // status of variable
+  // status of variable & return & parameter
   private final List<Effect> variableStatus;
+  private final List<Effect> returnStatus;
   private final List<List<Effect>> parametersStatus;
 
   //Fun entry
@@ -29,6 +30,7 @@ public class STentry {
     this.type = type;
     this.offset = offset;
     this.variableStatus = new ArrayList<>();
+    this.returnStatus = new ArrayList<>();
     this.parametersStatus = new ArrayList<>();
     //Effect initEffect = new Effect();
 
@@ -43,19 +45,14 @@ public class STentry {
         }
         this.parametersStatus.add(paramStatus);
       }
+
+      int maxReturnLen = ((ArrowTypeNode) type).getRet().getDereferenceLevel();
+      for(int index=0; index <= maxReturnLen; index++ ){
+        this.returnStatus.add(new Effect(Effect.INITIALIZED));
+      }
+
     }
     else{
-     /* try{
-        //int deferenceLevel = ((PointerTypeNode) type).getDereferenceLevel();
-        int deferenceLevel = type.getDereferenceLevel();
-        for(int g=0; g <= deferenceLevel;g++){
-          this.variableStatus.add(new Effect(Effect.INITIALIZED));
-        }
-      }
-      catch(Exception e){
-        this.variableStatus.add(new Effect(Effect.INITIALIZED));
-
-      }*/
       int deferenceLevel = type.getDereferenceLevel();
       for(int g=0; g <= deferenceLevel;g++){
         this.variableStatus.add(new Effect(Effect.INITIALIZED));
@@ -75,6 +72,7 @@ public class STentry {
     this.offset = entry.getOffset();
     this.type = entry.getType();
     this.variableStatus = new ArrayList<>();
+    this.returnStatus = new ArrayList<>();
     this.parametersStatus = new ArrayList<>();
 
     for (var fnStatus : entry.parametersStatus) {
@@ -181,6 +179,7 @@ public class STentry {
             ", \n\t\toffset=" + offset +
             ", \n\t\tvariableStatus=" + variableStatus +
             ", \n\t\tparametersStatus=" + parametersStatus +
+            ", \n\t\treturnStatus=" + returnStatus +
             ", \n\t\tbeginFuncLabel='" + beginFuncLabel + '\'' +
             ", \n\t\tendFuncLabel='" + endFuncLabel + '\'' +
             ", \n\t\tfunNode=" + funNode +
@@ -193,5 +192,15 @@ public class STentry {
 
   public void setEndLabel(String endFuncLabel) {
     this.endFuncLabel = endFuncLabel;
+  }
+
+  public void setResultList(List<Effect> resultList) {
+    for(int i=0;i<resultList.size();i++){
+      this.returnStatus.set(i,resultList.get(i));
+    }
+  }
+
+  public List<Effect> getReturnList() {
+    return this.returnStatus;
   }
 }

@@ -6,7 +6,7 @@ import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.PointerTypeNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.Effect;
 import effect.EffectError;
@@ -70,8 +70,8 @@ public class IdNode extends LhsNode implements Dereferenceable {
     return entry.getType();
   }
   
-  public RetEffType retTypeCheck() {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
   
   public String codeGeneration(Label labelManager){

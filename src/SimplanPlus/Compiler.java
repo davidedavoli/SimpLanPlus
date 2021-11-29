@@ -144,9 +144,9 @@ public class Compiler {
 	public static void main(String[] args) throws Exception {
 
 
-		int numberSingle = 1;
-		String dire = "examples/";
-		String fileAbsNameSingle = dire + baseName + numberSingle + ext;
+		int numberSingle = 12;
+		String dire = "tommasoExamples/";
+		String fileAbsNameSingle = dir + baseName + numberSingle + ext;
 		String fileNameSingle = baseName + numberSingle + ext;
 		compileFile(fileAbsNameSingle,fileNameSingle);
 

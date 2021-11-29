@@ -3,7 +3,7 @@ package ast.node.exp;
 import ast.Dereferenceable;
 import ast.Label;
 import ast.node.MetaNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.Effect;
 import effect.EffectError;
@@ -36,7 +36,7 @@ public abstract class ExpNode extends MetaNode {
     }
 
     @Override
-    public RetEffType retTypeCheck() {
+    public HasReturn retTypeCheck() {
         return null;
     }
 
