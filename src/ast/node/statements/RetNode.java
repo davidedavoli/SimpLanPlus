@@ -60,9 +60,11 @@ public class RetNode extends MetaNode {
 
   
   public TypeNode typeCheck() throws SimplanPlusException {
-        if(val == null){
+        //TODO da chiedere
+        if(etype instanceof VoidTypeNode && val != null)
+          throw new SimplanPlusException("Returning val in void function");
+        else if(val == null)
             return new VoidTypeNode();
-        }
         else if (TypeUtils.isSubtype(val.typeCheck(), etype))
             return etype;
         else

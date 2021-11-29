@@ -10,9 +10,10 @@
         return x;
     }
 
-    ^int x;
-    x = mynew();
-    print x^;
+    ^^int x;
+    x = new ^int;
+    x^ = mynew();
+    print x^^;
     //x^ = 2;
 
     //print global^;

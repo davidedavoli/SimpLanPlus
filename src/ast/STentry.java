@@ -3,6 +3,7 @@ package ast;
 import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.TypeNode;
+import ast.node.types.VoidTypeNode;
 import effect.Effect;
 import semantic.SimplanPlusException;
 
@@ -46,10 +47,18 @@ public class STentry {
         this.parametersStatus.add(paramStatus);
       }
 
-      int maxReturnLen = ((ArrowTypeNode) type).getRet().getDereferenceLevel();
-      for(int index=0; index <= maxReturnLen; index++ ){
+      if(((ArrowTypeNode) type).getRet() instanceof Dereferenceable){
+        int maxReturnLen = ((ArrowTypeNode) type).getRet().getDereferenceLevel();
+        for(int index=0; index <= maxReturnLen; index++ ){
+          this.returnStatus.add(new Effect(Effect.INITIALIZED));
+        }
+      }
+      else{
+        System.out.println("else");
         this.returnStatus.add(new Effect(Effect.INITIALIZED));
       }
+
+
 
     }
     else{
@@ -195,7 +204,10 @@ public class STentry {
   }
 
   public void setResultList(List<Effect> resultList) {
-    for(int i=0;i<resultList.size();i++){
+    if(this.returnStatus.size()==0 && type instanceof ArrowTypeNode && !(((ArrowTypeNode) type).getRet() instanceof VoidTypeNode)){
+      this.returnStatus.add(Effect.READWRITE);
+    }
+    for(int i=0;i<returnStatus.size();i++){
       this.returnStatus.set(i,resultList.get(i));
     }
   }

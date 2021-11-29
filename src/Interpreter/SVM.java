@@ -103,14 +103,6 @@ public class SVM {
                             regStore(arg1,value);
                             break;
                         case SVMParser.LOADW:
-                            // check if object address where we take the method label
-                            // is null value (-10000) //TODO l'if è un fossile del codice di Simplan, si valuti se tenerlo o rimuoverlo
-                    /*
-                    if (memory[sp] == -10000) {
-                        System.out.println("\nError: Null pointer exception");
-                        return;
-                    }
-                     */
                             offset = Integer.parseInt(arg2);
                             address = offset + regRead(arg3);
                             regStore(arg1, memory.read(address));

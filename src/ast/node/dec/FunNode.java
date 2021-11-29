@@ -203,8 +203,8 @@ public class FunNode extends MetaNode {
 	 */
 	public ArrayList<EffectError> fixPointCheckEffect(Environment env, List<List<Effect>> effects){
 	  ArrayList<EffectError> errors = new ArrayList<>();
-
-	  // =====================================================================
+	  List<Effect> maxReturnEffect = new ArrayList<>();
+				// =====================================================================
 	  // 1. copy the old env, before analyze the body of the function
 		env.createVoidScope();
 
@@ -278,9 +278,12 @@ public class FunNode extends MetaNode {
 				idEntry.setParameterStatus(argIndex, argStatuses.get(dereferenceLevel), dereferenceLevel);
 			}
 		}
-		List<Effect> maxReturnEffect = getMaxEffect();
+		if(!(type instanceof VoidTypeNode)){
+			maxReturnEffect = getMaxEffect();
 
-		idEntry.setResultList(maxReturnEffect);
+			idEntry.setResultList(maxReturnEffect);
+		}
+
 
 		return errors;
 	}
@@ -302,7 +305,6 @@ public class FunNode extends MetaNode {
 					returnNodeEffect.add(expNodeEffect);
 				}
 			}
-
 		}
 		List<Effect> maxReturnEffect = returnNodeEffect.get(0);
 		for(int i=1;i<returnNodeEffect.size()-1;i++){
@@ -321,9 +323,13 @@ public class FunNode extends MetaNode {
 	private ArrayList<EffectError> checkBodyAndUpdateArgs(Environment env, STentry innerFunEntry){
 		ArrayList<EffectError> errors = new ArrayList<>();
 		errors.addAll(body.checkEffects(env));
-		List<Effect> maxReturnEffect = getMaxEffect();
+		List<Effect> maxReturnEffect = new ArrayList<>();
+		if(!(type instanceof VoidTypeNode)){
+			maxReturnEffect = getMaxEffect();
 
-		innerFunEntry.setResultList(maxReturnEffect);
+			innerFunEntry.setResultList(maxReturnEffect);
+		}
+
 		//System.out.println("max Effect returning from function check body "+innerFunEntry.getReturnList());
 
 		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
@@ -338,7 +344,14 @@ public class FunNode extends MetaNode {
 				innerFunEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(dereferenceLevel), dereferenceLevel);
 
 			}
-			functionEntry.setResultList(maxReturnEffect);
+			/*System.out.println("function " +functionEntry);
+			System.out.println("max " +maxReturnEffect);*/
+			if(!(type instanceof VoidTypeNode)){
+				functionEntry.setResultList(maxReturnEffect);
+			}
+
+			//System.out.println("function " +functionEntry);
+
 		}
 		return errors;
 	}

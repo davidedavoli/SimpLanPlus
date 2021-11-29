@@ -1,0 +1,16 @@
+{
+   ^int global1;
+   ^int global2;
+   ^int x;
+   if(true){
+       global1=new int;
+       x = global1;
+    }
+   else{
+       global2 = new int;
+       x = global2;
+   }
+   x^ = 2;
+   delete global1;
+   print x^;
+}

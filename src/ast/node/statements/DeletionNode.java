@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import ast.STentry;
 import ast.node.IdNode;
 import ast.node.MetaNode;
+import ast.node.exp.IdExpNode;
 import ast.node.types.PointerTypeNode;
 import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
@@ -19,11 +20,11 @@ import semantic.SimplanPlusException;
 
 public class DeletionNode extends MetaNode {
 
-  private IdNode id;
+  private final IdExpNode id;
   private TypeNode type;
   private STentry entry;
-  
-  public DeletionNode (IdNode i) {
+
+  public DeletionNode (IdExpNode i) {
     id=i;
     type=null;
     entry=null;
@@ -69,7 +70,7 @@ public class DeletionNode extends MetaNode {
         errors.add(new EffectError(id.getID() + " already deleted."));
       } else {
         errors.addAll(env.checkStmStatus(
-                id,//new LhsNode(id),
+                id,
                 Effect::sequenceEffect,
                 Effect.DELETED)
         );

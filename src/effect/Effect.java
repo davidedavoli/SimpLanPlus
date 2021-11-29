@@ -51,17 +51,10 @@ public class Effect {
     }
 
     public static Effect maxEffectNoCopy(final Effect effect1, final Effect effect2) {
-        int maxStatus = Math.max(effect1.status, effect2.status);
-        switch (maxStatus){
-            case INIT:
-                return Effect.INITIALIZED;
-            case RW:
-                return Effect.READWRITE;
-            case DEL:
-                return Effect.DELETED;
-            default:
-                return Effect.ERROR;
-        }
+        if(effect1.status > effect2.status)
+            return effect1;
+        else
+            return effect2;
     }
 
     public static Effect sequenceEffect(final Effect effect1, final Effect effect2) {

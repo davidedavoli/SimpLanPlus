@@ -217,7 +217,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	public Node visitDeletion(DeletionContext ctx) {
 		MetaNode res;
 
-		IdNode id = new IdNode(ctx.ID().getText());
+		IdExpNode id = new IdExpNode(ctx.ID().getText());
 		res = new DeletionNode(id);
 		id.setParent(res);
 

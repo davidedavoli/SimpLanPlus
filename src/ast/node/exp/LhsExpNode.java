@@ -44,13 +44,11 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
   }
   
   public int getDereferenceLevel(){
-      System.out.println("inner "+ inner);
 	  if (inner!=null)
 		  return 1+inner.getDereferenceLevel();
 	  else
 		  return 0;
   }
-
   public STentry getEntry(){
 	  if (inner!=null)
 		  return inner.getEntry();

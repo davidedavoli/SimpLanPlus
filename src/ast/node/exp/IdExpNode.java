@@ -77,9 +77,8 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
 	}
   
   public TypeNode typeCheck () throws SimplanPlusException {
-	if (entry.getType() instanceof ArrowTypeNode) { //
+	if (entry.getType() instanceof ArrowTypeNode) {
 	  throw new SimplanPlusException("Wrong usage of function identifier");
-     // System.exit(0);
     }
     return entry.getType();
   }
@@ -110,13 +109,12 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
         ArrayList<EffectError> errors = new ArrayList<>();
         entry = env.effectsLookUp(id);
 
-        Effect actualStatus = entry.getDereferenceLevelVariableStatus(getDereferenceLevel());
-        System.out.println("ID exp status "+entry.getStatusList());
-        System.out.println("ID exp status "+getDereferenceLevel());
+        Effect actualStatus = entry.getDereferenceLevelVariableStatus(entry.getMaxDereferenceLevel()-1);
+
         if (actualStatus.equals(Effect.INITIALIZED)) {
-            errors.add(new EffectError(this.getID() + " used before writing value. IdExpNode"));
+            entry.setDereferenceLevelVariableStatus(Effect.READWRITE, entry.getMaxDereferenceLevel()-1);
+            //errors.add(new EffectError(this.getID() + " used before writing value. IdExpNode"));
         }
-        //System.out.println("id: "+id+" "+entry.getStatusList());
         errors.addAll(checkExpStatus(env));
         for(int i=0;i<entry.getMaxDereferenceLevel();i++){
             Effect status = entry.getDereferenceLevelVariableStatus(i);

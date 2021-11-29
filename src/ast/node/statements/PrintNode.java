@@ -27,7 +27,6 @@ public class PrintNode extends MetaNode {
   public TypeNode typeCheck() throws SimplanPlusException {
     TypeNode valType = val.typeCheck();
     if(valType instanceof PointerTypeNode)
-   // if (!(valType instanceof BoolTypeNode || valType instanceof IntTypeNode))
       throw new SimplanPlusException("Print of a pointer");
     return valType;
   }  
@@ -45,7 +44,6 @@ public class PrintNode extends MetaNode {
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
       ArrayList<EffectError> errors = new ArrayList<>();
-      System.out.println("PRINT");
       errors.addAll(val.checkEffects(env));
       return errors;
     }

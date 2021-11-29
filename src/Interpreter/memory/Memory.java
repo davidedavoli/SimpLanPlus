@@ -12,7 +12,7 @@ public class Memory {
         }
     }
 
-    public int read(int n) throws SimplanPlusException {
+    public int read(int n){
         return mem[n].read();
     }
 

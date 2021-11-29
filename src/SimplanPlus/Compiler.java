@@ -143,8 +143,8 @@ public class Compiler {
 	}
 	public static void main(String[] args) throws Exception {
 
-
-		int numberSingle = 12;
+		//32 dovrebbe andare bene
+		int numberSingle = 13;
 		String dire = "tommasoExamples/";
 		String fileAbsNameSingle = dir + baseName + numberSingle + ext;
 		String fileNameSingle = baseName + numberSingle + ext;

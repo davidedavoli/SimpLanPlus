@@ -18,13 +18,14 @@ public class Cell {
 
     public void free(){
         pointed=false;
+        val=null;
     }
 
     public void allocate(){
         pointed=true;
     }
 
-    public Integer read() throws SimplanPlusException {
+    public Integer read() {
         if(val == null){
             System.err.println("Value is not written in memory");
             System.exit(1);

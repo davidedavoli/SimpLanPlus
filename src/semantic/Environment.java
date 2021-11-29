@@ -66,7 +66,8 @@ public class Environment {
 					for (int deferenceLevel = 0; deferenceLevel < maxDeference; deferenceLevel++){
 						var firstEffect = entryFirstEnv.getDereferenceLevelVariableStatus(deferenceLevel);
 						var secondEffect = entrySecondEnv.getDereferenceLevelVariableStatus(deferenceLevel);
-						entry.setDereferenceLevelVariableStatus(Effect.maxEffect(firstEffect,secondEffect),deferenceLevel);
+						//entry.setDereferenceLevelVariableStatus(Effect.maxEffect(firstEffect,secondEffect),deferenceLevel);
+						entry.updatePointerStatusReference(Effect.maxEffectNoCopy(firstEffect,secondEffect),deferenceLevel);
 					}
 					maxScope.put(varId,entry);
 				}
@@ -365,7 +366,11 @@ public class Environment {
 		for (var scope : newEnvironment.symTable) {
 			final HashMap<String, STentry> copiedScope = new HashMap<>();
 			for (var id : scope.keySet()) {
-				copiedScope.put(id, new STentry(scope.get(id)));
+				//TODO chiedere laneve se a sto punto diamo errore solo a run time perchè
+				// nel caso di assegnare due puntatori diversi nell'if la variabile rimane
+				// referenziata al secondo
+				copiedScope.put(id, scope.get(id));
+				//copiedScope.put(id, new STentry(scope.get(id)));
 			}
 			this.symTable.add(copiedScope);
 		}
