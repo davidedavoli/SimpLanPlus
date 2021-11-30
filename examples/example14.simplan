@@ -3,7 +3,6 @@
    ^int newGlobal(){
        global=new int;
        if(false){
-            delete global;
             return global;
        }
        else{
@@ -19,19 +18,19 @@
 }*/
 {
    ^int global;
-   ^int newGlobal(){
+   int newGlobal(){
        global=new int;
         if(false){
             //delete global;
-            return global;
+            return global^;
         }
         else{
-            return global;
+            return global^;
         }
 
     }
-   ^int x;
-   x = newGlobal();
+   ^int x = new int;
+   x^ = newGlobal();
    delete global;
    x^ = 2;
 

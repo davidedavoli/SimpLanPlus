@@ -89,9 +89,9 @@ lw $al 0($al) //go up to chain
 push $al
 jal  Function0// jump to start of function and put in $ra next istruction
 
-mv $fp $al //put in $a1 (al) actual fp
+mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
-addi $al $al 2 //put in $al address of Id
+lw $a0 2($al) //put in $a0 value of Id y
 
 free $a0 //free address in $a0
 
@@ -102,9 +102,9 @@ LABELthen1:
 push 0
 push $fp //loadind new block
 mv $sp $fp //Load new $fp
-mv $fp $al //put in $a1 (al) actual fp
+mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
-addi $al $al 2 //put in $al address of Id
+lw $a0 2($al) //put in $a0 value of Id y
 
 free $a0 //free address in $a0
 

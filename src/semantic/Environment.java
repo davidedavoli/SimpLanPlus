@@ -186,7 +186,7 @@ public class Environment {
 			for (var entry : scope.entrySet()) {
 				for (int i = 0; i < entry.getValue().getMaxDereferenceLevel(); i++) {
 					if (entry.getValue().getDereferenceLevelVariableStatus(i).equals(Effect.ERROR)) {
-						errors.add(new EffectError("The dereferenced pointer " + entry.getKey() + "^".repeat(i) + " is used after deletion."));
+						errors.add(new EffectError("The pointer " + entry.getKey() + "^".repeat(i) + " is used after deletion."));
 					}
 				}
 			}

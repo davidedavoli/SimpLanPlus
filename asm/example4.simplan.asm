@@ -99,8 +99,8 @@ subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 
 b LABELendIf2
 LABELthen1:
-mv $fp $al //put in $a1 (al) actual fp
-addi $al $al 1 //put in $al address of Id
+mv $fp $al //put in $al actual fp
+lw $a0 1($al) //put in $a0 value of Id x
 
 free $a0 //free address in $a0
 

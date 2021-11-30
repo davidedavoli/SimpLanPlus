@@ -2,7 +2,9 @@ push 0
 mv $sp $fp //Load new $fp
 subi $sp $sp 1 // non assegnato nulla
 
-subi $sp $sp 1 // non assegnato nulla
+new $a0// put new address in a0
+
+push $a0
 
 push $fp
 mv $fp $al //put in $al actual fp
@@ -12,6 +14,7 @@ jal  Function0// jump to start of function and put in $ra next istruction
 //RITORNATO DA CGEN EXP
 mv $fp $al //put in $a1 (al) actual fp
 addi $al $al -2 //put in $al address of Id
+lw $al 0($al) //deferencing inner
 
 sw $a0 0($al) // 0($al) = $a0 x=exp
 
@@ -55,6 +58,7 @@ lw $al 0($al) //go up to chain
 lw $al 0($al) //go up to chain
 lw $a0 -1($al) //put in $a0 value of Id global
 
+lw $a0 0($a0)
 lw $fp 0($fp) //Load old $fp pushed 
 subi $sp $fp 1 //Restore stackpointer as before block creation in return 
 lw $fp 0($fp) //Load old $fp pushed 
@@ -72,6 +76,7 @@ lw $al 0($al) //go up to chain
 lw $al 0($al) //go up to chain
 lw $a0 -1($al) //put in $a0 value of Id global
 
+lw $a0 0($a0)
 lw $fp 0($fp) //Load old $fp pushed 
 subi $sp $fp 1 //Restore stackpointer as before block creation in return 
 lw $fp 0($fp) //Load old $fp pushed 

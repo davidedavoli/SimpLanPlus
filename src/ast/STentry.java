@@ -17,7 +17,7 @@ public class STentry {
 
   // status of variable & return & parameter
   private final List<Effect> variableStatus;
-  private final List<Effect> returnStatus;
+//  private final List<Effect> returnStatus;
   private final List<List<Effect>> parametersStatus;
 
   //Fun entry
@@ -30,7 +30,7 @@ public class STentry {
     this.type = type;
     this.offset = offset;
     this.variableStatus = new ArrayList<>();
-    this.returnStatus = new ArrayList<>();
+    //this.returnStatus = new ArrayList<>();
     this.parametersStatus = new ArrayList<>();
     //Effect initEffect = new Effect();
 
@@ -45,6 +45,7 @@ public class STentry {
         }
         this.parametersStatus.add(paramStatus);
       }
+      /*
       TypeNode returnType = ((ArrowTypeNode) type).getRet();
       if(returnType.getClass() == PointerTypeNode.class){
         int maxReturnLen = ((ArrowTypeNode) type).getRet().getDereferenceLevel();
@@ -55,6 +56,7 @@ public class STentry {
       else{
         this.returnStatus.add(new Effect(Effect.INITIALIZED));
       }
+      */
 
 
 
@@ -79,7 +81,7 @@ public class STentry {
     this.offset = entry.getOffset();
     this.type = entry.getType();
     this.variableStatus = new ArrayList<>();
-    this.returnStatus = new ArrayList<>();
+    //this.returnStatus = new ArrayList<>();
     this.parametersStatus = new ArrayList<>();
 
     for (var fnStatus : entry.parametersStatus) {
@@ -186,7 +188,7 @@ public class STentry {
             ", \n\t\toffset=" + offset +
             ", \n\t\tvariableStatus=" + variableStatus +
             ", \n\t\tparametersStatus=" + parametersStatus +
-            ", \n\t\treturnStatus=" + returnStatus +
+            //", \n\t\treturnStatus=" + returnStatus +
             ", \n\t\tbeginFuncLabel='" + beginFuncLabel + '\'' +
             ", \n\t\tendFuncLabel='" + endFuncLabel + '\'' +
             ", \n\t\tfunNode=" + funNode +
@@ -201,7 +203,7 @@ public class STentry {
     this.endFuncLabel = endFuncLabel;
   }
 
-  public void setResultList(List<Effect> resultList) {
+  /*public void setResultList(List<Effect> resultList) {
     TypeNode returnType = ((ArrowTypeNode) type).getRet();
 
     if((this.returnStatus.size()==0) && (type instanceof ArrowTypeNode) && (returnType.getClass() != PointerTypeNode.class)){ //!(((ArrowTypeNode) type).getRet() instanceof VoidTypeNode)){
@@ -229,6 +231,6 @@ public class STentry {
   public List<Effect> getReturnList() {
     return this.returnStatus;
   }
-
+*/
 
 }

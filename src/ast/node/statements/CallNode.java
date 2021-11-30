@@ -187,12 +187,12 @@ public HasReturn retTypeCheck() {
                 e2 = Environment.parallelEnvironment(e2, parEnvironments.get(i));
             }
         }
-        List<Effect> returned = env.getCurrentST().get(id.getID()).getReturnList();
+        //List<Effect> returned = env.getCurrentST().get(id.getID()).getReturnList();
 
         Environment updatedEnv = Environment.updateEnvironment(e1, e2);
         env.replaceWithNewEnv(updatedEnv);
 
-        env.getCurrentST().get(id.getID()).setResultList(returned);
+        //env.getCurrentST().get(id.getID()).setResultList(returned);
 
 
         effectErrors.addAll(env.getEffectErrors());

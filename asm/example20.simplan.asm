@@ -1,7 +1,7 @@
 push 0
 mv $sp $fp //Load new $fp
 push $fp
-li $a0 9
+li $a0 10
 
 push $a0
 mv $fp $al //put in $al actual fp

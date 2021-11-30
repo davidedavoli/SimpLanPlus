@@ -64,7 +64,7 @@ public class RetNode extends MetaNode {
         if(etype instanceof VoidTypeNode && val != null)
           throw new SimplanPlusException("Returning val in void function");
         else if(etype.getClass() == PointerTypeNode.class)
-            throw new SimplanPlusException("Trying to return a pointer.");
+            throw new SimplanPlusException("Trying to return pointer inside a function.");
         else if(val == null)
             return new VoidTypeNode();
         else if (TypeUtils.isSubtype(val.typeCheck(), etype))

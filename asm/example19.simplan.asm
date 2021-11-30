@@ -147,10 +147,6 @@ b endFunction2
 subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 
 
-li $a0 100
-
-print $a0
-
 li $a0 1
 
 bc $a0 LABELthen3
