@@ -2,7 +2,6 @@ package ast.node.dec;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import ast.Dereferenceable;
 import ast.FuncBodyUtils;
 import ast.Label;
 import ast.STentry;
@@ -10,15 +9,11 @@ import ast.node.ArgNode;
 import ast.node.IdNode;
 import ast.node.MetaNode;
 import ast.node.Node;
-import ast.node.exp.ExpNode;
-import ast.node.exp.IdExpNode;
-import ast.node.exp.LhsExpNode;
 import ast.node.statements.BlockNode;
 import ast.node.statements.RetNode;
 import ast.node.types.*;
 import effect.Effect;
 import effect.EffectError;
-import org.stringtemplate.v4.ST;
 import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
@@ -165,9 +160,9 @@ public class FunNode extends MetaNode {
 	 */
 	@Override
 	public ArrayList<EffectError> checkEffects (Environment env){
-	  ArrayList<EffectError> errors = new ArrayList<>();
+		ArrayList<EffectError> errors = new ArrayList<>();
 
-	  // create a new entry in STable  with the function id
+	  	// create a new entry in STable  with the function id
 	  	env.addEntry(this.id, functionIdNode.getEntry());
 		functionIdNode.getEntry().setFunctionNode(this);
 		functionIdNode.getEntry().setBeginLabel(beginFuncLabel);
@@ -188,10 +183,7 @@ public class FunNode extends MetaNode {
 			startingEffect.add(argEffect);
 		}
 
-
 		errors.addAll(fixPointCheckEffect(env, startingEffect));
-
-
 
 	  return errors;
 	}
@@ -203,24 +195,21 @@ public class FunNode extends MetaNode {
 	 * @return  ArrayList<SemanticError>
 	 */
 	public ArrayList<EffectError> fixPointCheckEffect(Environment env, List<List<Effect>> effects){
-	  ArrayList<EffectError> errors = new ArrayList<>();
-				// =====================================================================
-	  // 1. copy the old env, before analyze the body of the function
+		ArrayList<EffectError> errors = new ArrayList<>();
+
+	  	// 1. copy the old env, before analyze the body of the function
 		env.createVoidScope();
 
 		// =====================================================================
 		int argOffset = 1;
-		// 2. put at RW all the formal parameters
-		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
-			var arg = (ArgNode) parlist.get(argIndex);
-
+		// 2. put at RW all formal parameters
+		for(int i = 0; i < parlist.size(); i++){
+			var arg = (ArgNode) parlist.get(i);
 			env.newFunctionParameter(arg.getIdNode().getID(), arg.getType(), argOffset++);
-
 			STentry argEntry = env.effectsLookUp(arg.getIdNode().getID());
-
 			// update the status
 			for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
-				argEntry.setDereferenceLevelVariableStatus(new Effect(effects.get(argIndex).get(derefLvl)), derefLvl);
+				argEntry.setDereferenceLevelVariableStatus(new Effect(effects.get(i).get(derefLvl)), derefLvl);
 			}
 		}
 
@@ -237,124 +226,64 @@ public class FunNode extends MetaNode {
 			effectsCopy.add(new ArrayList<>(status));
 		}
 
-		errors.addAll(checkBodyAndUpdateArgs(env, effectsFunEntry));
+		errors.addAll(checkInstructions(env, effectsFunEntry));
 
-		boolean different_funType = !effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
-
-		while (different_funType){
+		while (!effectsAreChanged(effectsFunEntry, effectsCopy)){
 			// effect are changed!
 			// replace the env and update status with the new effects
-
 			env.replaceWithNewEnv(decFunEnv);
 
 			var funEntry = env.effectsLookUp(id);
 
-			for (int argIndex = 0; argIndex < parlist.size(); argIndex++) {
-
-				var argNode = (ArgNode) parlist.get(argIndex);
+			for (int parIndex = 0; parIndex < parlist.size(); parIndex++) {
+				var argNode = (ArgNode) parlist.get(parIndex);
 				var argEntry = env.effectsLookUp(argNode.getIdNode().getID());
 
-				var argStatusList = effectsFunEntry.getFunctionStatusList().get(argIndex);
+				var argStatusList = effectsFunEntry.getFunctionStatusList().get(parIndex);
 
 				for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
-					funEntry.setParameterStatus(argIndex, argStatusList.get(derefLvl), derefLvl);
+					funEntry.setParameterStatus(parIndex, argStatusList.get(derefLvl), derefLvl);
 				}
 			}
 
 			effectsCopy = new ArrayList<>(effectsFunEntry.getFunctionStatusList());
 
-			errors.addAll(checkBodyAndUpdateArgs(env, effectsFunEntry));
-
-			different_funType = !effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
+			errors.addAll(checkInstructions(env, effectsFunEntry));
 		}
 
 		env.popBlockScope();
-
+		// Update effects of arguments
 		var idEntry = env.effectsLookUp(id);
-		for (int argIndex = 0; argIndex < parlist.size(); argIndex++) {
-			var argStatuses = effectsFunEntry.getFunctionStatusList().get(argIndex);
+		for (int parIndex = 0; parIndex < parlist.size(); parIndex++) {
+			var argStatuses = effectsFunEntry.getFunctionStatusList().get(parIndex);
 
 			for (int dereferenceLevel = 0; dereferenceLevel < argStatuses.size(); dereferenceLevel++) {
-				idEntry.setParameterStatus(argIndex, argStatuses.get(dereferenceLevel), dereferenceLevel);
+				idEntry.setParameterStatus(parIndex, argStatuses.get(dereferenceLevel), dereferenceLevel);
 			}
 		}
-		/*
-		if(!(type instanceof VoidTypeNode)){
-			List<Effect> maxReturnEffect = getMaxEffect();
-			idEntry.setResultList(maxReturnEntry.getStatusList());
-		}
-		*/
 
 		return errors;
 	}
 
-	/*public List<Effect> getMaxEffect(){
-		List<RetNode> listOfReturnNodeFunction = returnNodeInBlock();
-		List<List<Effect>> returnNodeEffect = new ArrayList<>();
-		List<STentry> returnNodeEntry = new ArrayList<>();
-		for (RetNode returnNode: listOfReturnNodeFunction){
-			ExpNode returnValue = returnNode.getValNode();
-			if(returnValue != null){
+	private boolean effectsAreChanged(STentry effectsFunEntry, List<List<Effect>> effectsCopy) {
+		return effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
+	}
 
-				if(returnValue instanceof  Dereferenceable){
-					Dereferenceable returnValueDereference = (Dereferenceable) returnValue;
-					returnNodeEffect.add(returnValueDereference.getEntry().getStatusList());
-				}
-				else{
-					List<Effect> expNodeEffect = new ArrayList<>();
-					expNodeEffect.add(Effect.READWRITE);
-					returnNodeEffect.add(expNodeEffect);
-				}
-			}
-		}
-
-		List<Effect> maxReturnEffect = returnNodeEntry.get(0).getStatusList();
-
-
-		for(int i=1;i<returnNodeEffect.size()-1;i++){
-
-			for(int j=0;j<returnNodeEffect.get(i).size();j++){
-				Effect maxEffect = Effect.maxEffectNoCopy(
-						maxReturnEffect.get(j),
-						returnNodeEffect.get(i).get(j)
-				);
-				maxReturnEffect.set(j,maxEffect);
-
-			}
-		}
-		return  maxReturnEffect;
-	}*/
-	private ArrayList<EffectError> checkBodyAndUpdateArgs(Environment env, STentry innerFunEntry){
+	private ArrayList<EffectError> checkInstructions(Environment env, STentry innerFunEntry){
 		ArrayList<EffectError> errors = new ArrayList<>();
 		errors.addAll(body.checkEffects(env));
 
-		/*
-		List<Effect> maxReturnEffect = new ArrayList<>();
-		if(!(type instanceof VoidTypeNode)){
-			maxReturnEffect = getMaxEffect();
-			innerFunEntry.setResultList(maxReturnEffect);
-		}
-		*/
-
 		STentry functionEntry = env.effectsLookUp(id);
 
-		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
-			ArgNode arg = (ArgNode) parlist.get(argIndex);
+		for(int parIndex = 0; parIndex < parlist.size(); parIndex++){
+			ArgNode arg = (ArgNode) parlist.get(parIndex);
 
 			var argEntry = env.effectsLookUp(arg.getIdNode().getID());
-
 			for (int dereferenceLevel = 0; dereferenceLevel < argEntry.getMaxDereferenceLevel(); dereferenceLevel++) {
-
-				functionEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(dereferenceLevel), dereferenceLevel);
-				innerFunEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(dereferenceLevel), dereferenceLevel);
-
+				functionEntry.setParameterStatus(parIndex, argEntry.getDereferenceLevelVariableStatus(dereferenceLevel), dereferenceLevel);
+				innerFunEntry.setParameterStatus(parIndex, argEntry.getDereferenceLevelVariableStatus(dereferenceLevel), dereferenceLevel);
 			}
 		}
-
-		/*if(!(type instanceof VoidTypeNode)){
-			maxReturnEffect = getMaxEffect(env,functionEntry);
-			functionEntry.setResultList(maxReturnEffect);
-		}*/
 		return errors;
 	}
 

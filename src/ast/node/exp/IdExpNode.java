@@ -119,7 +119,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
         for(int i=0;i<entry.getMaxDereferenceLevel();i++){
             Effect status = entry.getDereferenceLevelVariableStatus(i);
             if (status.equals(new Effect(Effect.DELETED))) {
-                errors.add(new EffectError(this.getID() + " used after deliting. IdExpNode"));
+                errors.add(new EffectError(this.getID() + " used after deleting. IdExpNode"));
             }
         }
 

@@ -144,7 +144,7 @@ public class Compiler {
 	public static void main(String[] args) throws Exception {
 
 		//32 dovrebbe andare bene
-		int numberSingle = 32;
+		int numberSingle = 4;
 		String dire = "tommasoExamples/";
 		String fileAbsNameSingle = dire + baseName + numberSingle + ext;
 		String fileNameSingle = baseName + numberSingle + ext;

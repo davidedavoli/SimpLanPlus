@@ -91,7 +91,7 @@ public HasReturn retTypeCheck() {
         id.setEntry(env.effectsLookUp(id.getID()));
         List<List<Effect>> functionEffects = id.getEntry().getFunctionStatusList();
 
-
+        System.out.println(functionEffects);
         /**
          * Non pointer parameters
          */
