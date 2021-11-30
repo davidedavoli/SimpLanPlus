@@ -19,42 +19,39 @@ import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
 public class FunNode extends MetaNode {
-
 	private final String id;
 	private final IdNode functionIdNode;
-  private final TypeNode type;
-  private ArrowTypeNode functionType; //just for ST
-  private ArrayList<TypeNode> partypes;
-  private final ArrayList<Node> parlist = new ArrayList<>();
-  private List<Effect> returnEffect = new ArrayList<>();
-  private BlockNode body;
-  private String beginFuncLabel = "";
-  private String endFuncLabel = "";
-  private int nestingLevel;
+	private final TypeNode type;
+	private ArrowTypeNode functionType; //just for ST
+	private ArrayList<TypeNode> partypes;
+	private final ArrayList<Node> parlist = new ArrayList<>();
+	private List<Effect> returnEffect = new ArrayList<>();
+	private BlockNode body;
+	private String beginFuncLabel;
+	private String endFuncLabel;
 
-  public FunNode (String i, TypeNode t, IdNode functionIdNode) {
-    id=i;
-	this.functionIdNode = functionIdNode;
-    type=t;
-	beginFuncLabel = FuncBodyUtils.freshFunLabel();
-	endFuncLabel = FuncBodyUtils.endFreshFunLabel();
-	nestingLevel = -1;
 
-  }
 
-  public void addFunBlock(BlockNode b) {
-    body=b;
-	body.setIsFunction(true);
+	public FunNode (String i, TypeNode t, IdNode functionIdNode) {
+    	id=i;
+		this.functionIdNode = functionIdNode;
+    	type=t;
+		beginFuncLabel = FuncBodyUtils.freshFunLabel();
+		endFuncLabel = FuncBodyUtils.endFreshFunLabel();
+  	}
 
-  }
+  	public void addFunBlock(BlockNode b) {
+		body=b;
+		body.setIsFunction(true);
+  	}
 
-  public String get_end_fun_label(){
+  	public String get_end_fun_label(){
 		return endFuncLabel;
 	}
 
-  public void addPar (ArgNode p) {
-    parlist.add(p);
-  }
+  	public void addPar (ArgNode p) {
+    	parlist.add(p);
+  	}
 
 	public BlockNode getBody() {
 		return body;
@@ -64,26 +61,24 @@ public class FunNode extends MetaNode {
 	}
 
 	public String toPrint(String s) throws SimplanPlusException {
-	StringBuilder parlstr= new StringBuilder();
-	for (Node par:parlist)
-	  parlstr.append(par.toPrint(s + "  "));
-    return s+"Fun:" + id +"\n"
+		StringBuilder parlstr= new StringBuilder();
+		for (Node par:parlist)
+	  		parlstr.append(par.toPrint(s + "  "));
+    	return s+"Fun:" + id +"\n"
 		   +type.toPrint(s+"  ")
 		   +parlstr
            +body.toPrint(s+"  ") ;
-  }
+  	}
 
-  //valore di ritorno non utilizzato
-  public TypeNode typeCheck () throws SimplanPlusException {
-	body.typeCheck();
-    return new ArrowTypeNode(partypes, type);
-  }
+  	//valore di ritorno non utilizzato
+  	public TypeNode typeCheck () throws SimplanPlusException {
+		body.typeCheck();
+    	return new ArrowTypeNode(partypes, type);
+  	}
 
-  public HasReturn retTypeCheck() {
+  	public HasReturn retTypeCheck() {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);
-  }
-
-
+  	}
 
 	@Override
 	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
@@ -101,7 +96,6 @@ public class FunNode extends MetaNode {
 
 		functionType = new ArrowTypeNode(partypes, type);
 
-
 		//env.offset = -2;
 		HashMap<String, STentry> hm = env.getCurrentST();
 		STentry entry = env.createFunDec(beginFuncLabel,endFuncLabel,functionType);
@@ -110,7 +104,6 @@ public class FunNode extends MetaNode {
 		functionIdNode.getEntry().setBeginLabel(beginFuncLabel);
 		functionIdNode.getEntry().setEndLabel(endFuncLabel);
 
-		nestingLevel = env.getNestingLevel();
 		if ( hm.put(id,entry) != null )
 			res.add(new SemanticError("Fun id '"+id+"' already declared"));
 		else{
@@ -132,27 +125,12 @@ public class FunNode extends MetaNode {
 		}
 
 		HasReturn noReturn = new HasReturn(HasReturn.hasReturnType.ABS);
-		//RetEffType isReturn = new RetEffType(RetEffType.RetT.PRES);
 
 		if ( body.retTypeCheck().leq(noReturn) && !(type instanceof VoidTypeNode)) {
 			res.add(new SemanticError("Possible absence of return value"));
 		}
-      /*if ((type instanceof VoidTypeNode) && isReturn.leq(body.retTypeCheck())) {
-    	  res.add(new SemanticError("Return statement in void function"));
-      }*/
-
-
 		return res;
 	}
-
-	public List<RetNode> returnNodeInBlock(){
-
-		return body.getGrandChildren().stream()
-				.filter( metaNode -> metaNode instanceof RetNode)
-				.map(metaNode -> (RetNode)metaNode)
-				.collect(Collectors.toList());
-	}
-
 
 	/**
 	 * @param env Environment
@@ -245,9 +223,7 @@ public class FunNode extends MetaNode {
 					funEntry.setParameterStatus(parIndex, argStatusList.get(derefLvl), derefLvl);
 				}
 			}
-
 			effectsCopy = new ArrayList<>(effectsFunEntry.getFunctionStatusList());
-
 			errors.addAll(checkInstructions(env, effectsFunEntry));
 		}
 
@@ -261,7 +237,6 @@ public class FunNode extends MetaNode {
 				idEntry.setParameterStatus(parIndex, argStatuses.get(dereferenceLevel), dereferenceLevel);
 			}
 		}
-
 		return errors;
 	}
 
@@ -317,7 +292,6 @@ public class FunNode extends MetaNode {
 
 	  cgen.append(endFuncLabel).append(":\n");
 
-
 	  cgen.append("lw $ra 0($sp)\n");
 
 	  cgen.append("pop\n");
@@ -332,15 +306,10 @@ public class FunNode extends MetaNode {
 
 	  cgen.append("// END OF ").append(id).append("\n");
 
-
 	  return cgen.toString();
   }
 
 	public String getId() {
 		return id;
-	}
-
-	public IdNode getIdNode() {
-		return functionIdNode;
 	}
 }
