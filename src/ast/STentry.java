@@ -1,10 +1,9 @@
 package ast;
 
 import ast.node.dec.FunNode;
-import ast.node.types.ArrowTypeNode;
-import ast.node.types.TypeNode;
-import ast.node.types.VoidTypeNode;
+import ast.node.types.*;
 import effect.Effect;
+import semantic.Environment;
 import semantic.SimplanPlusException;
 
 import java.util.ArrayList;
@@ -46,15 +45,14 @@ public class STentry {
         }
         this.parametersStatus.add(paramStatus);
       }
-
-      if(((ArrowTypeNode) type).getRet() instanceof Dereferenceable){
+      TypeNode returnType = ((ArrowTypeNode) type).getRet();
+      if(returnType.getClass() == PointerTypeNode.class){
         int maxReturnLen = ((ArrowTypeNode) type).getRet().getDereferenceLevel();
         for(int index=0; index <= maxReturnLen; index++ ){
           this.returnStatus.add(new Effect(Effect.INITIALIZED));
         }
       }
       else{
-        System.out.println("else");
         this.returnStatus.add(new Effect(Effect.INITIALIZED));
       }
 
@@ -130,7 +128,7 @@ public class STentry {
     this.variableStatus.get(dereferenceLevel).updateStatus(effect);
     //this.variableStatus.set(dereferenceLevel, effect);
   }
-  public void reInitVariableStatus() {
+  public void reInitVariableStatus(Environment env) {
     setDereferenceLevelVariableStatus(new Effect(Effect.DELETED), 0);
     updatePointerStatusReference(new Effect(Effect.DELETED), 0);
     for (int i = 1; i < variableStatus.size(); i++) {
@@ -204,15 +202,33 @@ public class STentry {
   }
 
   public void setResultList(List<Effect> resultList) {
-    if(this.returnStatus.size()==0 && type instanceof ArrowTypeNode && !(((ArrowTypeNode) type).getRet() instanceof VoidTypeNode)){
+    TypeNode returnType = ((ArrowTypeNode) type).getRet();
+
+    if((this.returnStatus.size()==0) && (type instanceof ArrowTypeNode) && (returnType.getClass() != PointerTypeNode.class)){ //!(((ArrowTypeNode) type).getRet() instanceof VoidTypeNode)){
       this.returnStatus.add(Effect.READWRITE);
     }
-    for(int i=0;i<returnStatus.size();i++){
-      this.returnStatus.set(i,resultList.get(i));
+    else {
+      this.returnStatus.clear();
+      for (int i = 0; i < resultList.size(); i++) {
+        this.returnStatus.add(resultList.get(i));
+        this.updatePointerStatusReferenceResultList(resultList.get(i), i);
+      }
     }
   }
+
+  public void updatePointerStatusReferenceResultList(Effect effect, int dereferenceLevel) {
+    this.returnStatus.set(dereferenceLevel, effect);
+  }
+
+  public Effect getDereferenceLevelVariableStatusReturn(int dereferenceLevel) {
+    return this.returnStatus.get(dereferenceLevel);
+
+  }
+
 
   public List<Effect> getReturnList() {
     return this.returnStatus;
   }
+
+
 }

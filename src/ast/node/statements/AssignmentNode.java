@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.Dereferenceable;
+import ast.STentry;
 import ast.node.LhsNode;
 import ast.node.MetaNode;
 import ast.node.dec.FunNode;
@@ -73,9 +74,11 @@ public class AssignmentNode extends MetaNode {
 
       errors.addAll(lhs.checkEffects(env));
       errors.addAll(exp.checkEffects(env));
+
       if (lhs.getEntry().getDereferenceLevelVariableStatus(lhs.getDereferenceLevel()).equals(new Effect(Effect.ERROR))) {
         errors.addAll(env.checkStmStatus(lhs, Effect::sequenceEffect, Effect.READWRITE));
       }
+
       else if (exp instanceof LhsExpNode) {
 
         List<Dereferenceable> rhsPointerList = exp.variables();
@@ -90,19 +93,22 @@ public class AssignmentNode extends MetaNode {
           lhs.setIdStatus(status,i);
         }
       }
-      else if(exp instanceof CallExpNode){
-        List<Effect> returnedEffectList = ((CallExpNode) exp).innerEntry().getReturnList();
 
+      else if(exp instanceof CallExpNode){
+        STentry returnedEffectEntry = env.effectsLookUp( ((CallExpNode) exp).getIdName());//.innerEntry();
         int lhsDereferenceLevel = lhs.getDereferenceLevel();
 
-        for (int i = lhsDereferenceLevel, j = 0; i < returnedEffectList.size(); i++, j++) {
-          Effect status = returnedEffectList.get(j);
-          //lhs.setIdStatus(status,i);
-          lhs.getEntry().setDereferenceLevelVariableStatus(status,i);
+        for (int i = lhsDereferenceLevel, j = 0; i < returnedEffectEntry.getReturnList().size(); i++, j++) {
+          Effect status = returnedEffectEntry.getDereferenceLevelVariableStatusReturn(j);
+          lhs.setIdStatus(status,i);
+          //lhs.getEntry().setDereferenceLevelVariableStatus(status,i);
 
         }
         env.addEntry(lhs.getID(),lhs.getEntry());
-        //lhs.setEntry(lhs.getEntry());
+        lhs.setEntry(lhs.getEntry());
+        System.out.println(env.effectsLookUp(lhs.getID()).getStatusList());
+
+        //
       }
       else { // lhs is not in error status and exp is not a pointer.
         lhs.getEntry().setDereferenceLevelVariableStatus(new Effect(Effect.READWRITE), lhs.getDereferenceLevel());

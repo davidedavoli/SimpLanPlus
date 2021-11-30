@@ -27,6 +27,9 @@ public class CallExpNode extends ExpNode {
     public STentry innerEntry(){
         return inner.getEntry();
     }
+    public String getIdName(){
+        return inner.getIdName();
+    }
     @Override
     public TypeNode typeCheck() throws SimplanPlusException {
         return inner.typeCheck();

@@ -1,15 +1,13 @@
 package ast.node.statements;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.exp.ExpNode;
-import ast.node.types.HasReturn;
-import ast.node.types.TypeNode;
-import ast.node.types.TypeUtils;
-import ast.node.types.VoidTypeNode;
+import ast.node.types.*;
 import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
@@ -32,8 +30,7 @@ public class RetNode extends MetaNode {
         return (ExpNode) this.val;
 
   }
-  
-  
+
   public TypeNode getEtype() {
 	  return etype;
   }
@@ -45,24 +42,29 @@ public class RetNode extends MetaNode {
   @Override
  	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
 	  ArrayList<SemanticError> res = new ArrayList<SemanticError> ();
-
-	  if (! (etype instanceof TypeNode))
-          res.add(new SemanticError("Return expression out of a function"));
       if(val != null){
           res.addAll(val.checkSemantics(env));
       }
       current_nl=env.getNestingLevel();
 
       FunNode f = new FunNode("foo", new VoidTypeNode(),null);//parent_f.getIdNode());
-      parent_f = (FunNode) this.getAncestorsInstanceOf(f.getClass()).get(0);
+      List<Node> ancestor = this.getAncestorsInstanceOf(f.getClass());
+      if(ancestor.size()==0){
+          res.add(new SemanticError("Return expression out of a function"));
+      }
+      else{
+          parent_f = (FunNode) ancestor.get(0);
+      }
+
 	  return res;
  	}
 
   
   public TypeNode typeCheck() throws SimplanPlusException {
-        //TODO da chiedere
         if(etype instanceof VoidTypeNode && val != null)
           throw new SimplanPlusException("Returning val in void function");
+        else if(etype.getClass() == PointerTypeNode.class)
+            throw new SimplanPlusException("Trying to return a pointer.");
         else if(val == null)
             return new VoidTypeNode();
         else if (TypeUtils.isSubtype(val.typeCheck(), etype))

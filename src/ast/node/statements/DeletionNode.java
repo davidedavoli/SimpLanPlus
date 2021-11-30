@@ -60,6 +60,7 @@ public class DeletionNode extends MetaNode {
       ArrayList<EffectError> errors = new ArrayList<>();
 
       errors.addAll(id.checkEffects(env));
+      //System.out.println("prima\n"+env);
 
       STentry idEntry = id.getEntry();
       if (
@@ -74,8 +75,10 @@ public class DeletionNode extends MetaNode {
                 Effect::sequenceEffect,
                 Effect.DELETED)
         );
-        idEntry.reInitVariableStatus();
+
+        idEntry.reInitVariableStatus(env);
       }
+
       return errors;
     }
 

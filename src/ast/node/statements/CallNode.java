@@ -29,8 +29,12 @@ public class CallNode extends MetaNode {
   public STentry getEntry(){
       return this.entry;
   }
-  
-  public CallNode(IdNode id, ArrayList<ExpNode> args) {
+
+    public String getIdName(){
+        return this.id.getID();
+    }
+
+    public CallNode(IdNode id, ArrayList<ExpNode> args) {
 	this.id=id;
     parameterlist = args;
     isAlreadyCalled = false;
@@ -174,11 +178,6 @@ public HasReturn retTypeCheck() {
 
                 entry.setDereferenceLevelVariableStatus(seq, dereferenceLevel);
             }
-
-            /*for(int index = 0;index<actualDereference;index++){
-                System.out.println("SETTING "+index+" status");
-                entry.setDereferenceLevelVariableStatus(env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(index), index+actualDereference);
-            }*/
             parEnvironments.add(tmpEnvironment);
         }
 
@@ -188,9 +187,14 @@ public HasReturn retTypeCheck() {
                 e2 = Environment.parallelEnvironment(e2, parEnvironments.get(i));
             }
         }
+        List<Effect> returned = env.getCurrentST().get(id.getID()).getReturnList();
 
         Environment updatedEnv = Environment.updateEnvironment(e1, e2);
         env.replaceWithNewEnv(updatedEnv);
+
+        env.getCurrentST().get(id.getID()).setResultList(returned);
+
+
         effectErrors.addAll(env.getEffectErrors());
 
         return effectErrors;

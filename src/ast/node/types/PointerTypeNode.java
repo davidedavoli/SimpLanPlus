@@ -55,7 +55,6 @@ public class PointerTypeNode implements TypeNode {
         return new ArrayList<>();
     }
 
-    //TODO Generare il codice
   public String codeGeneration(Label labelManager) {
 		return "";
   }

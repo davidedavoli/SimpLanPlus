@@ -94,6 +94,7 @@ public class LhsNode extends MetaNode implements Dereferenceable {
         inner.setEntry(actualEntry);
 
         errors.addAll(inner.checkEffects(env));
+        System.out.println(inner.getEntry().getStatusList());
         if (!inner.getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()-1).equals(new Effect(Effect.READWRITE))) {
             errors.add(new EffectError(inner.getID() + " has not all pointer to rw "));
         }

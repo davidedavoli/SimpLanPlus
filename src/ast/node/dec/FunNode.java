@@ -18,6 +18,7 @@ import ast.node.statements.RetNode;
 import ast.node.types.*;
 import effect.Effect;
 import effect.EffectError;
+import org.stringtemplate.v4.ST;
 import semantic.Environment;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
@@ -203,7 +204,6 @@ public class FunNode extends MetaNode {
 	 */
 	public ArrayList<EffectError> fixPointCheckEffect(Environment env, List<List<Effect>> effects){
 	  ArrayList<EffectError> errors = new ArrayList<>();
-	  List<Effect> maxReturnEffect = new ArrayList<>();
 				// =====================================================================
 	  // 1. copy the old env, before analyze the body of the function
 		env.createVoidScope();
@@ -278,19 +278,20 @@ public class FunNode extends MetaNode {
 				idEntry.setParameterStatus(argIndex, argStatuses.get(dereferenceLevel), dereferenceLevel);
 			}
 		}
+		/*
 		if(!(type instanceof VoidTypeNode)){
-			maxReturnEffect = getMaxEffect();
-
-			idEntry.setResultList(maxReturnEffect);
+			List<Effect> maxReturnEffect = getMaxEffect();
+			idEntry.setResultList(maxReturnEntry.getStatusList());
 		}
-
+		*/
 
 		return errors;
 	}
 
-	public List<Effect> getMaxEffect(){
+	/*public List<Effect> getMaxEffect(){
 		List<RetNode> listOfReturnNodeFunction = returnNodeInBlock();
-		List<List<Effect>> returnNodeEffect= new ArrayList<>();
+		List<List<Effect>> returnNodeEffect = new ArrayList<>();
+		List<STentry> returnNodeEntry = new ArrayList<>();
 		for (RetNode returnNode: listOfReturnNodeFunction){
 			ExpNode returnValue = returnNode.getValNode();
 			if(returnValue != null){
@@ -306,11 +307,14 @@ public class FunNode extends MetaNode {
 				}
 			}
 		}
-		List<Effect> maxReturnEffect = returnNodeEffect.get(0);
+
+		List<Effect> maxReturnEffect = returnNodeEntry.get(0).getStatusList();
+
+
 		for(int i=1;i<returnNodeEffect.size()-1;i++){
 
 			for(int j=0;j<returnNodeEffect.get(i).size();j++){
-				Effect maxEffect = Effect.maxEffect(
+				Effect maxEffect = Effect.maxEffectNoCopy(
 						maxReturnEffect.get(j),
 						returnNodeEffect.get(i).get(j)
 				);
@@ -319,24 +323,25 @@ public class FunNode extends MetaNode {
 			}
 		}
 		return  maxReturnEffect;
-	}
+	}*/
 	private ArrayList<EffectError> checkBodyAndUpdateArgs(Environment env, STentry innerFunEntry){
 		ArrayList<EffectError> errors = new ArrayList<>();
 		errors.addAll(body.checkEffects(env));
+
+		/*
 		List<Effect> maxReturnEffect = new ArrayList<>();
 		if(!(type instanceof VoidTypeNode)){
 			maxReturnEffect = getMaxEffect();
-
 			innerFunEntry.setResultList(maxReturnEffect);
 		}
+		*/
 
-		//System.out.println("max Effect returning from function check body "+innerFunEntry.getReturnList());
+		STentry functionEntry = env.effectsLookUp(id);
 
 		for(int argIndex = 0; argIndex < parlist.size(); argIndex++){
 			ArgNode arg = (ArgNode) parlist.get(argIndex);
 
 			var argEntry = env.effectsLookUp(arg.getIdNode().getID());
-			STentry functionEntry = env.effectsLookUp(id);
 
 			for (int dereferenceLevel = 0; dereferenceLevel < argEntry.getMaxDereferenceLevel(); dereferenceLevel++) {
 
@@ -344,15 +349,12 @@ public class FunNode extends MetaNode {
 				innerFunEntry.setParameterStatus(argIndex, argEntry.getDereferenceLevelVariableStatus(dereferenceLevel), dereferenceLevel);
 
 			}
-			/*System.out.println("function " +functionEntry);
-			System.out.println("max " +maxReturnEffect);*/
-			if(!(type instanceof VoidTypeNode)){
-				functionEntry.setResultList(maxReturnEffect);
-			}
-
-			//System.out.println("function " +functionEntry);
-
 		}
+
+		/*if(!(type instanceof VoidTypeNode)){
+			maxReturnEffect = getMaxEffect(env,functionEntry);
+			functionEntry.setResultList(maxReturnEffect);
+		}*/
 		return errors;
 	}
 

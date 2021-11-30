@@ -106,9 +106,14 @@ public class IdNode extends LhsNode implements Dereferenceable {
     }
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
         entry = env.effectsLookUp(id);
         nestinglevel = env.getNestingLevel();
-        return new ArrayList<EffectError>();
+        /*if (getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()).equals(new Effect(Effect.READWRITE))) {
+            errors.add(new EffectError(getID() + " has not all pointer to rw "));
+        }*/
+
+        return errors;
     }
 
     public void setIdStatus(Effect effect, int dereferenceLevel){
