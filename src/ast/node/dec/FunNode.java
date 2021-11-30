@@ -237,8 +237,51 @@ public class FunNode extends MetaNode {
 				idEntry.setParameterStatus(parIndex, argStatuses.get(dereferenceLevel), dereferenceLevel);
 			}
 		}
+		/*
+		if(!(type instanceof VoidTypeNode)){
+			List<Effect> maxReturnEffect = getMaxEffect();
+			idEntry.setResultList(maxReturnEntry.getStatusList());
+		}
+		*/
 		return errors;
 	}
+
+	/*public List<Effect> getMaxEffect(){
+		List<RetNode> listOfReturnNodeFunction = returnNodeInBlock();
+		List<List<Effect>> returnNodeEffect = new ArrayList<>();
+		List<STentry> returnNodeEntry = new ArrayList<>();
+		for (RetNode returnNode: listOfReturnNodeFunction){
+			ExpNode returnValue = returnNode.getValNode();
+			if(returnValue != null){
+
+				if(returnValue instanceof  Dereferenceable){
+					Dereferenceable returnValueDereference = (Dereferenceable) returnValue;
+					returnNodeEffect.add(returnValueDereference.getEntry().getStatusList());
+				}
+				else{
+					List<Effect> expNodeEffect = new ArrayList<>();
+					expNodeEffect.add(Effect.READWRITE);
+					returnNodeEffect.add(expNodeEffect);
+				}
+			}
+		}
+
+		List<Effect> maxReturnEffect = returnNodeEntry.get(0).getStatusList();
+
+
+		for(int i=1;i<returnNodeEffect.size()-1;i++){
+
+			for(int j=0;j<returnNodeEffect.get(i).size();j++){
+				Effect maxEffect = Effect.maxEffectNoCopy(
+						maxReturnEffect.get(j),
+						returnNodeEffect.get(i).get(j)
+				);
+				maxReturnEffect.set(j,maxEffect);
+
+			}
+		}
+		return  maxReturnEffect;
+	}*/
 
 	private boolean effectsAreChanged(STentry effectsFunEntry, List<List<Effect>> effectsCopy) {
 		return effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
@@ -247,6 +290,14 @@ public class FunNode extends MetaNode {
 	private ArrayList<EffectError> checkInstructions(Environment env, STentry innerFunEntry){
 		ArrayList<EffectError> errors = new ArrayList<>();
 		errors.addAll(body.checkEffects(env));
+
+		/*
+		List<Effect> maxReturnEffect = new ArrayList<>();
+		if(!(type instanceof VoidTypeNode)){
+			maxReturnEffect = getMaxEffect();
+			innerFunEntry.setResultList(maxReturnEffect);
+		}
+		*/
 
 		STentry functionEntry = env.effectsLookUp(id);
 
@@ -259,6 +310,10 @@ public class FunNode extends MetaNode {
 				innerFunEntry.setParameterStatus(parIndex, argEntry.getDereferenceLevelVariableStatus(dereferenceLevel), dereferenceLevel);
 			}
 		}
+		/*if(!(type instanceof VoidTypeNode)){
+			maxReturnEffect = getMaxEffect(env,functionEntry);
+			functionEntry.setResultList(maxReturnEffect);
+		}*/
 		return errors;
 	}
 
