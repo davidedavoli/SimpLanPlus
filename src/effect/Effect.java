@@ -70,9 +70,8 @@ public class Effect {
     public static Effect parallelEffect(final Effect effect1, final Effect effect2) {
         Effect firstSecondEffect = sequenceEffect(effect1, effect2);
         Effect secondFirstEffect = sequenceEffect(effect2, effect1);
-        Effect parEffect = maxEffect(firstSecondEffect,secondFirstEffect);
 
-        return parEffect;
+        return maxEffect(firstSecondEffect,secondFirstEffect);
     }
 
     @Override

@@ -2,7 +2,7 @@ package ast.node;
 
 import java.util.ArrayList;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.STentry;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.PointerTypeNode;
@@ -13,11 +13,10 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
-public class IdNode extends LhsNode implements Dereferenceable {
+public class IdNode extends LhsNode implements Dereferences {
 
-  private String id;
+  private final String id;
   private STentry entry;
   private int nestinglevel;
   
@@ -40,9 +39,6 @@ public class IdNode extends LhsNode implements Dereferenceable {
 	  return 0;
   }
   
-  public int getNestingLevel() {
-	  return nestinglevel;
-  }
 
   public void setEntry(STentry entry) {
       this.entry = entry;
@@ -74,29 +70,28 @@ public class IdNode extends LhsNode implements Dereferenceable {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
   
-  public String codeGeneration(Label labelManager){
+  public String codeGeneration(Label labelManager) {
       /**
        * ritorna indirizzo di ID nel suo frame
        */
 
-      StringBuilder cgen = new StringBuilder();
+      StringBuilder codeGenerated = new StringBuilder();
 
-      cgen.append("mv $fp $al //put in $a1 (al) actual fp\n");
+      codeGenerated.append("mv $fp $al //put in $a1 (al) actual fp\n");
 
-      for (int i = 0; i<nestinglevel-entry.getNestingLevel(); i++)
-          cgen.append("lw $al 0($al) //go up to chain\n");
+      codeGenerated.append("lw $al 0($al) //go up to chain\n".repeat(Math.max(0, nestinglevel - entry.getNestingLevel())));
 
-      cgen.append("addi $al $al ").append(entry.getOffset()).append(" //put in $al address of Id\n");
+      codeGenerated.append("addi $al $al ").append(entry.getOffset()).append(" //put in $al address of Id\n");
 
-      return cgen.toString();
+      return codeGenerated.toString();
 
   }
 
     @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
 
         //create result list
-        ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+        ArrayList<SemanticError> res = new ArrayList<>();
         entry = env.lookUp(id);
         if (entry == null)
             res.add(new SemanticError("Id "+id+" not declared."));
@@ -109,9 +104,6 @@ public class IdNode extends LhsNode implements Dereferenceable {
         ArrayList<EffectError> errors = new ArrayList<>();
         entry = env.effectsLookUp(id);
         nestinglevel = env.getNestingLevel();
-        /*if (getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()).equals(new Effect(Effect.READWRITE))) {
-            errors.add(new EffectError(getID() + " has not all pointer to rw "));
-        }*/
 
         return errors;
     }
@@ -119,10 +111,7 @@ public class IdNode extends LhsNode implements Dereferenceable {
     public void setIdStatus(Effect effect, int dereferenceLevel){
         this.entry.updatePointerStatusReference(effect, dereferenceLevel);
     }
-
-    public void declaredIdStatus(Effect effect, int dereferenceLevel){
-        this.entry.setDereferenceLevelVariableStatus(effect, dereferenceLevel);
-    }
+    
     public Effect getIdStatus(int dereferenceLevel){
         return this.entry.getDereferenceLevelVariableStatus(dereferenceLevel);
     }

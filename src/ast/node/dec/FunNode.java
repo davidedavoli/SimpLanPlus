@@ -1,6 +1,5 @@
 package ast.node.dec;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import ast.FuncBodyUtils;
 import ast.Label;
@@ -10,25 +9,23 @@ import ast.node.IdNode;
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.statements.BlockNode;
-import ast.node.statements.RetNode;
 import ast.node.types.*;
 import effect.Effect;
 import effect.EffectError;
 import semantic.Environment;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class FunNode extends MetaNode {
 	private final String id;
 	private final IdNode functionIdNode;
 	private final TypeNode type;
 	private ArrowTypeNode functionType; //just for ST
-	private ArrayList<TypeNode> partypes;
-	private final ArrayList<Node> parlist = new ArrayList<>();
-	private List<Effect> returnEffect = new ArrayList<>();
+	private ArrayList<TypeNode> parameterTypes;
+	private final ArrayList<Node> parameterList = new ArrayList<>();
+	private final List<Effect> returnEffect = new ArrayList<>();
 	private BlockNode body;
-	private String beginFuncLabel;
-	private String endFuncLabel;
+	private final String beginFuncLabel;
+	private final String endFuncLabel;
 
 
 
@@ -50,30 +47,29 @@ public class FunNode extends MetaNode {
 	}
 
   	public void addPar (ArgNode p) {
-    	parlist.add(p);
+    	parameterList.add(p);
   	}
 
 	public BlockNode getBody() {
 		return body;
 	}
 	public List<Node> getPars() {
-		return parlist;
+		return parameterList;
 	}
 
 	public String toPrint(String s) {
-	StringBuilder parlstr= new StringBuilder();
-	for (Node par:parlist)
-	  parlstr.append(par.toPrint(s + "  "));
+	StringBuilder parameterString= new StringBuilder();
+	for (Node par: parameterList)
+	  parameterString.append(par.toPrint(s + "  "));
     return s+"Fun:" + id +"\n"
 		   +type.toPrint(s+"  ")
-		   +parlstr
+		   +parameterString
            +body.toPrint(s+"  ") ;
   	}
 
-  //valore di ritorno non utilizzato
   public TypeNode typeCheck() {
 	body.typeCheck();
-    return new ArrowTypeNode(partypes, type);
+    return new ArrowTypeNode(parameterTypes, type);
   }
 
   	public HasReturn retTypeCheck() {
@@ -81,20 +77,20 @@ public class FunNode extends MetaNode {
   	}
 
 	@Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+	public ArrayList<SemanticError> checkSemantics(Environment env) {
 
 		//create result list
 		ArrayList<SemanticError> res = new ArrayList<>();
 
 		ArrayList<TypeNode> parTypes = new ArrayList<>();
-		for(Node a : parlist){
+		for(Node a : parameterList){
 			ArgNode arg = (ArgNode) a;
 			parTypes.add(arg.getType());
 		}
 		//set func type
-		partypes=parTypes;
+		parameterTypes =parTypes;
 
-		functionType = new ArrowTypeNode(partypes, type);
+		functionType = new ArrowTypeNode(parameterTypes, type);
 
 		//env.offset = -2;
 		HashMap<String, STentry> hm = env.getCurrentST();
@@ -108,11 +104,11 @@ public class FunNode extends MetaNode {
 			res.add(new SemanticError("Fun id '"+id+"' already declared"));
 		else{
 			env.createVoidScope();
-			int paroffset=1;
+			int parameterOffset=1;
 			//check args
-			for(Node a : parlist){
+			for(Node a : parameterList){
 				ArgNode arg = (ArgNode) a;
-				STentry oldEntry = env.newFunctionParameter(arg.getIdNode().getID(),arg.getType(),paroffset++);
+				STentry oldEntry = env.newFunctionParameter(arg.getIdNode().getID(),arg.getType(),parameterOffset++);
 				arg.getIdNode().setEntry(env.lookUp(arg.getIdNode().getID()));
 				if(oldEntry != null)
 					res.add(new SemanticError("Parameter id '"+arg.getIdNode().getID()+"' already declared"));
@@ -138,9 +134,8 @@ public class FunNode extends MetaNode {
 	 */
 	@Override
 	public ArrayList<EffectError> checkEffects (Environment env){
-		ArrayList<EffectError> errors = new ArrayList<>();
 
-	  	// create a new entry in STable  with the function id
+		// create a new entry in STable  with the function id
 	  	env.addEntry(this.id, functionIdNode.getEntry());
 		functionIdNode.getEntry().setFunctionNode(this);
 		functionIdNode.getEntry().setBeginLabel(beginFuncLabel);
@@ -149,7 +144,7 @@ public class FunNode extends MetaNode {
 		// put all the argNode to RW
 		List<List<Effect>> startingEffect = new ArrayList<>();
 
-		for (Node par : parlist) {
+		for (Node par : parameterList) {
 			ArgNode argNode = (ArgNode) par;
 			List<Effect> argEffect = new ArrayList<>();
 
@@ -161,9 +156,7 @@ public class FunNode extends MetaNode {
 			startingEffect.add(argEffect);
 		}
 
-		errors.addAll(fixPointCheckEffect(env, startingEffect));
-
-	  return errors;
+		return new ArrayList<>(fixPointCheckEffect(env, startingEffect));
 	}
 
 	/**
@@ -173,21 +166,20 @@ public class FunNode extends MetaNode {
 	 * @return  ArrayList<SemanticError>
 	 */
 	public ArrayList<EffectError> fixPointCheckEffect(Environment env, List<List<Effect>> effects){
-		ArrayList<EffectError> errors = new ArrayList<>();
 
-	  	// 1. copy the old env, before analyze the body of the function
+		// 1. copy the old env, before analyze the body of the function
 		env.createVoidScope();
 
 		// =====================================================================
 		int argOffset = 1;
 		// 2. put at RW all formal parameters
-		for(int i = 0; i < parlist.size(); i++){
-			var arg = (ArgNode) parlist.get(i);
+		for(int i = 0; i < parameterList.size(); i++){
+			var arg = (ArgNode) parameterList.get(i);
 			env.newFunctionParameter(arg.getIdNode().getID(), arg.getType(), argOffset++);
 			STentry argEntry = env.effectsLookUp(arg.getIdNode().getID());
 			// update the status
-			for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
-				argEntry.setDereferenceLevelVariableStatus(new Effect(effects.get(i).get(derefLvl)), derefLvl);
+			for (int dereferenceLevel = 0; dereferenceLevel < argEntry.getMaxDereferenceLevel(); dereferenceLevel++) {
+				argEntry.setDereferenceLevelVariableStatus(new Effect(effects.get(i).get(dereferenceLevel)), dereferenceLevel);
 			}
 		}
 
@@ -204,23 +196,23 @@ public class FunNode extends MetaNode {
 			effectsCopy.add(new ArrayList<>(status));
 		}
 
-		errors.addAll(checkInstructions(env, effectsFunEntry));
+		ArrayList<EffectError> errors = new ArrayList<>(checkInstructions(env, effectsFunEntry));
 
-		while (!effectsAreChanged(effectsFunEntry, effectsCopy)){
+		while (effectsAreDifferent(effectsFunEntry, effectsCopy)){
 			// effect are changed!
 			// replace the env and update status with the new effects
 			env.replaceWithNewEnv(decFunEnv);
 
 			var funEntry = env.effectsLookUp(id);
 
-			for (int parIndex = 0; parIndex < parlist.size(); parIndex++) {
-				var argNode = (ArgNode) parlist.get(parIndex);
+			for (int parIndex = 0; parIndex < parameterList.size(); parIndex++) {
+				var argNode = (ArgNode) parameterList.get(parIndex);
 				var argEntry = env.effectsLookUp(argNode.getIdNode().getID());
 
 				var argStatusList = effectsFunEntry.getFunctionStatusList().get(parIndex);
 
-				for (int derefLvl = 0; derefLvl < argEntry.getMaxDereferenceLevel(); derefLvl++) {
-					funEntry.setParameterStatus(parIndex, argStatusList.get(derefLvl), derefLvl);
+				for (int dereferenceLevel = 0; dereferenceLevel < argEntry.getMaxDereferenceLevel(); dereferenceLevel++) {
+					funEntry.setParameterStatus(parIndex, argStatusList.get(dereferenceLevel), dereferenceLevel);
 				}
 			}
 			effectsCopy = new ArrayList<>(effectsFunEntry.getFunctionStatusList());
@@ -230,7 +222,7 @@ public class FunNode extends MetaNode {
 		env.popBlockScope();
 		// Update effects of arguments
 		var idEntry = env.effectsLookUp(id);
-		for (int parIndex = 0; parIndex < parlist.size(); parIndex++) {
+		for (int parIndex = 0; parIndex < parameterList.size(); parIndex++) {
 			var argStatuses = effectsFunEntry.getFunctionStatusList().get(parIndex);
 
 			for (int dereferenceLevel = 0; dereferenceLevel < argStatuses.size(); dereferenceLevel++) {
@@ -254,8 +246,8 @@ public class FunNode extends MetaNode {
 			ExpNode returnValue = returnNode.getValNode();
 			if(returnValue != null){
 
-				if(returnValue instanceof  Dereferenceable){
-					Dereferenceable returnValueDereference = (Dereferenceable) returnValue;
+				if(returnValue instanceof  Dereferences){
+					Dereferences returnValueDereference = (Dereferences) returnValue;
 					returnNodeEffect.add(returnValueDereference.getEntry().getStatusList());
 				}
 				else{
@@ -283,13 +275,12 @@ public class FunNode extends MetaNode {
 		return  maxReturnEffect;
 	}*/
 
-	private boolean effectsAreChanged(STentry effectsFunEntry, List<List<Effect>> effectsCopy) {
-		return effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
+	private boolean effectsAreDifferent(STentry effectsFunEntry, List<List<Effect>> effectsCopy) {
+		return !effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
 	}
 
 	private ArrayList<EffectError> checkInstructions(Environment env, STentry innerFunEntry){
-		ArrayList<EffectError> errors = new ArrayList<>();
-		errors.addAll(body.checkEffects(env));
+		ArrayList<EffectError> errors = new ArrayList<>(body.checkEffects(env));
 
 		/*
 		List<Effect> maxReturnEffect = new ArrayList<>();
@@ -301,8 +292,8 @@ public class FunNode extends MetaNode {
 
 		STentry functionEntry = env.effectsLookUp(id);
 
-		for(int parIndex = 0; parIndex < parlist.size(); parIndex++){
-			ArgNode arg = (ArgNode) parlist.get(parIndex);
+		for(int parIndex = 0; parIndex < parameterList.size(); parIndex++){
+			ArgNode arg = (ArgNode) parameterList.get(parIndex);
 
 			var argEntry = env.effectsLookUp(arg.getIdNode().getID());
 			for (int dereferenceLevel = 0; dereferenceLevel < argEntry.getMaxDereferenceLevel(); dereferenceLevel++) {
@@ -318,17 +309,17 @@ public class FunNode extends MetaNode {
 	}
 
 
-	public String codeGeneration(Label labelManager) throws SimplanPlusException {
+	public String codeGeneration(Label labelManager) {
 	  int declaration_size = 0;
-	  int parameter_size = parlist.size();
+	  int parameter_size = parameterList.size();
 
-	  StringBuilder cgen = new StringBuilder();
+	  StringBuilder codeGenerated = new StringBuilder();
 
-	  cgen.append("//BEGIN FUNCTION ").append(beginFuncLabel).append("\n");
-	  cgen.append(beginFuncLabel).append(":\n");
+	  codeGenerated.append("//BEGIN FUNCTION ").append(beginFuncLabel).append("\n");
+	  codeGenerated.append(beginFuncLabel).append(":\n");
 
-	  cgen.append("mv $sp $fp\n");
-	  cgen.append("push $ra\n");
+	  codeGenerated.append("mv $sp $fp\n");
+	  codeGenerated.append("push $ra\n");
 
 
 		HasReturn returnEffect = new HasReturn(HasReturn.hasReturnType.PRES);
@@ -336,32 +327,32 @@ public class FunNode extends MetaNode {
 		if ((type instanceof VoidTypeNode) && !returnEffect.leq(body.retTypeCheck())) {
 			StringBuilder missingReturnCode = new StringBuilder();
 
-			missingReturnCode.append("subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return \n");
+			missingReturnCode.append("subi $sp $fp 1 //Restore stack pointer as before block creation in a void function without return \n");
 			missingReturnCode.append("lw $fp 0($fp) //Load old $fp pushed \n");
 			missingReturnCode.append("b ").append(endFuncLabel).append("\n");
 
 			body.addMissingReturnFunctionCode(missingReturnCode.toString());
 		}
 
-	  cgen.append(body.codeGeneration(labelManager)).append("\n");
+	  codeGenerated.append(body.codeGeneration(labelManager)).append("\n");
 
-	  cgen.append(endFuncLabel).append(":\n");
+	  codeGenerated.append(endFuncLabel).append(":\n");
 
-	  cgen.append("lw $ra 0($sp)\n");
+	  codeGenerated.append("lw $ra 0($sp)\n");
 
-	  cgen.append("pop\n");
+	  codeGenerated.append("pop\n");
 
-	  cgen.append("addi $sp $sp ").append(declaration_size).append("//pop declaration ").append(declaration_size).append("\n");
-	  cgen.append("addi $sp $sp ").append(parameter_size).append("// pop parameters").append(parameter_size).append("\n");
-	  cgen.append("pop\n");
-	  cgen.append("lw $fp 0($sp)\n");
-	  cgen.append("pop\n");
+	  codeGenerated.append("addi $sp $sp ").append(declaration_size).append("//pop declaration ").append(declaration_size).append("\n");
+	  codeGenerated.append("addi $sp $sp ").append(parameter_size).append("// pop parameters").append(parameter_size).append("\n");
+	  codeGenerated.append("pop\n");
+	  codeGenerated.append("lw $fp 0($sp)\n");
+	  codeGenerated.append("pop\n");
 
-	  cgen.append("jr $ra\n");
+	  codeGenerated.append("jr $ra\n");
 
-	  cgen.append("// END OF ").append(id).append("\n");
+	  codeGenerated.append("// END OF ").append(id).append("\n");
 
-	  return cgen.toString();
+	  return codeGenerated.toString();
   }
 
 	public String getId() {

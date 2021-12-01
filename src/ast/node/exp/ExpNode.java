@@ -1,6 +1,6 @@
 package ast.node.exp;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.Label;
 import ast.node.MetaNode;
 import ast.node.types.HasReturn;
@@ -9,7 +9,6 @@ import effect.Effect;
 import effect.EffectError;
 import semantic.Environment;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +25,12 @@ public abstract class ExpNode extends MetaNode {
     }
 
     @Override
-    public String codeGeneration(Label labelManager) throws SimplanPlusException {
+    public String codeGeneration(Label labelManager) {
         return null;
     }
 
     @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
         return null;
     }
 
@@ -46,7 +45,7 @@ public abstract class ExpNode extends MetaNode {
     }
 
 
-    public abstract List<Dereferenceable> variables();
+    public abstract List<Dereferences> variables();
 
     protected ArrayList<EffectError> checkExpStatus(Environment env) {
         ArrayList<EffectError> errors = new ArrayList<>();

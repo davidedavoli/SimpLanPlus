@@ -3,10 +3,8 @@ package ast.node.exp;
 import java.util.ArrayList;
 import java.util.List;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.STentry;
-import ast.node.LhsNode;
-import ast.node.dec.FunNode;
 import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.Effect;
@@ -14,9 +12,8 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
-public class LhsExpNode extends ExpNode implements Dereferenceable {
+public class LhsExpNode extends ExpNode implements Dereferences {
 
     protected LhsExpNode inner;
 
@@ -24,17 +21,10 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
 	  inner=i;
   }
 
-
-    public String getID() {
+  public String getID() {
 	  return inner.getID();
   }
 
-  
-  /*Non dovrebbe essere fatto così.
-  public LhsExpNode getInner() {
-	  return inner.getInner();
-  }
-  */
   public Boolean isPointer() {
       return inner.isPointer();
   }
@@ -55,48 +45,36 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
 	  else
 		  return null; 
   }
-    public void setEntry(STentry entry){
+
+  public void setEntry(STentry entry){
         inner.setEntry(entry);
     }
 
-    @Override
-    public Effect getIdStatus(int j) {
+  @Override
+  public Effect getIdStatus(int j) {
         return this.inner.getIdStatus(j);
     }
 
-    public int getNestingLevel(){
-	  if (inner!=null)
-		  return inner.getNestingLevel();
-	  else
-		  return -1; //sarà un valore sensato?
-  }
   
   @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
-  		//create result list
-  		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-  		res.addAll(inner.checkSemantics(env));
-        return res;
+  public ArrayList<SemanticError> checkSemantics(Environment env) {
+      return new ArrayList<>(inner.checkSemantics(env));
   }
   
   public String toPrint(String s) {
 	return s+"lhs: " + this.getDereferenceLevel()+" "+this.getID()+"\n";
   }
   
-  //valore di ritorno non utilizzato
   public TypeNode typeCheck() {
-	if (inner != null) {
-        return inner.typeCheck().dereference();
-    }
-	else //Questo caso non dovrebbe mai verificarsi per l'implementazione di Visitor.
-		return null;
+	if (inner != null) return inner.typeCheck().dereference();
+	else return null;
   }
   
-  public HasReturn retTypeCheck(FunNode funNode) {
+  public HasReturn retTypeCheck() {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
-    public List<Dereferenceable> variables() {
-        List<Dereferenceable> variable = new ArrayList<>();
+    public List<Dereferences> variables() {
+        List<Dereferences> variable = new ArrayList<>();
 
         variable.add(this);
 
@@ -104,7 +82,6 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
     }
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
-        ArrayList<EffectError> errors = new ArrayList<>();
         /**
          * Getting new entry if it was modified from some operation on environments
          */
@@ -112,7 +89,7 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
         STentry actualEntry = env.effectsLookUp(id);
         inner.setEntry(actualEntry);
 
-        errors.addAll(inner.checkEffects(env));
+        ArrayList<EffectError> errors = new ArrayList<>(inner.checkEffects(env));
 
         STentry innerEntry = getEntry();
         Effect actualStatus = innerEntry.getDereferenceLevelVariableStatus(getDereferenceLevel()-1);
@@ -131,15 +108,15 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
         return errors;
     }
 
-    public String codeGeneration(Label labelManager) throws SimplanPlusException {
+    public String codeGeneration(Label labelManager) {
       /**
-       * Mette in $a0 quello che c'è nella cella di memoria del puntatore
+       * Put in $a0 value pointed by inner
        */
-      StringBuilder cgen = new StringBuilder();
-      cgen.append(inner.codeGeneration(labelManager)).append("\n");
-      cgen.append("lw $a0 0($a0)");
+      StringBuilder codeGenerated = new StringBuilder();
+      codeGenerated.append(inner.codeGeneration(labelManager)).append("\n");
+      codeGenerated.append("lw $a0 0($a0)");
 
-      return cgen.toString();
+      return codeGenerated.toString();
   }  
     
 }  

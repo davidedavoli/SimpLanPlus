@@ -16,13 +16,12 @@ import effect.EffectError;
 import semantic.Environment;
     import ast.Label;
     import semantic.SemanticError;
-    import semantic.SimplanPlusException;
 
 public class VarNode extends MetaNode {
 
-    private IdNode id;
-    private TypeNode type;
-    private Node exp;
+    private final IdNode id;
+    private final TypeNode type;
+    private final Node exp;
 
     public VarNode (IdNode i, TypeNode t, Node v) {
         id=i;
@@ -50,33 +49,27 @@ public class VarNode extends MetaNode {
         return type;
     }
 
-    public String codeGeneration(Label labelManager) throws SimplanPlusException {
-        StringBuilder cgen = new StringBuilder();
+    public String codeGeneration(Label labelManager) {
+        StringBuilder codeGenerated = new StringBuilder();
         if(exp != null){
-            cgen.append(exp.codeGeneration(labelManager)).append("\n");
-            cgen.append("push $a0\n");
+            codeGenerated.append(exp.codeGeneration(labelManager)).append("\n");
+            codeGenerated.append("push $a0\n");
         }
         else{
-            /**
-            * Decidere se pushare 0 per dire che non c'è nulla o alzare solamente lo stack pointer
-            */
-            cgen.append("subi $sp $sp 1 // non assegnato nulla\n");
-            //cgen.append("push 0\n");
+            codeGenerated.append("subi $sp $sp 1 // No value assigned\n");
         }
-        return cgen.toString();
+        return codeGenerated.toString();
     }
 
     @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
-        //create result list
-        ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+        ArrayList<SemanticError> res = new ArrayList<>();
 
-        //env.offset = -2;
         HashMap<String, STentry> hm = env.getCurrentST();
 
         //return offset and decrement it by 1
         int new_offset = env.decOffset();
-        STentry entry = new STentry(env.getNestingLevel(), type, new_offset); //separo introducendo "entry"
+        STentry entry = new STentry(env.getNestingLevel(), type, new_offset);
         id.setEntry(entry);
 
         if (exp != null){

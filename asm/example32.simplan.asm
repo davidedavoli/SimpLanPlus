@@ -15,7 +15,7 @@ lw $a0 -2($al) //put in $a0 value of Id y
 push $a0
 mv $fp $al //put in $al actual fp
 push $al
-jal  Function0// jump to start of function and put in $ra next istruction
+jal  Function0// jump to start of function and put in $ra next instruction
 
 push $fp
 mv $fp $al //put in $al actual fp
@@ -24,10 +24,10 @@ lw $a0 -1($al) //put in $a0 value of Id x
 push $a0
 mv $fp $al //put in $al actual fp
 push $al
-jal  Function1// jump to start of function and put in $ra next istruction
+jal  Function1// jump to start of function and put in $ra next instruction
 
 halt
-//CREO FUNZIONI
+//Creating function:
 //BEGIN FUNCTION Function0
 Function0:
 mv $sp $fp
@@ -38,7 +38,7 @@ lw $a0 1($al) //put in $a0 value of Id a
 lw $a0 0($a0)
 print $a0
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return 
+subi $sp $fp 1 //Restore stack pointer as before block creation in a void function without return 
 lw $fp 0($fp) //Load old $fp pushed 
 b endFunction0
 
@@ -59,7 +59,6 @@ mv $sp $fp
 push $ra
 li $a0 1
 
-//RITORNATO DA CGEN EXP
 mv $fp $al //put in $a1 (al) actual fp
 addi $al $al 1 //put in $al address of Id
 lw $al 0($al) //deferencing inner
@@ -72,7 +71,7 @@ lw $a0 1($al) //put in $a0 value of Id a
 lw $a0 0($a0)
 print $a0
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return 
+subi $sp $fp 1 //Restore stack pointer as before block creation in a void function without return 
 lw $fp 0($fp) //Load old $fp pushed 
 b endFunction1
 
@@ -87,4 +86,4 @@ pop
 jr $ra
 // END OF h
 
-//FINE FUNZIONI
+//Ending function.

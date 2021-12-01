@@ -22,7 +22,6 @@ public class VoidTypeNode implements TypeNode {
       return null;
   }
     
-  //non utilizzato
   public TypeNode typeCheck() {
     return null;
   }
@@ -31,21 +30,17 @@ public class VoidTypeNode implements TypeNode {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
-    @Override
-    public ArrayList<EffectError> checkEffects (Environment env) {
+  @Override
+  public ArrayList<EffectError> checkEffects (Environment env) {
         return new ArrayList<>();
     }
 
-    @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
-
- 	  return new ArrayList<SemanticError>();
- 	}
-  
-  //non utilizzato
-  public String codeGeneration(Label labelManager){
+  @Override
+  public ArrayList<SemanticError> checkSemantics(Environment env) {
+     return new ArrayList<>();
+  }
+  public String codeGeneration(Label labelManager) {
 		return "";
   }
 
-    
 }  

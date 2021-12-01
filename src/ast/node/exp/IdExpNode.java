@@ -2,7 +2,7 @@ package ast.node.exp;
 
 import java.util.ArrayList;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.STentry;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.PointerTypeNode;
@@ -13,11 +13,10 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
-public class IdExpNode extends LhsExpNode implements Dereferenceable {
+public class IdExpNode extends LhsExpNode implements Dereferences {
 
-  private String id;
+  private final String id;
   private STentry entry;
   private int nestinglevel;
   
@@ -42,15 +41,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
   public LhsExpNode getInner(){
 	  return this;
   }
-  
-  public int detDerefLevel() {
-	  return 0;
-  }
-  
-  public int getNestingLevel() {
-	  return nestinglevel;
-  }
-  
+
   public STentry getEntry() {
 	  return entry;
   }
@@ -63,10 +54,10 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
   }
   
   @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+	public ArrayList<SemanticError> checkSemantics(Environment env) {
 	  
 	  //create result list
-	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+	  ArrayList<SemanticError> res = new ArrayList<>();
       entry = env.lookUp(id);
       if (entry == null)
           res.add(new SemanticError("Id "+id+" in expNode not declared"));
@@ -89,26 +80,24 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+  public String codeGeneration(Label labelManager) {
       /**
        * Ritorna valore di ID
        */
 
-      StringBuilder cgen = new StringBuilder();
+      StringBuilder codeGenerated = new StringBuilder();
 
-      cgen.append("mv $fp $al //put in $al actual fp\n");
+      codeGenerated.append("mv $fp $al //put in $al actual fp\n");
 
-      for (int i = 0; i<nestinglevel-entry.getNestingLevel(); i++)
-          cgen.append("lw $al 0($al) //go up to chain\n");
+      codeGenerated.append("lw $al 0($al) //go up to chain\n".repeat(Math.max(0, nestinglevel - entry.getNestingLevel())));
 
-      cgen.append("lw $a0 ").append(entry.getOffset()).append("($al) //put in $a0 value of Id ").append(id).append("\n");
+      codeGenerated.append("lw $a0 ").append(entry.getOffset()).append("($al) //put in $a0 value of Id ").append(id).append("\n");
 
-      return cgen.toString();
+      return codeGenerated.toString();
   }
 
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
-        ArrayList<EffectError> errors = new ArrayList<>();
         entry = env.effectsLookUp(id);
 
         Effect actualStatus = entry.getDereferenceLevelVariableStatus(entry.getMaxDereferenceLevel()-1);
@@ -117,7 +106,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
             entry.setDereferenceLevelVariableStatus(Effect.READWRITE, entry.getMaxDereferenceLevel()-1);
             //errors.add(new EffectError(this.getID() + " used before writing value. IdExpNode"));
         }
-        errors.addAll(checkExpStatus(env));
+        ArrayList<EffectError> errors = new ArrayList<>(checkExpStatus(env));
         for(int i=0;i<entry.getMaxDereferenceLevel();i++){
             Effect status = entry.getDereferenceLevelVariableStatus(i);
             if (status.equals(new Effect(Effect.DELETED))) {

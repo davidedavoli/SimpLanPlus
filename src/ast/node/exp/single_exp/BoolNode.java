@@ -3,7 +3,7 @@ package ast.node.exp.single_exp;
 import java.util.ArrayList;
 import java.util.List;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.node.exp.ExpNode;
 import ast.node.types.BoolTypeNode;
   import ast.node.types.HasReturn;
@@ -15,7 +15,7 @@ import semantic.Environment;
 
 public class BoolNode extends ExpNode {
 
-  private boolean val;
+  private final boolean val;
 
   public BoolNode (boolean n) {
   val=n;
@@ -40,19 +40,19 @@ public class BoolNode extends ExpNode {
   }
 
   @Override
-  public List<Dereferenceable> variables() {
-    return new ArrayList<Dereferenceable>();
+  public List<Dereferences> variables() {
+    return new ArrayList<>();
   }
 
   @Override
   public ArrayList<SemanticError> checkSemantics(Environment env) {
 
-    return new ArrayList<SemanticError>();
+    return new ArrayList<>();
   }
 
-  public String codeGeneration(Label labelManager){
-    StringBuilder cgen = new StringBuilder();
-    cgen.append("li $a0 ").append(val?1:0).append("\n");
-    return cgen.toString();
+  public String codeGeneration(Label labelManager) {
+    StringBuilder codeGenerated = new StringBuilder();
+    codeGenerated.append("li $a0 ").append(val?1:0).append("\n");
+    return codeGenerated.toString();
   }
 }

@@ -4,18 +4,16 @@ import java.util.ArrayList;
 
 import ast.node.MetaNode;
 import ast.node.Node;
-import ast.node.exp.ExpNode;
 import ast.node.exp.IdExpNode;
 import ast.node.types.*;
 import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class PrintNode extends MetaNode {
 
-  private Node val;
+  private final Node val;
   
   public PrintNode (Node v) {
     val=v;
@@ -36,7 +34,7 @@ public class PrintNode extends MetaNode {
   }  
   
   @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+ 	public ArrayList<SemanticError> checkSemantics(Environment env) {
 
  	  return val.checkSemantics(env);
  	}
@@ -47,16 +45,14 @@ public class PrintNode extends MetaNode {
 
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
-      ArrayList<EffectError> errors = new ArrayList<>();
-      errors.addAll(val.checkEffects(env));
-      return errors;
+      return new ArrayList<>(val.checkEffects(env));
     }
 
-    public String codeGeneration(Label labelManager) throws SimplanPlusException {
-        StringBuilder cgen = new StringBuilder();
-        cgen.append(val.codeGeneration(labelManager)).append("\n");
-        cgen.append("print $a0\n");
-		return cgen.toString();
+    public String codeGeneration(Label labelManager) {
+        StringBuilder codeGenerated = new StringBuilder();
+        codeGenerated.append(val.codeGeneration(labelManager)).append("\n");
+        codeGenerated.append("print $a0\n");
+		return codeGenerated.toString();
   }
     
 }  

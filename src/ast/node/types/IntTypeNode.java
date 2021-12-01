@@ -6,7 +6,6 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class IntTypeNode implements TypeNode {
   
@@ -20,14 +19,11 @@ public class IntTypeNode implements TypeNode {
       System.err.println("Attempt to dereference an Integer");
       System.exit(0);
       return null;
-      //throw new SimplanPlusException("Attempt to dereference an int");
   }
-  //non utilizzato
   public TypeNode typeCheck() {
     return null;
   }
 
-  //non utilizzato
   public String codeGeneration(Label labelManager) {
 		return "";
   }
@@ -36,15 +32,14 @@ public class IntTypeNode implements TypeNode {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
-    @Override
-    public ArrayList<EffectError> checkEffects (Environment env) {
+  @Override
+  public ArrayList<EffectError> checkEffects (Environment env) {
         return new ArrayList<>();
     }
 
-    @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) {
-
-	  return new ArrayList<SemanticError>();
-	}
+  @Override
+  public ArrayList<SemanticError> checkSemantics(Environment env) {
+      return new ArrayList<>();
+  }
   
 }  

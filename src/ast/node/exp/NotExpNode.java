@@ -3,7 +3,7 @@ package ast.node.exp;
 import java.util.ArrayList;
 import java.util.List;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
@@ -11,26 +11,22 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class NotExpNode extends ExpNode {
 
-  private ExpNode exp;
+  private final ExpNode exp;
   
   public NotExpNode (ExpNode e) {
     exp=e;
   }
   
   @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+ 	public ArrayList<SemanticError> checkSemantics(Environment env) {
 	  //create the result
-	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-	  
+
 	  //check semantics in the left and in the right exp
-	  
-	  res.addAll(exp.checkSemantics(env));
-	  
- 	  return res;
+
+	  return new ArrayList<>(exp.checkSemantics(env));
  	}
   
   public String toPrint(String s) {
@@ -41,7 +37,7 @@ public class NotExpNode extends ExpNode {
 	  TypeNode expType = exp.typeCheck();
 
 	  if (! (expType instanceof BoolTypeNode)) {
-		  System.err.println("Try to do negate (!) of a non bool");
+		  System.err.println("Trying to do negate (!) of a non bool");
 		  System.exit(0);
 	  }
 		  //throw new SimplanPlusException("Exp not bool, throw exception");
@@ -50,7 +46,7 @@ public class NotExpNode extends ExpNode {
 
   }
 	@Override
-	public List<Dereferenceable> variables() {
+	public List<Dereferences> variables() {
 		return exp.variables();
 	}
   
@@ -66,13 +62,13 @@ public class NotExpNode extends ExpNode {
 		return errors;
 	}
 
-	public String codeGeneration(Label labelManager) throws SimplanPlusException {
-	  StringBuilder cgen = new StringBuilder();
+	public String codeGeneration(Label labelManager) {
+	  StringBuilder codeGenerated = new StringBuilder();
 	  String loaded_exp = exp.codeGeneration(labelManager);
-	  cgen.append(loaded_exp).append("\n");
-	  cgen.append("not $a0 $a0\n");
+	  codeGenerated.append(loaded_exp).append("\n");
+	  codeGenerated.append("not $a0 $a0\n");
 
-	  return cgen.toString();
+	  return codeGenerated.toString();
 
   }
 }  

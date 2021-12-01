@@ -13,13 +13,12 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class IfNode extends MetaNode {
 
-  private ExpNode cond;
-  private Node th;
-  private Node el;
+  private final ExpNode cond;
+  private final Node th;
+  private final Node el;
   
   public IfNode (ExpNode c, Node t, Node e) {
     cond=c;
@@ -38,9 +37,9 @@ public class IfNode extends MetaNode {
   }
   
   @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+  public ArrayList<SemanticError> checkSemantics(Environment env) {
 	  //create the result
-	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+	  ArrayList<SemanticError> res = new ArrayList<>();
 	  
 	  //check semantics in the condition
 	  res.addAll(cond.checkSemantics(env));
@@ -56,18 +55,16 @@ public class IfNode extends MetaNode {
   public HasReturn retTypeCheck() {
       HasReturn th_v=th.retTypeCheck();
       HasReturn el_v=(el!=null)?el.retTypeCheck():new HasReturn(HasReturn.hasReturnType.ABS);
-      //do not remove these lines: retTypeCheck has a side-effect;
 	  if (el!=null)
 		  return HasReturn.min(th_v, el_v);
 	  else
-		  return new HasReturn(th_v.getVal());//RetEffType.RetT.ABS);
+		  return new HasReturn(th_v.getVal());
   }
 
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
-        ArrayList<EffectError> errors = new ArrayList<>();
 
-        errors.addAll(cond.checkEffects(env));
+        ArrayList<EffectError> errors = new ArrayList<>(cond.checkEffects(env));
 
         if (el != null) {
             var thenEnv = new Environment(env);
@@ -88,7 +85,6 @@ public class IfNode extends MetaNode {
     if ( !(TypeUtils.isSubtype(cond.typeCheck(),new BoolTypeNode()))) {
         System.err.println("Non boolean condition in if: "+cond.toPrint(""));
         System.exit(0);
-        //throw new SimplanPlusException("non boolean condition in if");
     }
     TypeNode t = th.typeCheck();
     if(el == null){
@@ -105,42 +101,42 @@ public class IfNode extends MetaNode {
     return null;
   }
   
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+  public String codeGeneration(Label labelManager) {
 
-      StringBuilder cgen = new StringBuilder();
+      StringBuilder codeGenerated = new StringBuilder();
       String then_branch = labelManager.freshLabel("then");
       String end_label = labelManager.freshLabel("endIf");
       /**
-       * Cgen condizione
+       * Code generation condition
        */
       String loaded_cond = cond.codeGeneration(labelManager);
-      cgen.append(loaded_cond).append("\n");
-      cgen.append("bc $a0 ").append(then_branch).append("\n");
+      codeGenerated.append(loaded_cond).append("\n");
+      codeGenerated.append("bc $a0 ").append(then_branch).append("\n");
 
       /**
-       * Cgen else
+       * Code generation else
        */
       if(el != null){
           String loaded_el = el.codeGeneration(labelManager);
-          cgen.append(loaded_el);
+          codeGenerated.append(loaded_el);
       }
-      cgen.append("b ").append(end_label).append("\n");
+      codeGenerated.append("b ").append(end_label).append("\n");
 
 
       /**
-       * Cgen then
+       * Code generation then
        */
-      cgen.append(then_branch).append(":\n");
+      codeGenerated.append(then_branch).append(":\n");
       String loaded_th = th.codeGeneration(labelManager);
-      cgen.append(loaded_th).append("\n");
+      codeGenerated.append(loaded_th).append("\n");
 
       /**
        * Append end_if_label_count
        */
-      cgen.append(end_label).append(":\n");
+      codeGenerated.append(end_label).append(":\n");
 
 
-      return cgen.toString();
+      return codeGenerated.toString();
   }
   
 }  

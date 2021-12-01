@@ -32,8 +32,8 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		BlockNode res;
 
 		//list of declarations in @res
-		ArrayList<Node> declarations = new ArrayList<Node>();
-		ArrayList<Node> statements = new ArrayList<Node>();
+		ArrayList<Node> declarations = new ArrayList<>();
+		ArrayList<Node> statements = new ArrayList<>();
 		
 		//visit all nodes corresponding to declarations inside the let context and store them in @declarations
 		//notice that the ctx.let().dec() method returns a list, this is because of the use of * or + in the grammar
@@ -113,7 +113,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	@Override 
 	public Node visitDecFun(DecFunContext ctx) {
 		//initialize @res with the visits to the type and its ID
-		FunNode res =null;
+		FunNode res;
 		IdNode id = new IdNode(ctx.ID().getText());
 		if (ctx.type()!=null)
 			res = new FunNode(ctx.ID().getText(), (TypeNode) visit(ctx.type()),id);//WARNING casting
@@ -290,7 +290,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		MetaNode res;
 		IdNode id = new IdNode(ctx.ID().getText());
 		//get the invocation arguments
-		ArrayList<ExpNode> args = new ArrayList<ExpNode>();
+		ArrayList<ExpNode> args = new ArrayList<>();
 
 		for(ExpContext exp : ctx.exp())
 			args.add((ExpNode) visit(exp));
@@ -347,32 +347,11 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	public Node visitDerExp(DerExpContext ctx) {
 		return visitLhsExp(ctx.lhs());
 	}
-	
-//	@Override
-//	public Node visitNewExp(NewExpContext ctx){ 
-//		if (ctx.getParent() instanceof AssignmentContext) {
-//			NewNode tmp = new NewNode(null);
-//			tmp.setID(visitLhsExp(((AssignmentContext)ctx.getParent()).lhs()).getID());
-//			return tmp;//usiamo la visitLhsExp dal momento che non ha side-effects sulla ST in modo da poter usare getID()
-//		}
-//		else if (ctx.getParent() instanceof DecVarContext)
-//			return new NewNode((TypeNode)visit(((DecVarContext)(ctx.getParent())).type()));
-//		else if (ctx.getParent() instanceof RetContext) {
-//			ParserRuleContext fct=ctx.getParent();
-//			while (fct !=null && !(fct instanceof DecFunContext))
-//				fct=fct.getParent();
-//			//in questo caso non ha senso chiedersi se siamo nel corpo di una funzione perché ne siamo certi dal momento che il medesimo check è stato fatto nel ramo return
-//			return new NewNode((((DecFunContext)fct).type()==null)?new VoidTypeNode(): (TypeNode) visit(((DecFunContext)fct).type()));
-//		}
-//		else return new NewNode(null); //WARNING in questo modo stiamo ammettendo solo uso di new nella forma type? id=new o return new.
-//	}
 
 	@Override
 	public Node visitNewExp(NewExpContext ctx){
 		if (ctx.getParent() instanceof AssignmentContext) {
-			NewNode tmp = new NewNode((TypeNode)visit(ctx.type()));
-//			tmp.setID(visitLhsExp(((AssignmentContext)ctx.getParent()).lhs()).getID());
-			return tmp;//usiamo la visitLhsExp dal momento che non ha side-effects sulla ST in modo da poter usare getID()
+			return new NewNode((TypeNode)visit(ctx.type()));
 		}
 		else if (ctx.getParent() instanceof DecVarContext)
 			return new NewNode((TypeNode)visit(ctx.type()));
@@ -380,10 +359,10 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 			ParserRuleContext fct=ctx.getParent();
 			while (fct !=null && !(fct instanceof DecFunContext))
 				fct=fct.getParent();
-			//in questo caso non ha senso chiedersi se siamo nel corpo di una funzione perché ne siamo certi dal momento che il medesimo check è stato fatto nel ramo return
+
 			return new NewNode((TypeNode)visit(ctx.type()));
 		}
-		else return new NewNode(null); //WARNING in questo modo stiamo ammettendo solo uso di new nella forma type? id=new o return new.
+		else return new NewNode(null);
 	}
 
 	@Override public ExpNode visitValExp(SimpLanPlusParser.ValExpContext ctx) {
@@ -421,8 +400,8 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		BlockNode res;
 
 		//list of declarations in @res
-		ArrayList<Node> declarations = new ArrayList<Node>();
-		ArrayList<Node> statements = new ArrayList<Node>();
+		ArrayList<Node> declarations = new ArrayList<>();
+		ArrayList<Node> statements = new ArrayList<>();
 
 		//visit all nodes corresponding to declarations inside the let context and store them in @declarations
 		//notice that the ctx.let().dec() method returns a list, this is because of the use of * or + in the grammar

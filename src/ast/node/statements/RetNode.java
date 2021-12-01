@@ -1,47 +1,36 @@
 package ast.node.statements;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import ast.Label;
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
-import ast.node.exp.ExpNode;
 import ast.node.types.*;
 import effect.EffectError;
 import semantic.Environment;
-import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RetNode extends MetaNode {
 
-  private Node val;
-  private TypeNode etype;// expected type
+  private final Node val;
+  private final TypeNode returnType;// expected type
   private FunNode parent_f;
   private int current_nl;
 
     public RetNode (Node v, TypeNode e) {
     val=v;
-    etype=e;
+    returnType=e;
   }
 
-  public ExpNode getValNode(){
-        return (ExpNode) this.val;
-
-  }
-
-  public TypeNode getEtype() {
-	  return etype;
-  }
-
-  public String toPrint(String s) {
+    public String toPrint(String s) {
     return s+"Return\n" + (val!= null ? val.toPrint(s+"  ") : "");
   }
 
   @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
-	  ArrayList<SemanticError> res = new ArrayList<SemanticError> ();
+ 	public ArrayList<SemanticError> checkSemantics(Environment env) {
+	  ArrayList<SemanticError> res = new ArrayList<>();
       if(val != null){
           res.addAll(val.checkSemantics(env));
       }
@@ -61,27 +50,24 @@ public class RetNode extends MetaNode {
 
   
   public TypeNode typeCheck() {
-        if(etype instanceof VoidTypeNode && val != null){
+        if(returnType instanceof VoidTypeNode && val != null){
             System.err.println("Trying to return value in void function: "+parent_f.getId());
             System.exit(0);
         }
-          //throw new SimplanPlusException("Returning val in void function");
-        else if(etype.getClass() == PointerTypeNode.class){
+        else if(returnType.getClass() == PointerTypeNode.class){
           System.err.println("Trying to return pointer inside of function: "+parent_f.getId());
           System.exit(0);
         }
-            //throw new SimplanPlusException("Trying to return pointer inside a function.");
         else if(val == null) {
           return new VoidTypeNode();
         }
-        else if (TypeUtils.isSubtype(val.typeCheck(), etype)) {
-          return etype;
+        else if (TypeUtils.isSubtype(val.typeCheck(), returnType)) {
+          return returnType;
         }
         else{
           System.err.println("Wrong return type for function "+parent_f.getId());
           System.exit(0);
         }
-           // throw new SimplanPlusException("Wrong return type for function");
       return null;
   }  
   
@@ -101,20 +87,19 @@ public class RetNode extends MetaNode {
     }
 
 
-    public String codeGeneration(Label labelManager) throws SimplanPlusException {
-        StringBuilder cgen = new StringBuilder();
+    public String codeGeneration(Label labelManager) {
+        StringBuilder codeGenerated = new StringBuilder();
         if( val != null){
-            cgen.append(val.codeGeneration(labelManager)).append("\n");
+            codeGenerated.append(val.codeGeneration(labelManager)).append("\n");
         }
 
-        for (int i = 0; i < current_nl-parent_f.getBody().getCurrent_nl(); i++)
-            cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
+        codeGenerated.append("lw $fp 0($fp) //Load old $fp pushed \n".repeat(Math.max(0, current_nl - parent_f.getBody().getCurrent_nl())));
 
-        cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation in return \n");
-        cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
+        codeGenerated.append("subi $sp $fp 1 //Restore stack pointer as before block creation in return \n");
+        codeGenerated.append("lw $fp 0($fp) //Load old $fp pushed \n");
 
-        cgen.append("b ").append(parent_f.get_end_fun_label()).append("\n");
-		return cgen.toString();
+        codeGenerated.append("b ").append(parent_f.get_end_fun_label()).append("\n");
+		return codeGenerated.toString();
   }
     
 }  

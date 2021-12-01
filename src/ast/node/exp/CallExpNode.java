@@ -1,15 +1,13 @@
 package ast.node.exp;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.Label;
-import ast.STentry;
 import ast.node.statements.CallNode;
 import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.EffectError;
 import semantic.Environment;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,24 +22,19 @@ public class CallExpNode extends ExpNode {
     public String toPrint(String indent) {
         return inner.toPrint(indent);
     }
-    public STentry innerEntry(){
-        return inner.getEntry();
-    }
-    public String getIdName(){
-        return inner.getIdName();
-    }
+
     @Override
     public TypeNode typeCheck() {
         return inner.typeCheck();
     }
 
     @Override
-    public String codeGeneration(Label labelManager) throws SimplanPlusException {
+    public String codeGeneration(Label labelManager) {
         return inner.codeGeneration(labelManager);
     }
 
     @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
         return inner.checkSemantics(env);
     }
 
@@ -56,9 +49,9 @@ public class CallExpNode extends ExpNode {
     }
 
     @Override
-    public List<Dereferenceable> variables() {
-        List<Dereferenceable> l = new ArrayList<>();
-        for (ExpNode par: inner.getParlist())
+    public List<Dereferences> variables() {
+        List<Dereferences> l = new ArrayList<>();
+        for (ExpNode par: inner.getParameterList())
             l.addAll(par.variables());
         return l;
     }

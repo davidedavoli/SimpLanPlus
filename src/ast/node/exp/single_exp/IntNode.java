@@ -3,7 +3,7 @@ package ast.node.exp.single_exp;
 import java.util.ArrayList;
 import java.util.List;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.node.exp.ExpNode;
 import ast.node.types.IntTypeNode;
 import ast.node.types.HasReturn;
@@ -15,14 +15,14 @@ import semantic.SemanticError;
 
 public class IntNode extends ExpNode {
 
-  private Integer val;
+  private final Integer val;
   
   public IntNode (Integer n) {
     val=n;
   }
   
   public String toPrint(String s) {
-    return s+"Int:" + Integer.toString(val) +"\n";  
+    return s+"Int:" + val +"\n";
   }
   
   public TypeNode typeCheck() {
@@ -30,10 +30,9 @@ public class IntNode extends ExpNode {
   } 
   
   @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
-
- 	  return new ArrayList<SemanticError>();
- 	}
+  public ArrayList<SemanticError> checkSemantics(Environment env) {
+    return new ArrayList<>();
+  }
   
   public HasReturn retTypeCheck() {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);
@@ -45,15 +44,15 @@ public class IntNode extends ExpNode {
   }
 
   @Override
-  public List<Dereferenceable> variables() {
-    return new ArrayList<Dereferenceable>();
+  public List<Dereferences> variables() {
+    return new ArrayList<>();
   }
 
-  public String codeGeneration(Label labelManager){
+  public String codeGeneration(Label labelManager) {
 
-      StringBuilder cgen = new StringBuilder();
-      cgen.append("li $a0 ").append(val).append("\n");
-      return cgen.toString();
+      StringBuilder codeGenerated = new StringBuilder();
+      codeGenerated.append("li $a0 ").append(val).append("\n");
+      return codeGenerated.toString();
   }
 
 

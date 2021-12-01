@@ -1,6 +1,6 @@
 package ast.node.exp;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.IntTypeNode;
 import ast.node.types.HasReturn;
@@ -9,7 +9,6 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,19 +43,8 @@ public class BinExpNode extends ExpNode {
                 System.err.println("Operands are of different type");
                 System.exit(0);
             }
-                //throw new SimplanPlusException("Operands are of different type");
-
-
-        /**
-        * +, -, *, / <,<=,>,>=: solo int
-        * ==,!= : solo o tra int o tra bool
-        * &&, ||, ! : solo tra bool
-        * */
 
         switch (operator) {
-            /**
-             * Math operator da cambiare
-             */
             case "+":
             case "-":
             case "*":
@@ -66,8 +54,6 @@ public class BinExpNode extends ExpNode {
                     System.err.println("Operands are not int in math operator ([ + | - | * | / ])");
                     System.exit(0);
                 }
-                    //throw new SimplanPlusException("Operands are not int in division");
-
                 return new IntTypeNode();
 
             case "<":
@@ -75,9 +61,8 @@ public class BinExpNode extends ExpNode {
             case ">":
             case ">=":
                 if (!(lhsType instanceof IntTypeNode)) {
-                    System.err.println("Operands are not int in >=");
+                    System.err.println("Operands are not int in ([ >= | > | < | <= ])");
                     System.exit(0);
-                    //throw new SimplanPlusException("Operands are not int in >=");
                 }
                 return new BoolTypeNode();
             /**
@@ -94,35 +79,34 @@ public class BinExpNode extends ExpNode {
                 if(!(lhsType instanceof  BoolTypeNode)){
                     System.err.println("Operands are not bool in [ or(||) | and[&&] ");
                     System.exit(0);
-                    //throw new SimplanPlusException("Operands are not bool in division");
                 }
                 return new BoolTypeNode();
         }
         /**
-         * Lo switch copre tutti i casi
+         * Should not arrive here.
          */
         return null;
     }
 
     @Override
-    public String codeGeneration(Label labelManager) throws SimplanPlusException {
+    public String codeGeneration(Label labelManager) {
 
-        StringBuilder cgen = new StringBuilder();
+        StringBuilder codeGenerated = new StringBuilder();
 
-        cgen.append("//Start codegen of ").append(lhs.getClass().getName()).append(operator).append(rhs.getClass().getName()).append("\n");
+        codeGenerated.append("//Start codegen of ").append(lhs.getClass().getName()).append(operator).append(rhs.getClass().getName()).append("\n");
         /**
          * Cgen for lhs and rhs to push them on the stack
          */
         String lhs_generated = lhs.codeGeneration(labelManager);
-        cgen.append(lhs_generated);
+        codeGenerated.append(lhs_generated);
 
-        cgen.append("push $a0 // push e1\n");
+        codeGenerated.append("push $a0 // push e1\n");
         String rhs_generated = rhs.codeGeneration(labelManager);
 
-        cgen.append(rhs_generated);
+        codeGenerated.append(rhs_generated);
 
-        cgen.append("lw $a2 0($sp) //take e2 and $a2 take e1\n");
-        cgen.append("pop // remove e1 from the stack to preserve stack\n");
+        codeGenerated.append("lw $a2 0($sp) //take e2 and $a2 take e1\n");
+        codeGenerated.append("pop // remove e1 from the stack to preserve stack\n");
 
         /**
          * $a2(=e1) operation $a0(=e2)
@@ -130,20 +114,20 @@ public class BinExpNode extends ExpNode {
 
         switch (operator) {
             case "+":{
-                cgen.append("add $a0 $a2 $a0 // a0 = t1+a0\n");
+                codeGenerated.append("add $a0 $a2 $a0 // a0 = t1+a0\n");
 
                 break;
             }
             case "-": {
-                cgen.append("sub $a0 $a2 $a0 // a0 = t1-a0\n");
+                codeGenerated.append("sub $a0 $a2 $a0 // a0 = t1-a0\n");
                 break;
             }
             case "*": {
-                cgen.append("mult $a0 $a2 $a0 // a0 = t1+a0\n");
+                codeGenerated.append("mult $a0 $a2 $a0 // a0 = t1+a0\n");
                 break;
             }
             case "/": {
-                cgen.append("div $a0 $a2 $a0 // a0 = t1/a0\n");
+                codeGenerated.append("div $a0 $a2 $a0 // a0 = t1/a0\n");
                 break;
             }
             /*
@@ -154,38 +138,38 @@ public class BinExpNode extends ExpNode {
             * eq
             * */
             case "<=":{
-                cgen.append("le $a0 $a2 $a0 // $a0 = $a2 <= $a0\n");
+                codeGenerated.append("le $a0 $a2 $a0 // $a0 = $a2 <= $a0\n");
                 break;
             }
             case "<":{
-                cgen.append("lt $a0 $a2 $a0 // $a0 = $a2 < $a0\n");
+                codeGenerated.append("lt $a0 $a2 $a0 // $a0 = $a2 < $a0\n");
                 break;
             }
             case ">":{
-                cgen.append("gt $a0 $a2 $a0 // $a0 = $a2 > $a0\n");
+                codeGenerated.append("gt $a0 $a2 $a0 // $a0 = $a2 > $a0\n");
                 break;
             }
             case ">=":{
-                cgen.append("ge $a0 $a2 $a0 // $a0 = $a2 >= $a0\n");
+                codeGenerated.append("ge $a0 $a2 $a0 // $a0 = $a2 >= $a0\n");
                 break;
             }
             case "==":{
-                cgen.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0\n");
+                codeGenerated.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0\n");
                 break;
             }
             case "!=":{
-                cgen.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0\n");
-                cgen.append("not $a0 $a0 // $a0 = !$a0\n");
+                codeGenerated.append("eq $a0 $a2 $a0 // $a0 = $a2 == $a0\n");
+                codeGenerated.append("not $a0 $a0 // $a0 = !$a0\n");
                 break;
             }
             case "&&":{
-                cgen.append("and $a0 $a2 $a0 // $a0 = $a2 && $a0\n");
-                //cgen.append("mult $a0 $a2 $a0 // $a0 = $a2 && $a0 aka $a0 = $a2 * $a0\n");
+                codeGenerated.append("and $a0 $a2 $a0 // $a0 = $a2 && $a0\n");
+                //codeGenerated.append("mult $a0 $a2 $a0 // $a0 = $a2 && $a0 aka $a0 = $a2 * $a0\n");
                 break;
             }
 
             case "||":{
-                cgen.append("or $a0 $a2 $a0 // $a0 = $a2 || $a0\n");
+                codeGenerated.append("or $a0 $a2 $a0 // $a0 = $a2 || $a0\n");
                 break;
             }
            
@@ -193,11 +177,11 @@ public class BinExpNode extends ExpNode {
              * Case of == and != to implement on boolean expression
              */
         }
-        return cgen.toString();
+        return codeGenerated.toString();
     }
 
     @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
         ArrayList<SemanticError> binExpNodeErrors = new ArrayList<>();
 
         binExpNodeErrors.addAll(lhs.checkSemantics(env));
@@ -206,8 +190,8 @@ public class BinExpNode extends ExpNode {
         return binExpNodeErrors;
     }
     @Override
-    public List<Dereferenceable> variables() {
-        List<Dereferenceable> variables = new ArrayList<>();
+    public List<Dereferences> variables() {
+        List<Dereferences> variables = new ArrayList<>();
 
         variables.addAll(lhs.variables());
         variables.addAll(rhs.variables());

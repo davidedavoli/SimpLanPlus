@@ -8,15 +8,14 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class ArrowTypeNode implements TypeNode {
 
-  private List<TypeNode> parlist;
-  private TypeNode ret;
+  private final List<TypeNode> parameterList;
+  private final TypeNode ret;
   
   public ArrowTypeNode (List<TypeNode> p, TypeNode r) {
-    parlist=p;
+    parameterList =p;
     ret=r;
   }
   
@@ -24,12 +23,11 @@ public class ArrowTypeNode implements TypeNode {
     System.err.println("Attempt to dereference a function");
     System.exit(0);
     return null;
-      //throw new SimplanPlusException("Attempt to dereference a bool");
   }
 
   public String toString(){
-    String s="";
-    s= parlist.stream()
+    String s;
+    s= parameterList.stream()
             .map(Object::toString)
             .collect(Collectors.joining("x"));
     s+="->";
@@ -38,10 +36,10 @@ public class ArrowTypeNode implements TypeNode {
   }
     
   public String toPrint(String s) { //
-	StringBuilder parlstr= new StringBuilder();
-    for (Node par:parlist)
-      parlstr.append(par.toPrint(s + "  "));
-	return s+"ArrowType\n" + parlstr + ret.toPrint(s+"  ->") ; 
+	StringBuilder parameterListString= new StringBuilder();
+    for (Node par: parameterList)
+      parameterListString.append(par.toPrint(s + "  "));
+	return s+"ArrowType\n" + parameterListString + ret.toPrint(s+"  ->") ;
   }
   
   public TypeNode getRet () { //
@@ -49,16 +47,14 @@ public class ArrowTypeNode implements TypeNode {
   }
   
   public List<TypeNode> getParList () { //
-    return parlist;
+    return parameterList;
   }
 
   @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) {
-		// TODO Auto-generated method stub
-		return new ArrayList<SemanticError>();
-	}
+  public ArrayList<SemanticError> checkSemantics(Environment env) {
+    return new ArrayList<>();
+  }
   
-  //non utilizzato
   public TypeNode typeCheck() {
     return null;
   }
@@ -72,7 +68,6 @@ public class ArrowTypeNode implements TypeNode {
     return new ArrayList<>();
   }
 
-  //non utilizzato
   public String codeGeneration(Label labelManager) {
 		return "";
   }

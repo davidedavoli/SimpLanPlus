@@ -3,7 +3,7 @@ package ast.node.exp;
 import java.util.ArrayList;
 import java.util.List;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.node.types.IntTypeNode;
 import ast.node.types.TypeUtils;
 import ast.node.types.HasReturn;
@@ -12,26 +12,18 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class NegExpNode extends ExpNode {
 
-  private ExpNode exp;
+  private final ExpNode exp;
   
   public NegExpNode (ExpNode e) {
     exp=e;
   }
   
   @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
-	  //create the result
-	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-	  
-	  //check semantics in the left and in the right exp
-	  
-	  res.addAll(exp.checkSemantics(env));
-	  
- 	  return res;
+ 	public ArrayList<SemanticError> checkSemantics(Environment env) {
+	  return new ArrayList<>(exp.checkSemantics(env));
  	}
   
   public String toPrint(String s) {
@@ -40,20 +32,19 @@ public class NegExpNode extends ExpNode {
   
   public TypeNode typeCheck() {
 	  if (! TypeUtils.isSubtype(exp.typeCheck(),new IntTypeNode())) {
-		  System.err.println("Try to do negative on a non int");
+		  System.err.println("Trying to do negative on a non int");
 		  System.exit(0);
 	  }
-		  	  //throw new SimplanPlusException("Non int negate");
 	  return new IntTypeNode();
   }
 
 	@Override
-	public String codeGeneration(Label labelManager) throws SimplanPlusException {
-		StringBuilder cgen = new StringBuilder();
+	public String codeGeneration(Label labelManager) {
+		StringBuilder codeGenerated = new StringBuilder();
 		String loaded_exp = exp.codeGeneration(labelManager);
-		cgen.append(loaded_exp).append("\n");
-		cgen.append("multi $a0 $a0 -1 //do negate\n");
-		return cgen.toString();
+		codeGenerated.append(loaded_exp).append("\n");
+		codeGenerated.append("multi $a0 $a0 -1 //do negate\n");
+		return codeGenerated.toString();
 	}
 
 	public HasReturn retTypeCheck() {
@@ -61,7 +52,7 @@ public class NegExpNode extends ExpNode {
   }
 
 	@Override
-	public List<Dereferenceable> variables() {
+	public List<Dereferences> variables() {
 		return exp.variables();
 	}
 

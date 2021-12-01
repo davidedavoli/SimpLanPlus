@@ -2,7 +2,7 @@ package ast;
 
 import effect.Effect;
 
-public interface Dereferenceable {
+public interface Dereferences {
 
     int getDereferenceLevel();
     String getID();

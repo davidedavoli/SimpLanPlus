@@ -6,10 +6,9 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class PointerTypeNode implements TypeNode {
-  private TypeNode type;
+  private final TypeNode type;
   
   public PointerTypeNode (TypeNode t) {
 	  type=t;
@@ -20,13 +19,11 @@ public class PointerTypeNode implements TypeNode {
   }
 
   public String toPrint(String s) {
-      //return s+"Pointer type\n"+type.toPrint(s+"   ");
       return s+"^"+type.toPrint("");
   }
     
-  //non utilizzato
   public TypeNode typeCheck() {
-    return null; //non bisognerebbe chiamare typecheck su questo nodo
+    return null;
   }
   
   public TypeNode dereference() {
@@ -35,24 +32,22 @@ public class PointerTypeNode implements TypeNode {
   
   public int getDereferenceLevel(){
 	  if (type instanceof PointerTypeNode)
-		  return 1+((PointerTypeNode)type).getDereferenceLevel();
+		  return 1+ type.getDereferenceLevel();
 	  else
 		  return 1;
   }
   
   @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
+  public ArrayList<SemanticError> checkSemantics(Environment env) {
+      return new ArrayList<>();
+  }
 
- 	  return new ArrayList<SemanticError>();
- 	}
-  
-  
   public HasReturn retTypeCheck() {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
-    @Override
-    public ArrayList<EffectError> checkEffects (Environment env) {
+  @Override
+  public ArrayList<EffectError> checkEffects (Environment env) {
         return new ArrayList<>();
     }
 

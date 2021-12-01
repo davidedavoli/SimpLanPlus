@@ -2,31 +2,24 @@ package ast.node;
 
 import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
-
 import java.util.ArrayList;
-
 import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public interface Node {
 
   String toPrint(String indent);
 
-  //fa il type checking e ritorna: 
-  //  per una espressione, il suo tipo (oggetto BoolTypeNode o IntTypeNode)
-  //  per una dichiarazione, "null"
+  //type checking return:
+  //  for an expression his type
+  //  for a declaration null
   TypeNode typeCheck();
   
-  String codeGeneration(Label labelManager) throws SimplanPlusException;
+  String codeGeneration(Label labelManager);
 
-
-
-  ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException;
-  
-  //ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl);
+  ArrayList<SemanticError> checkSemantics(Environment env);
 
   HasReturn retTypeCheck();
 

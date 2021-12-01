@@ -3,7 +3,7 @@ package semantic;
 import java.util.*;
 import java.util.function.BiFunction;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.STentry;
 import ast.node.types.ArrowTypeNode;
 import ast.node.types.TypeNode;
@@ -11,15 +11,10 @@ import effect.Effect;
 import effect.EffectError;
 
 public class Environment {
-	
-	//THESE VARIABLES SHOULDN'T BE PUBLIC
-	//THIS CAN BE DONE MUCH BETTER
-	
-	private ArrayList<HashMap<String,STentry>>  symTable = new ArrayList<HashMap<String,STentry>>();
-	private int nestingLevel = -1;
-	private int offset = 0;
-	//livello ambiente con dichiarazioni piu' esterno � 0 (prima posizione ArrayList) invece che 1 (slides)
-	//il "fronte" della lista di tabelle � symTable.get(nestingLevel)
+
+	private final ArrayList<HashMap<String,STentry>>  symTable;
+	private int nestingLevel;
+	private int offset;
 
 	public Environment(int nestingLevel, int offset){
 		this.symTable = new ArrayList<>();
@@ -208,9 +203,7 @@ public class Environment {
 	public HashMap<String, STentry> getCurrentST() {
 		return this.symTable.get(this.nestingLevel);
 	}
-	public HashMap<String, STentry> getPrevCurrentST() {
-		return this.symTable.get(this.nestingLevel-1);
-	}
+
 	/**
 	 * End of Getter
 	 */
@@ -230,11 +223,6 @@ public class Environment {
 		this.offset = -1;
 	}
 
-
-	public int setNestingLevel(int nestingLevel) {
-		this.nestingLevel = nestingLevel;
-		return nestingLevel;
-	}
 	/**
 	 * End of Setter
 	 */
@@ -250,8 +238,7 @@ public class Environment {
 				return stEntry;
 			}
 		}
-		//throw new SimplanPlusException("ID " + id + " is not in the ST.");
-		//System.err.println("ID " + id + " is not in the ST.");
+
 		return null;
 	}
 
@@ -267,7 +254,7 @@ public class Environment {
 	public void createVoidScope(){
 		this.nestingLevel++;
 		offset = 0;
-		this.symTable.add(new HashMap<String, STentry>());
+		this.symTable.add(new HashMap<>());
 	}
 
 	public void createScope(HashMap<String, STentry> newScope){
@@ -303,22 +290,17 @@ public class Environment {
 	public STentry newFunctionParameter(final String varId, final TypeNode varType, final int offset){
 		HashMap<String, STentry> ST = this.symTable.get(this.nestingLevel);
 		STentry newEntry = new STentry(this.nestingLevel,varType,offset);
-		STentry oldEntry = ST.put(varId,newEntry);
-		return oldEntry;
+		return ST.put(varId,newEntry);
 	}
 	public STentry createFunDec(String bFL, String eFL,TypeNode type){
-		STentry entry = new STentry(this.nestingLevel,this.offset--,bFL,eFL,type);
-		return entry;
+		return new STentry(this.nestingLevel, this.offset--,bFL,eFL,type);
 	}
 
 	public void addEntry(String id, STentry entry){
 		HashMap<String, STentry> ST = this.symTable.get(nestingLevel);
 		ST.put(id,entry);
 	}
-	public void removeEntry(String id){
-		HashMap<String, STentry> ST = this.symTable.get(nestingLevel);
-		ST.remove(id);
-	}
+
 
 	/**
 	 * End new parameter/declaration function
@@ -328,12 +310,12 @@ public class Environment {
 	/**
 	 *
 	 * Check Stm status
-	 * @param {LhsNode} variable is the variable that will receive the new effect
-	 * @param {BiFunction} function from effect that has to be invoke
-	 * @param {int} effect to be applayed
+	 * @param variable {LhsNode} variable is the variable that will receive the new effect
+	 * @param effectFun {BiFunction} function from effect that has to be invoked
+	 * @param effect {int} effect to be applied
 	 */
 	public ArrayList<EffectError> checkStmStatus(
-		Dereferenceable variable,
+		Dereferences variable,
 		BiFunction<Effect,Effect,Effect> effectFun,
 		Effect effect
 	) {
@@ -410,15 +392,6 @@ public class Environment {
 
 	@Override
 	public String toString() {
-
-		StringBuilder st = new StringBuilder();
-		String hs="";
-		for (HashMap<String, STentry> hm: symTable){
-			for (String k: hm.keySet()){
-				hs = "\t" + k + "->" + hm.get(k).toString() + "\n";
-			}
-			st.append(hs).append('\n');
-		}
 
 		return "Environment{" +
 				"\n\tsymTable=\n\t\t" + symTable +

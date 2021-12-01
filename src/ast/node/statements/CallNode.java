@@ -2,7 +2,7 @@ package ast.node.statements;
 import java.util.ArrayList;
 import java.util.List;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.STentry;
 import ast.node.*;
 import ast.node.dec.FunNode;
@@ -14,15 +14,13 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class CallNode extends MetaNode {
 
-  private IdNode id;
+  private final IdNode id;
   private STentry entry;
-  private ArrayList<ExpNode> parameterlist;
-  private int nestinglevel;
-  private String endFunction;
+  private final ArrayList<ExpNode> parameterList;
+  private int nestingLevel;
   private Boolean isAlreadyCalled;
 
 
@@ -36,17 +34,17 @@ public class CallNode extends MetaNode {
 
     public CallNode(IdNode id, ArrayList<ExpNode> args) {
 	this.id=id;
-    parameterlist = args;
+    parameterList = args;
     isAlreadyCalled = false;
 }
 
 public String toPrint(String s) {  //
-    StringBuilder parlstr= new StringBuilder();
-	for (ExpNode par:parameterlist)
-	  parlstr.append(par.toPrint(s + "  "));
-	return s+"Call:" + id + " at nestlev " + nestinglevel +"\n" 
+    StringBuilder parameterString= new StringBuilder();
+	for (ExpNode par: parameterList)
+	  parameterString.append(par.toPrint(s + "  "));
+	return s+"Call:" + id + " at nesting level " + nestingLevel +"\n"
            +entry.toPrint(s+"  ")
-           +parlstr;        
+           +parameterString;
   }
 
 public HasReturn retTypeCheck() {
@@ -56,9 +54,8 @@ public HasReturn retTypeCheck() {
 
     @Override
     public ArrayList<EffectError> checkEffects(Environment env) {
-        ArrayList<EffectError> effectErrors = new ArrayList<>();
-        effectErrors.addAll(id.checkEffects(env));
-        parameterlist.forEach((p) -> effectErrors.addAll(p.checkEffects(env)));
+        ArrayList<EffectError> effectErrors = new ArrayList<>(id.checkEffects(env));
+        parameterList.forEach((p) -> effectErrors.addAll(p.checkEffects(env)));
         //Get all actual parameter status
         if(!isAlreadyCalled){
 
@@ -67,7 +64,7 @@ public HasReturn retTypeCheck() {
 
             List<List<Effect>> startingEffect = new ArrayList<>();
 
-            for (ExpNode par : parameterlist) {
+            for (ExpNode par : parameterList) {
                 List<Effect> parameterEffect = new ArrayList<>();
 
                 // put all the pointed var in RW
@@ -94,30 +91,30 @@ public HasReturn retTypeCheck() {
          * Non pointer parameters
          */
         List<Integer> indexOfNoPointerParameters = new ArrayList<>();
-        for(int index=0; index< parameterlist.size(); index++){
-            ExpNode parameter = parameterlist.get(index);
-            if ( !( (parameter instanceof Dereferenceable) && ((Dereferenceable) parameter).isPointer() ) ) {
+        for(int index = 0; index< parameterList.size(); index++){
+            ExpNode parameter = parameterList.get(index);
+            if ( !( (parameter instanceof Dereferences) && ((Dereferences) parameter).isPointer() ) ) {
                 indexOfNoPointerParameters.add(index);
             }
         }
         /**
          * Variable in the expression of parameter
          */
-        List<Dereferenceable> indexOfExpressionParameter = new ArrayList<>();
-        for (ExpNode parameter : parameterlist) {
-            if ( !( (parameter instanceof Dereferenceable) && ((Dereferenceable) parameter).isPointer() ) ) {
+        List<Dereferences> indexOfExpressionParameter = new ArrayList<>();
+        for (ExpNode parameter : parameterList) {
+            if ( !( (parameter instanceof Dereferences) && ((Dereferences) parameter).isPointer() ) ) {
                 indexOfExpressionParameter.addAll(parameter.variables());
             }
         }
 
         /**
-         * Checkin error on non pointer parameters
+         * Checking error on non pointer parameters
          */
         for (int index : indexOfNoPointerParameters) {
             List<Effect> actualEffectsList = functionEffects.get(index);
             for(Effect effect : actualEffectsList ){
                 if(effect.equals(Effect.ERROR))
-                    effectErrors.add(new EffectError("The parameter " + parameterlist.get(index) + " from function: " + id.getID() + " is in Error status."));
+                    effectErrors.add(new EffectError("The parameter " + parameterList.get(index) + " from function: " + id.getID() + " is in Error status."));
             }
         }
 
@@ -136,9 +133,9 @@ public HasReturn retTypeCheck() {
          * Non pointer parameters
          */
         List<Integer> indexOfPointerParameters = new ArrayList<>();
-        for(int index=0; index< parameterlist.size(); index++){
-            ExpNode parameter = parameterlist.get(index);
-            if( (parameter instanceof Dereferenceable) && ((Dereferenceable) parameter).isPointer() ){
+        for(int index = 0; index< parameterList.size(); index++){
+            ExpNode parameter = parameterList.get(index);
+            if( (parameter instanceof Dereferences) && ((Dereferences) parameter).isPointer() ){
                 indexOfPointerParameters.add(index);
             }
         }
@@ -151,7 +148,7 @@ public HasReturn retTypeCheck() {
             Environment tmpEnvironment = new Environment();
             tmpEnvironment.createVoidScope();
 
-            Dereferenceable pointer = parameterlist.get(i).variables().get(0);
+            Dereferences pointer = parameterList.get(i).variables().get(0);
 
             STentry entry = tmpEnvironment.createNewDeclaration(pointer.getID(), pointer.getEntry().getType());
 
@@ -198,17 +195,17 @@ public HasReturn retTypeCheck() {
         return effectErrors;
     }
 
-    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
 		//create the result
-		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+		ArrayList<SemanticError> res = new ArrayList<>();
 
 
         entry = env.lookUp(id.getID());
         if (entry == null)
             res.add(new SemanticError("Id "+id.getID()+" not declared."));
         else{
-            nestinglevel = env.getNestingLevel();
-            for(ExpNode arg : parameterlist)
+            nestingLevel = env.getNestingLevel();
+            for(ExpNode arg : parameterList)
                 res.addAll(arg.checkSemantics(env));
         }
 
@@ -225,50 +222,46 @@ public HasReturn retTypeCheck() {
          System.err.println("Trying to invoke "+id.getID()+". But it is not a function.");
          System.exit(0);
      }
-         //throw new SimplanPlusException("Invocation of a non-function "+id);
-     
+
      List<TypeNode> p = t.getParList();
-     if ( !(p.size() == parameterlist.size()) ){
+     if ( !(p.size() == parameterList.size()) ){
          System.err.println("Wrong number of parameters in the invocation of "+id.getID());
          System.exit(0);
      }
-         //throw new SimplanPlusException("Wrong number of parameters in the invocation of "+id);
-    
-     for (int i=0; i<parameterlist.size(); i++)
-       if ( !(TypeUtils.isSubtype( (parameterlist.get(i)).typeCheck(), p.get(i)) ) ){
+
+     for (int i = 0; i< parameterList.size(); i++)
+       if ( !(TypeUtils.isSubtype( (parameterList.get(i)).typeCheck(), p.get(i)) ) ){
            System.err.println("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id.getID());
            System.exit(0);
        }
-           //throw new SimplanPlusException("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id);
-       
+
      return t.getRet();
   }
   
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
-      StringBuilder cgen = new StringBuilder();
+  public String codeGeneration(Label labelManager) {
+      StringBuilder codeGenerated = new StringBuilder();
 
-      cgen.append("push $fp\n");
+      codeGenerated.append("push $fp\n");
 
-      for (int i=parameterlist.size()-1; i>=0; i--){
-          cgen.append(parameterlist.get(i).codeGeneration(labelManager)).append("\n");
-          cgen.append("push $a0\n");
+      for (int i = parameterList.size()-1; i>=0; i--){
+          codeGenerated.append(parameterList.get(i).codeGeneration(labelManager)).append("\n");
+          codeGenerated.append("push $a0\n");
       }
 
-      cgen.append("mv $fp $al //put in $al actual fp\n");
+      codeGenerated.append("mv $fp $al //put in $al actual fp\n");
 
 
-      for (int i = 0; i<nestinglevel-entry.getNestingLevel(); i++)
-          cgen.append("lw $al 0($al) //go up to chain\n");
+      codeGenerated.append("lw $al 0($al) //go up to chain\n".repeat(Math.max(0, nestingLevel - entry.getNestingLevel())));
 
-      cgen.append("push $al\n");
-      cgen.append("jal  ").append(entry.getBeginFuncLabel()).append("// jump to start of function and put in $ra next istruction\n");
+      codeGenerated.append("push $al\n");
+      codeGenerated.append("jal  ").append(entry.getBeginFuncLabel()).append("// jump to start of function and put in $ra next instruction\n");
 
-      return cgen.toString();
+      return codeGenerated.toString();
   }
 
 
-    public ArrayList<ExpNode> getParlist() {
-        return parameterlist;
+    public ArrayList<ExpNode> getParameterList() {
+        return parameterList;
     }
 
     private ArrayList<SemanticError> checkAncestorCall(){

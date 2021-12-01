@@ -1,7 +1,5 @@
 package Interpreter.memory;
 
-import semantic.SimplanPlusException;
-
 public class Cell {
     private Integer val;
     private boolean pointed;

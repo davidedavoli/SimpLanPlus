@@ -2,7 +2,7 @@ package ast.node;
 
 import java.util.ArrayList;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.STentry;
 import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
@@ -11,9 +11,8 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
-public class LhsNode extends MetaNode implements Dereferenceable {
+public class LhsNode extends MetaNode implements Dereferences {
 
   protected LhsNode inner;
 
@@ -53,16 +52,9 @@ public class LhsNode extends MetaNode implements Dereferenceable {
     public Effect getIdStatus(int j) {
         return this.inner.getIdStatus(j);
     }
-
-    public int getNestingLevel(){
-      if (inner!=null)
-          return inner.getNestingLevel();
-      else
-          return -1; //sarà un valore sensato?
-  }
-
+    
     @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
         return inner.checkSemantics(env);
     }
 
@@ -85,7 +77,6 @@ public class LhsNode extends MetaNode implements Dereferenceable {
 
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
-        ArrayList<EffectError> errors = new ArrayList<>();
         /**
          * Getting new entry if it was modified from some operation on environments
          */
@@ -93,23 +84,23 @@ public class LhsNode extends MetaNode implements Dereferenceable {
         STentry actualEntry = env.effectsLookUp(id);
         inner.setEntry(actualEntry);
 
-        errors.addAll(inner.checkEffects(env));
+        ArrayList<EffectError> errors = new ArrayList<>(inner.checkEffects(env));
         if (!inner.getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()-1).equals(new Effect(Effect.READWRITE))) {
             errors.add(new EffectError(inner.getID() + " has not all pointer to rw."));
         }
         return  errors;
     }
 
-    public String codeGeneration(Label labelManager) throws SimplanPlusException {
+    public String codeGeneration(Label labelManager) {
       /**
        * Ritorna indirizzo del puntatore
        */
 
-      StringBuilder cgen = new StringBuilder();
-      cgen.append(inner.codeGeneration(labelManager));
-      cgen.append("lw $al 0($al) //deferencing inner\n");
+      StringBuilder codeGenerated = new StringBuilder();
+      codeGenerated.append(inner.codeGeneration(labelManager));
+      codeGenerated.append("lw $al 0($al) //deferencing inner\n");
 
-      return cgen.toString();
+      return codeGenerated.toString();
     }
 
     public void setIdStatus(Effect effect, int level){

@@ -1,4 +1,3 @@
-// Generated from D:/universita/SimpLanPlus/src/parser\SimpLanPlus.g4 by ANTLR 4.9.1
 package parser;
 import ast.SimpLanPlusListener;
 import ast.SimpLanPlusVisitor;

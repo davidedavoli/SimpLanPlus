@@ -2,8 +2,8 @@ package ast.node.types;
 
 public class HasReturn {
 	
-	public enum hasReturnType {ABS, PRES};
-	private hasReturnType val;
+	public enum hasReturnType {ABS, PRES}
+	private final hasReturnType val;
 	
 	public hasReturnType getVal() {
 		return val;

@@ -20,7 +20,6 @@ import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
 import effect.EffectError;
-import semantic.SimplanPlusException;
 
 
 public class Compiler {
@@ -34,18 +33,16 @@ public class Compiler {
 		FileInputStream is = new FileInputStream(codeFile);
 		ANTLRInputStream input = new ANTLRInputStream(is);
 		SimpLanPlusLexer lexer = new SimpLanPlusLexer(input);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-		return tokens;
+		return new CommonTokenStream(lexer);
 	}
 	private static Node parser(CommonTokenStream tokens){
 		SimpLanPlusParser parser = new SimpLanPlusParser(tokens);
 		SimpLanPlusVisitorImpl visitor = new SimpLanPlusVisitorImpl();
 
-		Node ast = visitor.visitMainBlock(parser.block(), true); //generazione AST
-		return ast;
+		return visitor.visitMainBlock(parser.block(), true);
 	}
-	private static void checkErrorAst(Node ast, Environment env) throws SimplanPlusException {
+	private static void checkErrorAst(Node ast, Environment env) {
 		//SIMPLE CHECK FOR LEXER ERRORS
 
 		ArrayList<SemanticError> semanticError = ast.checkSemantics(env);
@@ -74,7 +71,7 @@ public class Compiler {
 		}
 	}
 
-	private static void codeGeneration(String fileAsm, Node ast) throws IOException, SimplanPlusException {
+	private static void codeGeneration(String fileAsm, Node ast) throws IOException {
 
 		Label labelManager = new Label();
 		String code=ast.codeGeneration(labelManager);
@@ -111,7 +108,8 @@ public class Compiler {
 		return visitorSVM;
 	}
 
-	private static void compileFile(String fileAbsName,String fileName) throws IOException, SimplanPlusException {
+
+	private static void compileFile(String fileAbsName,String fileName) throws IOException {
 		System.out.println("COMPILING "+fileAbsName);
 		String fileAsm = asmDir+fileName+".asm";
 		CommonTokenStream tokens = lexer(fileAbsName);
@@ -134,14 +132,14 @@ public class Compiler {
 		interpreterCode(visitorSVM.getCode(),fileName);
 	}
 
-	private static void interpreterCode(Instruction[] code,String filename) throws SimplanPlusException {
+	private static void interpreterCode(Instruction[] code,String filename) {
 		System.out.println("Starting Virtual Machine for "+filename+"...");
 		SVM vm = new SVM(code);
 		vm.cpu();
 	}
 	public static void main(String[] args) throws Exception {
 
-		int numberSingle = 31;
+		int numberSingle = 33;
 		String dire = "tommasoExamples/";
 		String fileAbsNameSingle = dire + baseName + numberSingle + ext;
 		String fileNameSingle = baseName + numberSingle + ext;

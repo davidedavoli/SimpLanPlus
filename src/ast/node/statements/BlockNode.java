@@ -1,21 +1,20 @@
 package ast.node.statements;
 
-import ast.STentry;
+import ast.Label;
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
 import ast.node.dec.VarNode;
 import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import ast.Label;
 import effect.EffectError;
 import semantic.Environment;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BlockNode extends MetaNode {
 
@@ -42,26 +41,24 @@ public class BlockNode extends MetaNode {
     }
 
     public String toPrint(String s) {
-	StringBuilder declstr= new StringBuilder();
-	StringBuilder statstr= new StringBuilder();
+	StringBuilder declarationString= new StringBuilder();
+	StringBuilder statementString= new StringBuilder();
     for (Node dec:declarations)
-      declstr.append(dec.toPrint(s + "  "));
+      declarationString.append(dec.toPrint(s + "  "));
     for (Node stat:statements)
-      statstr.append(stat.toPrint(s + "  "));
-	return s+"Block\n" + declstr + statstr ; 
+        statementString.append(stat.toPrint(s + "  "));
+	return s+"Block\n" + declarationString + statementString ;
   }
   
   @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
-      HashMap<String, STentry> hm = new HashMap<String,STentry> ();
-
+	public ArrayList<SemanticError> checkSemantics(Environment env) {
       if (!isFunction) {
           env.createVoidScope();
       }
       current_nl = env.getNestingLevel();
 
       //declare resulting list
-      ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+      ArrayList<SemanticError> res = new ArrayList<>();
       if(isFunction)
           env.functionOffset();
       else
@@ -115,20 +112,7 @@ public class BlockNode extends MetaNode {
         return last;
      }
 
-  public ArrayList<TypeNode> getReturnList() throws SimplanPlusException {
-      ArrayList<TypeNode> res = new ArrayList<TypeNode>();
-      for (Node s: statements) {
-    	  if (s instanceof BlockNode)
-    		  res.addAll(((BlockNode) s).getReturnList());//Warning  Casting
-    	  else if (s instanceof RetNode) {
-    		  res.add(s.typeCheck());
-    		  break;
-    	  }
-      }
-      return res;
-  }
-  
-  public HasReturn retTypeCheck() {
+    public HasReturn retTypeCheck() {
 	  HasReturn tmp = new HasReturn(HasReturn.hasReturnType.ABS);
 	  for (Node s:statements) {
 			  tmp= HasReturn.max(tmp, s.retTypeCheck());
@@ -160,21 +144,21 @@ public class BlockNode extends MetaNode {
     }
 
   
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
-      StringBuilder cgen = new StringBuilder();
+  public String codeGeneration(Label labelManager) {
+      StringBuilder codeGenerated = new StringBuilder();
 
 
       /**
        * Activation link
        */
         if (!isFunction){
-            cgen.append("push 0\n");
+            codeGenerated.append("push 0\n");
 
             if (!isMain) {
-              cgen.append("push $fp //loadind new block\n");
+              codeGenerated.append("push $fp //loading new block\n");
             }
 
-            cgen.append("mv $sp $fp //Load new $fp\n");
+            codeGenerated.append("mv $sp $fp //Load new $fp\n");
 
         }
 
@@ -182,34 +166,34 @@ public class BlockNode extends MetaNode {
       Collection<Node> funDec = declarations.stream().filter(fun -> fun instanceof FunNode).collect(Collectors.toList());
 
       for (Node dec:varDec)
-            cgen.append(dec.codeGeneration(labelManager)).append("\n");
+            codeGenerated.append(dec.codeGeneration(labelManager)).append("\n");
 
 
 	  for (Node stat:statements)
-          cgen.append(stat.codeGeneration(labelManager)).append("\n");
+          codeGenerated.append(stat.codeGeneration(labelManager)).append("\n");
 
       if(!isFunction){
            if(isMain){
-               cgen.append("halt\n");
+               codeGenerated.append("halt\n");
            }
            else{
-                cgen.append("subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode\n");
-                cgen.append("lw $fp 0($fp) //Load old $fp pushed \n");
+                codeGenerated.append("subi $sp $fp 1 //Restore stack pointer as before block creation in blockNode\n");
+                codeGenerated.append("lw $fp 0($fp) //Load old $fp pushed \n");
             }
       }
       else{
-          cgen.append(this.missingReturnCode);
+          codeGenerated.append(this.missingReturnCode);
           this.missingReturnCode = "";
       }
 
       if (funDec.size() > 0)
-         cgen.append("//CREO FUNZIONI\n");
+         codeGenerated.append("//Creating function:\n");
       for (Node fun:funDec){
-          cgen.append(fun.codeGeneration(labelManager)).append("\n");
+          codeGenerated.append(fun.codeGeneration(labelManager)).append("\n");
       }
       if (funDec.size() > 0)
-          cgen.append("//FINE FUNZIONI\n");
-	  return  cgen.toString();
+          codeGenerated.append("//Ending function.\n");
+	  return  codeGenerated.toString();
 
   }
 

@@ -6,7 +6,6 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class BoolTypeNode implements TypeNode {
   
@@ -21,10 +20,8 @@ public class BoolTypeNode implements TypeNode {
       System.err.println("Attempt to dereference a Boolean");
       System.exit(0);
       return null;
-      //throw new SimplanPlusException("Attempt to dereference a bool");
   }
     
-  //non utilizzato
   public TypeNode typeCheck() {
     return null;
   }
@@ -33,19 +30,17 @@ public class BoolTypeNode implements TypeNode {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
-    @Override
-    public ArrayList<EffectError> checkEffects (Environment env) {
+  @Override
+  public ArrayList<EffectError> checkEffects (Environment env) {
         return new ArrayList<>();
     }
 
-    @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
+  @Override
+  public ArrayList<SemanticError> checkSemantics(Environment env) {
+     return new ArrayList<>();
+  }
 
- 	  return new ArrayList<SemanticError>();
- 	}
-  
-  //non utilizzato
-  public String codeGeneration(Label labelManager) {
+   public String codeGeneration(Label labelManager) {
 		return "";
   }
 

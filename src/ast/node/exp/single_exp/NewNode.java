@@ -3,7 +3,7 @@ package ast.node.exp.single_exp;
 import java.util.ArrayList;
 import java.util.List;
 
-import ast.Dereferenceable;
+import ast.Dereferences;
 import ast.node.exp.ExpNode;
 import ast.node.types.PointerTypeNode;
 import ast.node.types.HasReturn;
@@ -12,36 +12,33 @@ import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class NewNode extends ExpNode {
-	
-	  private TypeNode type;
+
+	private final TypeNode type;
 	  
-	  public NewNode (TypeNode t) {
+	public NewNode (TypeNode t) {
 		    type=t;
 		  }
-	  
-	  @Override
-	  public ArrayList<SemanticError> checkSemantics(Environment env) {
-		  //create result list
-		  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
+
+	@Override
+	public ArrayList<SemanticError> checkSemantics(Environment env) {
+		ArrayList<SemanticError> res = new ArrayList<>();
 		  
-	  	  if (type == null)
-	  		  res.add(new SemanticError("new operator in compound expression"));
-	      return res;
-	  }
+		if (type == null)
+	  		res.add(new SemanticError("new operator in compound expression"));
+		return res;
+	}
 	  
-	  public String toPrint(String s) {
+	public String toPrint(String s) {
 		return s+"New:\n" + type.toPrint(s+"   ") +"\n";
 	  }
-	  
-	  //valore di ritorno non utilizzato
-	  public TypeNode typeCheck() {
+
+	public TypeNode typeCheck() {
 	    return new PointerTypeNode(type);
 	  }
 	  
-	  public HasReturn retTypeCheck() {
+	public HasReturn retTypeCheck() {
 		  return new HasReturn(HasReturn.hasReturnType.ABS);
 	  }
 
@@ -51,13 +48,11 @@ public class NewNode extends ExpNode {
 	}
 
 	@Override
-	public List<Dereferenceable> variables() {
-		return new ArrayList<Dereferenceable>();
+	public List<Dereferences> variables() {
+		return new ArrayList<>();
 	}
 
-	public String codeGeneration(Label labelManager){
-		  StringBuilder cgen = new StringBuilder();
-		  cgen.append("new $a0").append("// put new address in a0\n");
-		  return cgen.toString();
+	public String codeGeneration(Label labelManager) {
+		return "new $a0" + "// put new address in a0\n";
 	  }  
 }  

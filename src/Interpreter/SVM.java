@@ -3,35 +3,34 @@ package Interpreter;
 import Interpreter.ast.Instruction;
 import Interpreter.memory.Memory;
 import Interpreter.parser.SVMParser;
-import semantic.SimplanPlusException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SVM {
 
-    public static final int CODESIZE = 10000;
-    public static final int MEMSIZE = 10000;
+    public static final int CODE_SIZE = 10000;
+    public static final int MEMORY_SIZE = 10000;
 
     private final Instruction[] code;
-    private final Memory memory = new Memory(MEMSIZE);
+    private final Memory memory = new Memory(MEMORY_SIZE);
 
     private int ip = 0;             // instruction pointer, internal register, no write nor read
-    private int sp = MEMSIZE;       // stack pointer
+    private int sp = MEMORY_SIZE;       // stack pointer
     private int hp = 0;             // heap pointer read-only
-    private int fp = MEMSIZE-1;       // frame pointer
+    private int fp = MEMORY_SIZE -1;       // frame pointer
     private int ra;
     private int al;
-    private int bsp = MEMSIZE;
+    private int bsp = MEMORY_SIZE;
 
-    private int[] a = new int[10];
-    private int[] r = new int[10];
+    private final int[] a = new int[10];
+    private final int[] r = new int[10];
 
     public SVM(Instruction[] code) {
         this.code = code;
     }
 
-    public void cpu() throws SimplanPlusException {
+    public void cpu() {
         while (true) {
             if (hp + 1 >= sp) {
                 System.out.println("\nError: Out of memory");
@@ -95,8 +94,8 @@ public class SVM {
 
                         case SVMParser.STOREW:
                             offset = Integer.parseInt(arg2);
-                            int addr_sw = offset + regRead(arg3);
-                            memory.write(addr_sw, regRead(arg1));
+                            int addressStoreWord = offset + regRead(arg3);
+                            memory.write(addressStoreWord, regRead(arg1));
                             break;
                         case SVMParser.LOAD:
                             value = Integer.parseInt(arg2);
@@ -118,7 +117,7 @@ public class SVM {
                             break;
                         case SVMParser.BCOND:
                             address = Integer.parseInt(code[ip].getArg1());
-                            ip++;  //aumentiamo ip, in caso non venga effettuato il branch
+                            ip++;
                             value = regRead(bytecode.getArg1());
                             if (value!=0) ip = address;
                             break;
@@ -173,31 +172,29 @@ public class SVM {
                         case SVMParser.FREE:
                             address = regRead(arg1);
                             if (address == hp - 1)
-                                hp--; //se è l'ultimo indirizzo occupato, allora hp viene decrementato
+                                hp--;
                             memory.free(address);
                             break;
 
                         case SVMParser.PRINT:
                             if (arg1==null)
-                                System.out.println((sp < MEMSIZE) ? memory.read(sp) : "Empty stack!");
+                                System.out.println((sp < MEMORY_SIZE) ? memory.read(sp) : "Empty stack!");
                             else{
-                                System.out.println( "PRINTO IL VALORE NEL REGISTRO: "+arg1 +" CON VALORE: "+ regRead(arg1));
+                                System.out.println( "Print: "+ regRead(arg1));
                             }
-                            //System.out.println((sp < MEMSIZE) ? regRead(arg1) : "Empty stack!");
-
                             break;
 
                         case SVMParser.HALT:
                             //to print the result
-                            System.out.println("HALTING PROGRAM...");
+                            System.out.println("Halting program...");
                             //printStack(20);
                             //System.out.println("\nResult: " + memory.read(sp) + "\n");
 
                             return;
                     }
                 } catch (Exception e) {
-                    System.out.println("PROGRAMM STOPPED AT "+ip);
-                    //Map<String, STentry > hm = env.symTable.get(env.nestingLevel)
+                    System.out.println("Program stopped at program counter: "+ip);
+                    /*
                     String toPrint = "";
                     int cont = 0;
                     for (Instruction ins:code){
@@ -218,9 +215,10 @@ public class SVM {
                         cont++;
 
                     }
+                    */
 
                     e.printStackTrace();
-                    printStack(30);
+                    //printStack(30);
                     return;
                 }
             }
@@ -236,66 +234,65 @@ public class SVM {
 
     private int regRead(String reg) {
 
-        if (reg.equals("$fp")){
-            return fp;
-        }
-        else if(reg.equals("$bsp")){
-            return bsp;
-        }
-        else if (reg.equals("$al")){
-            return al;
-        }
-        else if (reg.equals("$sp")) {
-            return sp;
-        }
-        else if (reg.equals("$ra")) {
-            return ra;
+        switch (reg) {
+            case "$fp":
+                return fp;
+            case "$bsp":
+                return bsp;
+            case "$al":
+                return al;
+            case "$sp":
+                return sp;
+            case "$ra":
+                return ra;
 
-        }
-        else{
-            switch (reg.charAt(1)) {
-                case 'r':
-                    return r[Integer.parseInt(reg.substring(2))];
-                case 'a':
-                    return a[Integer.parseInt(reg.substring(2))];
+            default:
+                switch (reg.charAt(1)) {
+                    case 'r':
+                        return r[Integer.parseInt(reg.substring(2))];
+                    case 'a':
+                        return a[Integer.parseInt(reg.substring(2))];
 
-            }
+                }
+                break;
         }
         return 0;
     }
 
     private void regStore(String reg, int v) throws Exception {
-        if (reg.equals("$fp")){
-            fp = v;
-        }
-        else if(reg.equals("$bsp")){
-            bsp = v;
-        }
-        else if (reg.equals("$al")){
-            al = v;
-        }
-        else if (reg.equals("$sp")) {
-            if (v > sp){
-                memory.cleanMemory(sp,v);
-            }
-            sp = v;
-            if (sp <= hp) {
-                throw new Exception("Stack overflow!");
-            }
-        }
-        else if (reg.equals("$ra")) {
-            ra = v;
-        }
-        else{
-            switch (reg.charAt(1)) {
-                case 'r':
-                    r[Integer.parseInt(reg.substring(2))] = v;
-                    break;
-                case 'a':
-                    a[Integer.parseInt(reg.substring(2))] = v;
+        switch (reg) {
+            case "$fp":
+                fp = v;
+                break;
+            case "$bsp":
+                bsp = v;
+                break;
+            case "$al":
+                al = v;
+                break;
+            case "$sp":
+                if (v > sp) {
+                    memory.cleanMemory(sp, v);
+                }
+                sp = v;
+                if (sp <= hp) {
+                    throw new Exception("Stack overflow!");
+                }
+                break;
+            case "$ra":
+                ra = v;
+                break;
+            default:
+                switch (reg.charAt(1)) {
+                    case 'r':
+                        r[Integer.parseInt(reg.substring(2))] = v;
+                        break;
+                    case 'a':
+                        a[Integer.parseInt(reg.substring(2))] = v;
 
-                    break;
-            }
+                        break;
+                }
+                break;
         }
 
     }
@@ -310,16 +307,16 @@ public class SVM {
         Matcher m = p.matcher(str);
         return m.matches();
     }
-    private void printStack(int numberOfVarToPrint) throws SimplanPlusException {
-        int ind = MEMSIZE-1;
+    /*private void printStack(int numberOfVarToPrint) {
+        int ind = MEMORY_SIZE-1;
         int to = ind-numberOfVarToPrint;
-        System.out.println("Stack attuale: "+sp+"Inizio print stack");
+        System.out.println("Actual stack pointer: "+sp+"\Starting print stack:\n");
 
         while (ind > to){
-            System.out.println("CELL "+ ind + " Value: "+memory.read(ind));
+            System.out.println("Cell: "+ ind + "\tValue: "+memory.read(ind));
             ind--;
         }
-        System.out.println("Fine print stack, current sp_addr: "+sp);
+        System.out.println("End print stack, current stack pointer: "+sp);
 
-    }
+    }*/
 }
