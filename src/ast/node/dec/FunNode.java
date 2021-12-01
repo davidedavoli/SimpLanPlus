@@ -201,7 +201,7 @@ public class FunNode extends MetaNode {
 		while (effectsAreDifferent(effectsFunEntry, effectsCopy)){
 			// effect are changed!
 			// replace the env and update status with the new effects
-			env.replaceWithNewEnv(decFunEnv);
+			env.replaceWithNewEnvironment(decFunEnv);
 
 			var funEntry = env.effectsLookUp(id);
 

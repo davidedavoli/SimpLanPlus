@@ -70,7 +70,7 @@ public class IfNode extends MetaNode {
             var elseEnv = new Environment(env);
             errors.addAll(el.checkEffects(elseEnv));
 
-            env.replaceWithNewEnv(Environment.maxEnvironment(thenEnv, elseEnv));
+            env.replaceWithNewEnvironment(Environment.maxEnvironment(thenEnv, elseEnv));
         } else {
             errors.addAll(th.checkEffects(env));
         }

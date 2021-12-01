@@ -52,12 +52,26 @@ public class Environment {
 	public int getOffset(){
 		return this.offset;
 	}
-	public int getNestingLevel() {
-		return nestingLevel;
-	}
+	public int getNestingLevel() {	return this.nestingLevel; }
 	public HashMap<String, STentry> getCurrentST() {
 		return this.symTable.get(this.nestingLevel);
 	}
+
+	public ArrayList<EffectError> getEffectErrors() {
+		ArrayList<EffectError> errors = new ArrayList<>();
+		for (var scope : symTable) {
+			for (var entry : scope.entrySet()) {
+				int actualMaxDereference = entry.getValue().getMaxDereferenceLevel();
+				for (int dereferenceLevel = 0; dereferenceLevel < actualMaxDereference; dereferenceLevel++) {
+					if (entry.getValue().getDereferenceLevelVariableStatus(dereferenceLevel).equals(Effect.ERROR)) {
+						errors.add(new EffectError("The pointer " + entry.getKey() + "^".repeat(dereferenceLevel) + " is used after deletion."));
+					}
+				}
+			}
+		}
+		return errors;
+	}
+
 	// setter
 	public int decOffset(){
 		return this.offset--;
@@ -69,27 +83,12 @@ public class Environment {
 		this.offset = -1;
 	}
 
-	public ArrayList<EffectError> getEffectErrors() {
-		ArrayList<EffectError> errors = new ArrayList<>();
-		for (var scope : symTable) {
-			for (var entry : scope.entrySet()) {
-				for (int i = 0; i < entry.getValue().getMaxDereferenceLevel(); i++) {
-					if (entry.getValue().getDereferenceLevelVariableStatus(i).equals(Effect.ERROR)) {
-						errors.add(new EffectError("The pointer " + entry.getKey() + "^".repeat(i) + " is used after deletion."));
-					}
-				}
-			}
-		}
-
-		return errors;
-	}
 
 	/**
 	 * =====================================================
 	 * PUSH AND POP SCOPE
 	 * =====================================================
 	 **/
-	// push scope
 	/**
 	 * Pushes new scope in the Symbol Table stack. Increments the nesting level.
 	 * Sets the offset to 0.
@@ -100,7 +99,7 @@ public class Environment {
 		this.symTable.add(new HashMap<>());
 	}
 	/**
-	 * Adds a new scope to the environment.
+	 * Adds scope passed to the environment.
 	 *
 	 * @param newScope the scope to add to the Symbol Table stack
 	 */
@@ -163,7 +162,7 @@ public class Environment {
 	}
 	/**
 	 * Searches [id] in the Symbol Table and returns its entry. It must be present, otherwise
-	 * Error "absence of ID" is raised".
+	 * Error "absence of ID" is raised.
 	 *
 	 * @param id the identifier of the variable or function.
 	 * @return the entry in the symbol table of the variable or function with that
@@ -178,7 +177,7 @@ public class Environment {
 			}
 		}
 		System.err.println("Unexpected absence of ID " + id + " in the Symbol Table.");
-		return null; // Does not happen if preconditions are met.
+		return null; // Should not happen in effects
 	}
 
 	/**
@@ -246,11 +245,11 @@ public class Environment {
 		Map<String, STentry> scope2 = secondEnv.symTable.get(secondEnv.symTable.size() - 1);
 
 		// CASE 1: Exists x in scope1 that not belongs to scope2
-		checkParEnv(scope1, scope2, resultingEnvironment);
+		checkIfEntryIsInUniqueScope(scope1, scope2, resultingEnvironment);
 		// CASE 2: Exists x in scope2 that non belongs to scope1
-		checkParEnv(scope2, scope1, resultingEnvironment);
+		checkIfEntryIsInUniqueScope(scope2, scope1, resultingEnvironment);
 		// CASE 3: The scopes contains the same variables, parallel operation occurs
-		parEnv(scope1, scope2, resultingEnvironment);
+		parallelEnvironment(scope1, scope2, resultingEnvironment);
 
 		return resultingEnvironment;
 	}
@@ -259,7 +258,7 @@ public class Environment {
 	/**
 	 * Creates a new environment updating {@code env1} with the effects applied in
 	 * {@code env2}.Consider invoking this function with clones of the environments
-	 * since this function performs side-effects on the arguments.
+	 * since this function performs side effects on the arguments.
 	 *
 	 * @param env1 environment to update (multi-scope)
 	 * @param env2 environment with updates (single-scope)
@@ -268,48 +267,58 @@ public class Environment {
 	public static Environment updateEnvironment(Environment env1, Environment env2) {
 		Environment returnedEnvironment;
 
-		if (env2.symTable.size() == 0 || env1.symTable.size() == 0) {
+		/*if (env2.symTable.size() == 0 || env1.symTable.size() == 0) {
+			return new Environment(env1);
+		}*/
+		if(env1.symTable.size() == 0){
+			return new Environment(env2);
+		}
+		else if(env2.symTable.size() == 0){
 			return new Environment(env1);
 		}
-
-		HashMap<String, STentry> headScope1 = env1.symTable.get(env1.symTable.size() - 1);
-		HashMap<String, STentry> headScope2 = env2.symTable.get(env2.symTable.size() - 1);
+		HashMap<String, STentry> topScopeFirstEnvironment = env1.symTable.get(env1.symTable.size() - 1);
+		HashMap<String, STentry> topScopeSecondEnvironment = env2.symTable.get(env2.symTable.size() - 1);
 
 		// CASE 3: \sigma' = \emptySet
-		if (headScope2.keySet().isEmpty()) {
+		if (topScopeSecondEnvironment.keySet().isEmpty()) {
 			return new Environment(env1);
 		}
 
-		var u = headScope2.entrySet().stream().findFirst().get();
-		env2.removeFirstIdentifier(u.getKey());
+		var nameIdSecondEnvironment = topScopeSecondEnvironment.entrySet().stream().findFirst().get().getKey();
+		var valueIdSecondEnvironment = topScopeSecondEnvironment.entrySet().stream().findFirst().get().getValue();
+		var typeIdSecondEnvironment = valueIdSecondEnvironment.getType();
+		env2.removeFirstIdentifier(nameIdSecondEnvironment);
 
 		// CASE 1
-		if (headScope1.containsKey(u.getKey())) {
-			headScope1.put(u.getKey(), u.getValue());
-
+		if (topScopeFirstEnvironment.containsKey(nameIdSecondEnvironment)) {
+			topScopeFirstEnvironment.put(nameIdSecondEnvironment, valueIdSecondEnvironment);
 			returnedEnvironment = updateEnvironment(env1, env2);
-		} else {
+		}
+		else {
 			// CASE 2
 			Environment envWithOnlyU = new Environment();
 			envWithOnlyU.createVoidScope();
-			STentry tmpEntry = envWithOnlyU.createNewDeclaration(u.getKey(), u.getValue().getType());
-			tmpEntry.setFunctionNode(u.getValue().getFunctionNode());
-			for (int j = 0; j < u.getValue().getMaxDereferenceLevel(); j++) {
-				tmpEntry.setDereferenceLevelVariableStatus(u.getValue().getDereferenceLevelVariableStatus(j), j);
+
+			STentry tmpEntry = envWithOnlyU.createNewDeclaration(nameIdSecondEnvironment, typeIdSecondEnvironment);
+			tmpEntry.setFunctionNode(valueIdSecondEnvironment.getFunctionNode());
+			int maxDereferenceIdSecondEnvironment = valueIdSecondEnvironment.getMaxDereferenceLevel();
+
+			for (int dereferenceLevel = 0; dereferenceLevel < maxDereferenceIdSecondEnvironment; dereferenceLevel++) {
+				tmpEntry.setDereferenceLevelVariableStatus(valueIdSecondEnvironment.getDereferenceLevelVariableStatus(dereferenceLevel), dereferenceLevel);
 			}
 
 			env1.popBlockScope();
-			Environment tmpEnv = updateEnvironment(env1, envWithOnlyU);
-			tmpEnv.createScope(headScope1);
+			Environment environmentUpdated = updateEnvironment(env1, envWithOnlyU);
+			environmentUpdated.createScope(topScopeFirstEnvironment);
 
-			returnedEnvironment = updateEnvironment(tmpEnv, env2);
+			returnedEnvironment = updateEnvironment(environmentUpdated, env2);
 		}
 		return returnedEnvironment;
 	}
 
 	/**
 	 * Checks the status of the variable and updates it with the given rule {@code effectFun}
-	 * If the new status is Effect.ERROR then returns a SemanticError:"ID used after deletion".
+	 * If the new status is Effect::ERROR then returns a SemanticError:"ID used after deletion".
 	 * If the variable is not declared an Exception is raised:"ID is not declared".
 	 *
 	 * @param variable {LhsNode} variable is the variable that will receive the new effect
@@ -348,44 +357,58 @@ public class Environment {
 	 * =====================================================
 	 **/
 	/**
-	 * Given two environment {@code scope1} and {@scope2}, check if there are some variables is {@code scope1},
+	 * Given two Map of <String, STEntry> {@code scope1} and {@code scope2}, check if there are some variables is {@code scope1},
 	 * that not belongs to {@code scope2}. If it is true, the variables are added to {@code resultingEnvironment}
 	 *
 	 * @param scope1 environment which has at least one scope
 	 * @param scope2 environment which has at least one scope
 	 * @param resultingEnvironment environment resulting after the check
 	 */
-	private static void checkParEnv(Map<String, STentry> scope1, Map<String, STentry> scope2, Environment resultingEnvironment) {
-		for (var xInE1 : scope1.entrySet()) {
-			if (!scope2.containsKey(xInE1.getKey())) {
-				STentry entry = resultingEnvironment.createNewDeclaration(xInE1.getKey(),
-						xInE1.getValue().getType());
-				entry.setFunctionNode(xInE1.getValue().getFunctionNode());
-				for (int j = 0; j < xInE1.getValue().getMaxDereferenceLevel(); j++) {
-					entry.setDereferenceLevelVariableStatus(xInE1.getValue().getDereferenceLevelVariableStatus(j), j);
+	private static void checkIfEntryIsInUniqueScope(Map<String, STentry> scope1, Map<String, STentry> scope2, Environment resultingEnvironment) {
+		for (var variableIdScope1 : scope1.entrySet()) {
+
+			if (!scope2.containsKey(variableIdScope1.getKey())) {
+				STentry entry = resultingEnvironment.createNewDeclaration(
+						variableIdScope1.getKey(),
+						variableIdScope1.getValue().getType()
+				);
+				entry.setFunctionNode(variableIdScope1.getValue().getFunctionNode());
+
+				int variableMaxDereferenceLevel = variableIdScope1.getValue().getMaxDereferenceLevel();
+				for (int variableDereferenceLevel = 0; variableDereferenceLevel < variableMaxDereferenceLevel; variableDereferenceLevel++) {
+					entry.setDereferenceLevelVariableStatus(variableIdScope1.getValue().getDereferenceLevelVariableStatus(variableDereferenceLevel), variableDereferenceLevel);
 				}
 			}
 		}
 	}
 
 	/**
-	 * Given two environment {@code scope1} and {@scope2} which contains the same variables,
-	 * execute Parallel effect operation between {@code scope1} and {@scope2} and store the result in
+	 * Given two Map of <String, STEntry> {@code scope1} and {@code scope2} which contains the same variables,
+	 * execute Parallel effect operation between {@code scope1} and {@code scope2} and store the result in
 	 * {@code resultingEnvironment}
 	 *
 	 * @param scope1 environment which has at least one scope
 	 * @param scope2 environment which has at least one scope
 	 * @param resultingEnvironment environment resulting after the parallel effect operation
 	 */
-	private static void parEnv(Map<String, STentry> scope1, Map<String, STentry> scope2, Environment resultingEnvironment){
-		for (var xInE1 : scope1.entrySet()) {
-			for (var xInE2 : scope2.entrySet()) {
-				if (xInE1.getKey().equals(xInE2.getKey())) {
-					STentry entry = resultingEnvironment.createNewDeclaration(xInE1.getKey(),
-							xInE1.getValue().getType());
-					entry.setFunctionNode(xInE1.getValue().getFunctionNode());
-					for (int j = 0; j < xInE2.getValue().getMaxDereferenceLevel(); j++) {
-						entry.setDereferenceLevelVariableStatus(Effect.parallelEffect(xInE1.getValue().getDereferenceLevelVariableStatus(j), xInE2.getValue().getDereferenceLevelVariableStatus(j)), j);
+	private static void parallelEnvironment(Map<String, STentry> scope1, Map<String, STentry> scope2, Environment resultingEnvironment){
+		for (var variableIdScope1 : scope1.entrySet()) {
+			for (var variableIdScope2 : scope2.entrySet()) {
+
+				if (variableIdScope1.getKey().equals(variableIdScope2.getKey())) {
+					STentry entry = resultingEnvironment.createNewDeclaration(
+							variableIdScope1.getKey(),
+							variableIdScope1.getValue().getType()
+					);
+					entry.setFunctionNode(variableIdScope1.getValue().getFunctionNode());
+
+					for (int j = 0; j < variableIdScope2.getValue().getMaxDereferenceLevel(); j++) {
+						entry.setDereferenceLevelVariableStatus(
+								Effect.parallelEffect(
+									variableIdScope1.getValue().getDereferenceLevelVariableStatus(j),
+									variableIdScope2.getValue().getDereferenceLevelVariableStatus(j)
+								),
+						j);
 					}
 				}
 			}
@@ -393,7 +416,7 @@ public class Environment {
 	}
 
 	/**
-	 * Given an {@code id} remove the first occurence from symbolTable if present.
+	 * Given an {@code id} remove the first occurrence from symbolTable if present.
 	 * @param id to be removed
 	 */
 	private void removeFirstIdentifier(String id) {
@@ -405,7 +428,7 @@ public class Environment {
 		}
 	}
 
-	public void replaceWithNewEnv(Environment newEnvironment) {
+	public void replaceWithNewEnvironment(Environment newEnvironment) {
 		this.symTable.clear();
 		this.nestingLevel = newEnvironment.getNestingLevel();
 		this.offset = newEnvironment.getOffset();
@@ -413,9 +436,6 @@ public class Environment {
 		for (var scope : newEnvironment.symTable) {
 			final HashMap<String, STentry> copiedScope = new HashMap<>();
 			for (var id : scope.keySet()) {
-				//TODO chiedere laneve se a sto punto diamo errore solo a run time perchè
-				// nel caso di assegnare due puntatori diversi nell'if la variabile rimane
-				// referenziata al secondo
 				copiedScope.put(id, scope.get(id));
 				//copiedScope.put(id, new STentry(scope.get(id)));
 			}
@@ -435,7 +455,6 @@ public class Environment {
 	public STentry createNewDeclaration(final String id, final TypeNode type) {
 		STentry stEntry;
 		if (type instanceof ArrowTypeNode) {
-			//TODO This offset doesn't change anything?
 			stEntry = new STentry(nestingLevel, type, 0);
 		} else {
 			stEntry = new STentry(nestingLevel, type, --offset);

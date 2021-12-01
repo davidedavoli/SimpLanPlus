@@ -185,7 +185,7 @@ public HasReturn retTypeCheck() {
         //List<Effect> returned = env.getCurrentST().get(id.getID()).getReturnList();
 
         Environment updatedEnv = Environment.updateEnvironment(e1, e2);
-        env.replaceWithNewEnv(updatedEnv);
+        env.replaceWithNewEnvironment(updatedEnv);
 
         //env.getCurrentST().get(id.getID()).setResultList(returned);
 
