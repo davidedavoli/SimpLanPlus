@@ -97,7 +97,7 @@ public class BlockNode extends MetaNode {
                 res.add(new SemanticError("Code after return statement"));
                 break;
             }
-            if (n instanceof RetNode)
+            if (new HasReturn(HasReturn.hasReturnType.PRES).leq( n.retTypeCheck()))
                 ret_passed = true;
         }
         return res;

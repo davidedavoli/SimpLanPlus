@@ -16,6 +16,12 @@ public class Environment {
 	private int nestingLevel;
 	private int offset;
 
+
+	/**
+	 * =====================================================
+	 * CONSTRUCTOR
+	 * =====================================================
+	 */
 	public Environment(int nestingLevel, int offset){
 		this.symTable = new ArrayList<>();
 		this.nestingLevel = nestingLevel;
@@ -33,12 +39,163 @@ public class Environment {
 			this.symTable.add(copiedScope);
 		}
 	}
-
 	public Environment() {
 		this(-1,0);
 	}
 
-	public static Environment max(Environment firstEnv, Environment secondEnv) {
+	/**
+	 * =====================================================
+	 * GETTER AND SETTER
+	 * =====================================================
+	 */
+	// getter
+	public int getOffset(){
+		return this.offset;
+	}
+	public int getNestingLevel() {
+		return nestingLevel;
+	}
+	public HashMap<String, STentry> getCurrentST() {
+		return this.symTable.get(this.nestingLevel);
+	}
+	// setter
+	public int decOffset(){
+		return this.offset--;
+	}
+	public void functionOffset(){
+		this.offset = -2;
+	}
+	public void blockOffset(){
+		this.offset = -1;
+	}
+
+	public ArrayList<EffectError> getEffectErrors() {
+		ArrayList<EffectError> errors = new ArrayList<>();
+		for (var scope : symTable) {
+			for (var entry : scope.entrySet()) {
+				for (int i = 0; i < entry.getValue().getMaxDereferenceLevel(); i++) {
+					if (entry.getValue().getDereferenceLevelVariableStatus(i).equals(Effect.ERROR)) {
+						errors.add(new EffectError("The pointer " + entry.getKey() + "^".repeat(i) + " is used after deletion."));
+					}
+				}
+			}
+		}
+
+		return errors;
+	}
+
+	/**
+	 * =====================================================
+	 * PUSH AND POP SCOPE
+	 * =====================================================
+	 **/
+	// push scope
+	/**
+	 * Pushes new scope in the Symbol Table stack. Increments the nesting level.
+	 * Sets the offset to 0.
+	 */
+	public void createVoidScope(){
+		this.nestingLevel++;
+		offset = 0;
+		this.symTable.add(new HashMap<>());
+	}
+	/**
+	 * Adds a new scope to the environment.
+	 *
+	 * @param newScope the scope to add to the Symbol Table stack
+	 */
+	public void createScope(HashMap<String, STentry> newScope){
+		this.nestingLevel++;
+		this.symTable.add(newScope);
+	}
+	// pop scope
+	public void popBlockScope(){
+		this.symTable.remove(this.nestingLevel--);
+
+	}
+	public void popFunScope(){
+		this.symTable.remove(this.nestingLevel--);
+		if(this.nestingLevel >= 0){
+			Optional<STentry> stEntry = this.symTable.get(this.nestingLevel).values().stream().min(Comparator.comparing(STentry::getOffset));
+			this.offset = stEntry.map(STentry::getOffset).orElse(-1);
+		}
+	}
+
+	/**
+	 * =====================================================
+	 * New parameter/declaration function
+	 * =====================================================
+	 **/
+	public STentry newFunctionParameter(final String varId, final TypeNode varType, final int offset){
+		HashMap<String, STentry> ST = this.symTable.get(this.nestingLevel);
+		STentry newEntry = new STentry(this.nestingLevel,varType,offset);
+		return ST.put(varId,newEntry);
+	}
+	public STentry createFunDec(String bFL, String eFL,TypeNode type){
+		return new STentry(this.nestingLevel, this.offset--,bFL,eFL,type);
+	}
+	public void addEntry(String id, STentry entry){
+		HashMap<String, STentry> ST = this.symTable.get(nestingLevel);
+		ST.put(id,entry);
+	}
+
+	/**
+	 * =====================================================
+	 * LOOKUP OPERATIONS
+	 * =====================================================
+	 **/
+	/**
+	 * Searches [id] in the Symbol Table and returns its entry, if present.
+	 *
+	 * @param id the identifier of the variable or function.
+	 * @return the entry in the symbol table of the variable or function with that
+	 * identifier.
+	 */
+	public STentry lookUp(final String id) {
+		for (int i = nestingLevel; i >= 0; i--) {
+			HashMap<String, STentry> scope = symTable.get(i);
+			STentry stEntry = scope.get(id);
+			if (stEntry != null) {
+				return stEntry;
+			}
+		}
+		return null;
+	}
+	/**
+	 * Searches [id] in the Symbol Table and returns its entry. It must be present, otherwise
+	 * Error "absence of ID" is raised".
+	 *
+	 * @param id the identifier of the variable or function.
+	 * @return the entry in the symbol table of the variable or function with that
+	 * identifier.
+	 */
+	public STentry effectsLookUp(String id) {
+		for (int i = nestingLevel; i >= 0; i--) {
+			var ithScope = symTable.get(i);
+			var stEntry = ithScope.get(id);
+			if (stEntry != null) {
+				return stEntry;
+			}
+		}
+		System.err.println("Unexpected absence of ID " + id + " in the Symbol Table.");
+		return null; // Does not happen if preconditions are met.
+	}
+
+	/**
+	 * =====================================================
+	 * EFFECT HANDLING
+	 * =====================================================
+	 **/
+	/**
+	 * Returns a new environment which has, for each identifier, the maximum
+	 * effect set in the two environments. Assumes dom(env2) is a subset of
+	 * dom(env1).
+	 *
+	 * @param firstEnv first environment
+	 * @param secondEnv second environment
+	 * @return {environment} the maximum environment of the two
+	 */
+	public static Environment maxEnvironment(Environment firstEnv, Environment secondEnv) {
 		var maxEnvironment = new Environment(firstEnv.nestingLevel, firstEnv.offset);
 		for (int scopeIndex = 0, size = firstEnv.symTable.size(); scopeIndex < size; scopeIndex++) {
 			var firstScope = firstEnv.symTable.get(scopeIndex);
@@ -70,8 +227,6 @@ public class Environment {
 			maxEnvironment.symTable.add(maxScope);
 		}
 
-
-
 		return maxEnvironment;
 	}
 
@@ -100,6 +255,98 @@ public class Environment {
 		return resultingEnvironment;
 	}
 
+
+	/**
+	 * Creates a new environment updating {@code env1} with the effects applied in
+	 * {@code env2}.Consider invoking this function with clones of the environments
+	 * since this function performs side-effects on the arguments.
+	 *
+	 * @param env1 environment to update (multi-scope)
+	 * @param env2 environment with updates (single-scope)
+	 * @return the updated environment
+	 */
+	public static Environment updateEnvironment(Environment env1, Environment env2) {
+		Environment returnedEnvironment;
+
+		if (env2.symTable.size() == 0 || env1.symTable.size() == 0) {
+			return new Environment(env1);
+		}
+
+		HashMap<String, STentry> headScope1 = env1.symTable.get(env1.symTable.size() - 1);
+		HashMap<String, STentry> headScope2 = env2.symTable.get(env2.symTable.size() - 1);
+
+		// CASE 3: \sigma' = \emptySet
+		if (headScope2.keySet().isEmpty()) {
+			return new Environment(env1);
+		}
+
+		var u = headScope2.entrySet().stream().findFirst().get();
+		env2.removeFirstIdentifier(u.getKey());
+
+		// CASE 1
+		if (headScope1.containsKey(u.getKey())) {
+			headScope1.put(u.getKey(), u.getValue());
+
+			returnedEnvironment = updateEnvironment(env1, env2);
+		} else {
+			// CASE 2
+			Environment envWithOnlyU = new Environment();
+			envWithOnlyU.createVoidScope();
+			STentry tmpEntry = envWithOnlyU.createNewDeclaration(u.getKey(), u.getValue().getType());
+			tmpEntry.setFunctionNode(u.getValue().getFunctionNode());
+			for (int j = 0; j < u.getValue().getMaxDereferenceLevel(); j++) {
+				tmpEntry.setDereferenceLevelVariableStatus(u.getValue().getDereferenceLevelVariableStatus(j), j);
+			}
+
+			env1.popBlockScope();
+			Environment tmpEnv = updateEnvironment(env1, envWithOnlyU);
+			tmpEnv.createScope(headScope1);
+
+			returnedEnvironment = updateEnvironment(tmpEnv, env2);
+		}
+		return returnedEnvironment;
+	}
+
+	/**
+	 * Checks the status of the variable and updates it with the given rule {@code effectFun}
+	 * If the new status is Effect.ERROR then returns a SemanticError:"ID used after deletion".
+	 * If the variable is not declared an Exception is raised:"ID is not declared".
+	 *
+	 * @param variable {LhsNode} variable is the variable that will receive the new effect
+	 * @param effectFun {BiFunction} function from effect that has to be invoked
+	 * @param effect {int} effect to be applied
+	 */
+	public ArrayList<EffectError> checkStmStatus(
+			Dereferences variable,
+			BiFunction<Effect,Effect,Effect> effectFun,
+			Effect effect
+	) {
+
+		ArrayList<EffectError> errors = new ArrayList<>();
+
+		try {
+			STentry idEntry = lookUp(variable.getID());
+
+			Effect oldEffect = idEntry.getDereferenceLevelVariableStatus(variable.getDereferenceLevel());
+			Effect newEffect = new Effect(effect);
+
+			Effect newStatus = effectFun.apply(oldEffect,newEffect);
+			idEntry.setDereferenceLevelVariableStatus(newStatus, variable.getDereferenceLevel());
+
+			if (newStatus.equals(new Effect(Effect.ERROR))) {
+				errors.add(new EffectError(variable.getID() + " used after deleting."));
+			}
+		} catch (Exception exception) {
+			errors.add(new EffectError(variable.getID() + " not declared. Aborting."));
+		}
+		return errors;
+	}
+
+	/**
+	 * =====================================================
+	 * UTILS
+	 * =====================================================
+	 **/
 	/**
 	 * Given two environment {@code scope1} and {@scope2}, check if there are some variables is {@code scope1},
 	 * that not belongs to {@code scope2}. If it is true, the variables are added to {@code resultingEnvironment}
@@ -145,48 +392,10 @@ public class Environment {
 		}
 	}
 
-	public static Environment updateEnvironment(Environment env1, Environment env2) {
-		Environment returnedEnvironment;
-
-		if (env2.symTable.size() == 0 || env1.symTable.size() == 0) {
-			return new Environment(env1);
-		}
-
-		HashMap<String, STentry> headScope1 = env1.symTable.get(env1.symTable.size() - 1);
-		HashMap<String, STentry> headScope2 = env2.symTable.get(env2.symTable.size() - 1);
-
-		if (headScope2.keySet().isEmpty()) {
-			// \sigma' = \emptySet
-			return new Environment(env1);
-		}
-
-		var u = headScope2.entrySet().stream().findFirst().get();
-		env2.removeFirstIdentifier(u.getKey());
-		//primo caso
-		if (headScope1.containsKey(u.getKey())) {
-			headScope1.put(u.getKey(), u.getValue());
-
-			returnedEnvironment = updateEnvironment(env1, env2);
-		} else {
-			//secondo caso
-			Environment envWithOnlyU = new Environment();
-			envWithOnlyU.createVoidScope();
-			STentry tmpEntry = envWithOnlyU.createNewDeclaration(u.getKey(), u.getValue().getType());
-			tmpEntry.setFunctionNode(u.getValue().getFunctionNode());
-			for (int j = 0; j < u.getValue().getMaxDereferenceLevel(); j++) {
-				tmpEntry.setDereferenceLevelVariableStatus(u.getValue().getDereferenceLevelVariableStatus(j), j);
-			}
-
-			env1.popBlockScope();
-			Environment tmpEnv = updateEnvironment(env1, envWithOnlyU);
-			tmpEnv.createScope(headScope1);
-
-			returnedEnvironment = updateEnvironment(tmpEnv, env2);
-		}
-
-		return returnedEnvironment;
-	}
-
+	/**
+	 * Given an {@code id} remove the first occurence from symbolTable if present.
+	 * @param id to be removed
+	 */
 	private void removeFirstIdentifier(String id) {
 		for (int i = symTable.size() - 1; i >= 0; i--) {
 			if (symTable.get(i).containsKey(id)) {
@@ -194,171 +403,6 @@ public class Environment {
 				return;
 			}
 		}
-	}
-
-	public ArrayList<EffectError> getEffectErrors() {
-		ArrayList<EffectError> errors = new ArrayList<>();
-		for (var scope : symTable) {
-			for (var entry : scope.entrySet()) {
-				for (int i = 0; i < entry.getValue().getMaxDereferenceLevel(); i++) {
-					if (entry.getValue().getDereferenceLevelVariableStatus(i).equals(Effect.ERROR)) {
-						errors.add(new EffectError("The pointer " + entry.getKey() + "^".repeat(i) + " is used after deletion."));
-					}
-				}
-			}
-		}
-
-		return errors;
-	}
-
-	/**
-	 * Getter
-	 */
-	public int getOffset(){
-		return this.offset;
-	}
-	public int getNestingLevel() {
-		return nestingLevel;
-	}
-
-	public HashMap<String, STentry> getCurrentST() {
-		return this.symTable.get(this.nestingLevel);
-	}
-
-	/**
-	 * End of Getter
-	 */
-
-
-	/**
-	 * Setter
-	 */
-	public int decOffset(){
-		return this.offset--;
-	}
-
-	public void functionOffset(){
-		this.offset = -2;
-	}
-	public void blockOffset(){
-		this.offset = -1;
-	}
-
-	/**
-	 * End of Setter
-	 */
-
-
-
-
-	public STentry lookUp(final String id) {
-		for (int i = nestingLevel; i >= 0; i--) {
-			HashMap<String, STentry> scope = symTable.get(i);
-			STentry stEntry = scope.get(id);
-			if (stEntry != null) {
-				return stEntry;
-			}
-		}
-
-		return null;
-	}
-
-
-
-
-
-
-	/**
-	 * Push and pop scope function
-	 *
-	 */
-	public void createVoidScope(){
-		this.nestingLevel++;
-		offset = 0;
-		this.symTable.add(new HashMap<>());
-	}
-
-	public void createScope(HashMap<String, STentry> newScope){
-		this.nestingLevel++;
-		this.symTable.add(newScope);
-	}
-
-
-	public void popBlockScope(){
-		this.symTable.remove(this.nestingLevel--);
-
-	}
-
-	public void popFunScope(){
-		this.symTable.remove(this.nestingLevel--);
-		if(this.nestingLevel >= 0){
-			Optional<STentry> stEntry = this.symTable.get(this.nestingLevel).values().stream().min(Comparator.comparing(STentry::getOffset));
-			this.offset = stEntry.map(STentry::getOffset).orElse(-1);
-		}
-	}
-
-	/**
-	 * End push and pop scope function
-	 */
-
-
-
-	/**
-	 * New parameter/declaration function
-	 */
-
-
-	public STentry newFunctionParameter(final String varId, final TypeNode varType, final int offset){
-		HashMap<String, STentry> ST = this.symTable.get(this.nestingLevel);
-		STentry newEntry = new STentry(this.nestingLevel,varType,offset);
-		return ST.put(varId,newEntry);
-	}
-	public STentry createFunDec(String bFL, String eFL,TypeNode type){
-		return new STentry(this.nestingLevel, this.offset--,bFL,eFL,type);
-	}
-
-	public void addEntry(String id, STentry entry){
-		HashMap<String, STentry> ST = this.symTable.get(nestingLevel);
-		ST.put(id,entry);
-	}
-
-
-	/**
-	 * End new parameter/declaration function
-	 */
-
-
-	/**
-	 *
-	 * Check Stm status
-	 * @param variable {LhsNode} variable is the variable that will receive the new effect
-	 * @param effectFun {BiFunction} function from effect that has to be invoked
-	 * @param effect {int} effect to be applied
-	 */
-	public ArrayList<EffectError> checkStmStatus(
-		Dereferences variable,
-		BiFunction<Effect,Effect,Effect> effectFun,
-		Effect effect
-	) {
-
-		ArrayList<EffectError> errors = new ArrayList<>();
-
-		try {
-			STentry idEntry = lookUp(variable.getID());
-
-			Effect oldEffect = idEntry.getDereferenceLevelVariableStatus(variable.getDereferenceLevel());
-			Effect newEffect = new Effect(effect);
-
-			Effect newStatus = effectFun.apply(oldEffect,newEffect);
-			idEntry.setDereferenceLevelVariableStatus(newStatus, variable.getDereferenceLevel());
-
-			if (newStatus.equals(new Effect(Effect.ERROR))) {
-				errors.add(new EffectError(variable.getID() + " used after deleting."));
-			}
-		} catch (Exception exception) {
-			errors.add(new EffectError(variable.getID() + " not declared. Aborting."));
-		}
-		return errors;
 	}
 
 	public void replaceWithNewEnv(Environment newEnvironment) {
@@ -379,19 +423,6 @@ public class Environment {
 		}
 	}
 
-	public STentry effectsLookUp(String id) {
-		for (int i = nestingLevel; i >= 0; i--) {
-			var ithScope = symTable.get(i);
-			var stEntry = ithScope.get(id);
-			if (stEntry != null) {
-				return stEntry;
-			}
-		}
-
-		System.err.println("Unexpected absence of ID " + id + " in the Symbol Table.");
-
-		return null; // Does not happen if preconditions are met.
-	}
 
 	/**
 	 * Adds a new variable named [id] of type [type] into the current scope. The
@@ -428,12 +459,4 @@ public class Environment {
 				", \n\toffset=" + offset +
 				"\n\t}";
 	}
-
-	/**
-	 *
-	 * End Stm status
-	 *
-	 */
-
-
 }

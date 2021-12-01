@@ -95,7 +95,8 @@ public class LhsExpNode extends ExpNode implements Dereferences {
         Effect actualStatus = innerEntry.getDereferenceLevelVariableStatus(getDereferenceLevel()-1);
 
         if (actualStatus.equals(new Effect(Effect.INITIALIZED))) {
-            errors.add(new EffectError(inner.getID() + " used before writing value."));
+            this.getEntry().setDereferenceLevelVariableStatus(Effect.READWRITE, this.getEntry().getMaxDereferenceLevel()-this.getDereferenceLevel());
+            //errors.add(new EffectError(this.getID() + " used before writing value. LhsExpNode"));
         }
         for(int i=0;i<innerEntry.getMaxDereferenceLevel();i++){
             Effect status = innerEntry.getDereferenceLevelVariableStatus(i);

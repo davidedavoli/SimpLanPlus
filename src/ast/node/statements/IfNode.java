@@ -51,15 +51,12 @@ public class IfNode extends MetaNode {
 	  
 	  return res;
   }
-  
-  public HasReturn retTypeCheck() {
-      HasReturn th_v=th.retTypeCheck();
-      HasReturn el_v=(el!=null)?el.retTypeCheck():new HasReturn(HasReturn.hasReturnType.ABS);
-	  if (el!=null)
-		  return HasReturn.min(th_v, el_v);
-	  else
-		  return new HasReturn(th_v.getVal());
-  }
+
+    public HasReturn retTypeCheck() {
+        HasReturn th_v=th.retTypeCheck();
+        HasReturn el_v=(el!=null)?el.retTypeCheck():new HasReturn(HasReturn.hasReturnType.ABS);
+        return HasReturn.min(th_v, el_v);
+    }
 
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
@@ -73,7 +70,7 @@ public class IfNode extends MetaNode {
             var elseEnv = new Environment(env);
             errors.addAll(el.checkEffects(elseEnv));
 
-            env.replaceWithNewEnv(Environment.max(thenEnv, elseEnv));
+            env.replaceWithNewEnv(Environment.maxEnvironment(thenEnv, elseEnv));
         } else {
             errors.addAll(th.checkEffects(env));
         }
