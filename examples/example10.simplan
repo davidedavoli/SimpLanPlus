@@ -4,15 +4,15 @@
         void g(){
             delete x;
         }
-       delete c;
-       g();
+       //delete c;
+       //g();
     }
 
     x = new int;
     x^ = 10;
     f(x);
-    print x^;
-    x^ = 11;
+    //print x^;
+    //x^ = 11;
 
 
 

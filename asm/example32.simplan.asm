@@ -10,15 +10,6 @@ push $a0
 
 push $fp
 mv $fp $al //put in $al actual fp
-lw $a0 -2($al) //put in $a0 value of Id y
-
-push $a0
-mv $fp $al //put in $al actual fp
-push $al
-jal  Function0// jump to start of function and put in $ra next instruction
-
-push $fp
-mv $fp $al //put in $al actual fp
 lw $a0 -1($al) //put in $a0 value of Id x
 
 push $a0

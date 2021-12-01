@@ -3,6 +3,7 @@
    ^int x;
    x = new int;
    delete x;
+   //x = new int;
    x^ = 5;
 }
 }

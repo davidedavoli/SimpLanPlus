@@ -6,7 +6,6 @@ push $a0
 
 li $a0 5
 
-//RITORNATO DA CGEN EXP
 mv $fp $al //put in $a1 (al) actual fp
 addi $al $al -1 //put in $al address of Id
 lw $al 0($al) //deferencing inner
@@ -20,7 +19,6 @@ free $a0 //free address in $a0
 
 new $a0// put new address in a0
 
-//RITORNATO DA CGEN EXP
 mv $fp $al //put in $a1 (al) actual fp
 addi $al $al -1 //put in $al address of Id
 
@@ -28,7 +26,6 @@ sw $a0 0($al) // 0($al) = $a0 a=exp
 
 li $a0 4
 
-//RITORNATO DA CGEN EXP
 mv $fp $al //put in $a1 (al) actual fp
 addi $al $al -1 //put in $al address of Id
 lw $al 0($al) //deferencing inner

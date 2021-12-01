@@ -6,17 +6,17 @@ li $a0 1
 push $a0
 mv $fp $al //put in $al actual fp
 push $al
-jal  Function2// jump to start of function and put in $ra next istruction
+jal  Function2// jump to start of function and put in $ra next instruction
 
 halt
-//CREO FUNZIONI
+//Creating function:
 //BEGIN FUNCTION Function0
 Function0:
 mv $sp $fp
 push $ra
 li $a0 1
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in return 
+subi $sp $fp 1 //Restore stack pointer as before block creation in return 
 lw $fp 0($fp) //Load old $fp pushed 
 b endFunction0
 
@@ -38,7 +38,7 @@ mv $sp $fp
 push $ra
 li $a0 2
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in return 
+subi $sp $fp 1 //Restore stack pointer as before block creation in return 
 lw $fp 0($fp) //Load old $fp pushed 
 b endFunction1
 
@@ -69,39 +69,39 @@ eq $a0 $a2 $a0 // $a0 = $a2 == $a0
 
 bc $a0 LABELthen1
 push 0
-push $fp //loadind new block
+push $fp //loading new block
 mv $sp $fp //Load new $fp
 push $fp
 mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
 lw $al 0($al) //go up to chain
 push $al
-jal  Function0// jump to start of function and put in $ra next istruction
+jal  Function0// jump to start of function and put in $ra next instruction
 
 print $a0
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
+subi $sp $fp 1 //Restore stack pointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 
 b LABELendIf2
 LABELthen1:
 push 0
-push $fp //loadind new block
+push $fp //loading new block
 mv $sp $fp //Load new $fp
 push $fp
 mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
 lw $al 0($al) //go up to chain
 push $al
-jal  Function1// jump to start of function and put in $ra next istruction
+jal  Function1// jump to start of function and put in $ra next instruction
 
 print $a0
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
+subi $sp $fp 1 //Restore stack pointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 
 
 LABELendIf2:
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return 
+subi $sp $fp 1 //Restore stack pointer as before block creation in a void function without return 
 lw $fp 0($fp) //Load old $fp pushed 
 b endFunction2
 
@@ -116,4 +116,4 @@ pop
 jr $ra
 // END OF h
 
-//FINE FUNZIONI
+//Ending function.

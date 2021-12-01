@@ -6,10 +6,10 @@ li $a0 1
 push $a0
 mv $fp $al //put in $al actual fp
 push $al
-jal  Function0// jump to start of function and put in $ra next istruction
+jal  Function0// jump to start of function and put in $ra next instruction
 
 halt
-//CREO FUNZIONI
+//Creating function:
 //BEGIN FUNCTION Function0
 Function0:
 mv $sp $fp
@@ -38,16 +38,16 @@ push $a0
 mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
 push $al
-jal  Function0// jump to start of function and put in $ra next istruction
+jal  Function0// jump to start of function and put in $ra next instruction
 b LABELendIf2
 LABELthen1:
-subi $sp $fp 1 //Restore stackpointer as before block creation in return 
+subi $sp $fp 1 //Restore stack pointer as before block creation in return 
 lw $fp 0($fp) //Load old $fp pushed 
 b endFunction0
 
 LABELendIf2:
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return 
+subi $sp $fp 1 //Restore stack pointer as before block creation in a void function without return 
 lw $fp 0($fp) //Load old $fp pushed 
 b endFunction0
 
@@ -62,4 +62,4 @@ pop
 jr $ra
 // END OF f
 
-//FINE FUNZIONI
+//Ending function.

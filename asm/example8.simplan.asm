@@ -9,10 +9,10 @@ li $a0 5
 push $a0
 mv $fp $al //put in $al actual fp
 push $al
-jal  Function0// jump to start of function and put in $ra next istruction
+jal  Function0// jump to start of function and put in $ra next instruction
 
 halt
-//CREO FUNZIONI
+//Creating function:
 //BEGIN FUNCTION Function0
 Function0:
 mv $sp $fp
@@ -29,7 +29,7 @@ gt $a0 $a2 $a0 // $a0 = $a2 > $a0
 
 bc $a0 LABELthen1
 push 0
-push $fp //loadind new block
+push $fp //loading new block
 mv $sp $fp //Load new $fp
 li $a0 1
 
@@ -62,14 +62,14 @@ mv $fp $al //put in $al actual fp
 lw $al 0($al) //go up to chain
 lw $al 0($al) //go up to chain
 push $al
-jal  Function0// jump to start of function and put in $ra next istruction
+jal  Function0// jump to start of function and put in $ra next instruction
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
+subi $sp $fp 1 //Restore stack pointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 
 b LABELendIf2
 LABELthen1:
 push 0
-push $fp //loadind new block
+push $fp //loading new block
 mv $sp $fp //Load new $fp
 //Start codegen of ast.node.exp.IdExpNode+ast.node.exp.IdExpNode
 mv $fp $al //put in $al actual fp
@@ -85,12 +85,12 @@ add $a0 $a2 $a0 // a0 = t1+a0
 
 print $a0
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in blockNode
+subi $sp $fp 1 //Restore stack pointer as before block creation in blockNode
 lw $fp 0($fp) //Load old $fp pushed 
 
 LABELendIf2:
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return 
+subi $sp $fp 1 //Restore stack pointer as before block creation in a void function without return 
 lw $fp 0($fp) //Load old $fp pushed 
 b endFunction0
 
@@ -105,4 +105,4 @@ pop
 jr $ra
 // END OF f
 
-//FINE FUNZIONI
+//Ending function.

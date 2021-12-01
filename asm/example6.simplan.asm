@@ -1,72 +1,165 @@
 push 0
 mv $sp $fp //Load new $fp
-li $a0 1
+new $a0// put new address in a0
 
 push $a0
 
-push $fp
-mv $fp $al //put in $al actual fp
-lw $a0 -1($al) //put in $a0 value of Id x
+new $a0// put new address in a0
 
 push $a0
-mv $fp $al //put in $al actual fp
-push $al
-jal  Function0// jump to start of function and put in $ra next istruction
 
-halt
-//CREO FUNZIONI
-//BEGIN FUNCTION Function0
-Function0:
-mv $sp $fp
-push $ra
-//Start codegen of ast.node.exp.IdExpNode==ast.node.exp.single_exp.IntNode
-mv $fp $al //put in $al actual fp
-lw $a0 1($al) //put in $a0 value of Id y
-push $a0 // push e1
-li $a0 0
-lw $a2 0($sp) //take e2 and $a2 take e1
-pop // remove e1 from the stack to preserve stack
-eq $a0 $a2 $a0 // $a0 = $a2 == $a0
+new $a0// put new address in a0
 
-bc $a0 LABELthen1
-push $fp
-//Start codegen of ast.node.exp.IdExpNode-ast.node.exp.single_exp.IntNode
-mv $fp $al //put in $al actual fp
-lw $a0 1($al) //put in $a0 value of Id y
-push $a0 // push e1
-li $a0 1
-lw $a2 0($sp) //take e2 and $a2 take e1
-pop // remove e1 from the stack to preserve stack
-sub $a0 $a2 $a0 // a0 = t1-a0
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -1 //put in $al address of Id
+lw $al 0($al) //deferencing inner
 
-push $a0
-mv $fp $al //put in $al actual fp
-lw $al 0($al) //go up to chain
-push $al
-jal  Function0// jump to start of function and put in $ra next istruction
-b LABELendIf2
-LABELthen1:
-mv $fp $al //put in $al actual fp
-lw $al 0($al) //go up to chain
-lw $a0 -1($al) //put in $a0 value of Id x
+sw $a0 0($al) // 0($al) = $a0 triple=exp
 
+new $a0// put new address in a0
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -1 //put in $al address of Id
+lw $al 0($al) //deferencing inner
+lw $al 0($al) //deferencing inner
+
+sw $a0 0($al) // 0($al) = $a0 triple=exp
+
+li $a0 40
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -1 //put in $al address of Id
+lw $al 0($al) //deferencing inner
+lw $al 0($al) //deferencing inner
+lw $al 0($al) //deferencing inner
+
+sw $a0 0($al) // 0($al) = $a0 triple=exp
+
+new $a0// put new address in a0
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -2 //put in $al address of Id
+lw $al 0($al) //deferencing inner
+
+sw $a0 0($al) // 0($al) = $a0 duple=exp
+
+li $a0 2
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -2 //put in $al address of Id
+lw $al 0($al) //deferencing inner
+lw $al 0($al) //deferencing inner
+
+sw $a0 0($al) // 0($al) = $a0 duple=exp
+
+mv $fp $al //put in $al actual fp
+lw $a0 -1($al) //put in $a0 value of Id triple
+
+lw $a0 0($a0)
+lw $a0 0($a0)
+lw $a0 0($a0)
 print $a0
 
-LABELendIf2:
+mv $fp $al //put in $al actual fp
+lw $a0 -2($al) //put in $a0 value of Id duple
 
-subi $sp $fp 1 //Restore stackpointer as before block creation in a void function without return 
-lw $fp 0($fp) //Load old $fp pushed 
-b endFunction0
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -1 //put in $al address of Id
+lw $al 0($al) //deferencing inner
 
-endFunction0:
-lw $ra 0($sp)
-pop
-addi $sp $sp 0//pop declaration 0
-addi $sp $sp 1// pop parameters1
-pop
-lw $fp 0($sp)
-pop
-jr $ra
-// END OF f
+sw $a0 0($al) // 0($al) = $a0 triple=exp
 
-//FINE FUNZIONI
+mv $fp $al //put in $al actual fp
+lw $a0 -2($al) //put in $a0 value of Id duple
+
+lw $a0 0($a0)
+lw $a0 0($a0)
+print $a0
+
+mv $fp $al //put in $al actual fp
+lw $a0 -1($al) //put in $a0 value of Id triple
+
+lw $a0 0($a0)
+lw $a0 0($a0)
+lw $a0 0($a0)
+print $a0
+
+mv $fp $al //put in $al actual fp
+lw $a0 -2($al) //put in $a0 value of Id duple
+
+free $a0 //free address in $a0
+
+new $a0// put new address in a0
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -1 //put in $al address of Id
+
+sw $a0 0($al) // 0($al) = $a0 triple=exp
+
+new $a0// put new address in a0
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -1 //put in $al address of Id
+lw $al 0($al) //deferencing inner
+
+sw $a0 0($al) // 0($al) = $a0 triple=exp
+
+new $a0// put new address in a0
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -1 //put in $al address of Id
+lw $al 0($al) //deferencing inner
+lw $al 0($al) //deferencing inner
+
+sw $a0 0($al) // 0($al) = $a0 triple=exp
+
+li $a0 55
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -1 //put in $al address of Id
+lw $al 0($al) //deferencing inner
+lw $al 0($al) //deferencing inner
+lw $al 0($al) //deferencing inner
+
+sw $a0 0($al) // 0($al) = $a0 triple=exp
+
+new $a0// put new address in a0
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -2 //put in $al address of Id
+
+sw $a0 0($al) // 0($al) = $a0 duple=exp
+
+new $a0// put new address in a0
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -2 //put in $al address of Id
+lw $al 0($al) //deferencing inner
+
+sw $a0 0($al) // 0($al) = $a0 duple=exp
+
+li $a0 66
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -2 //put in $al address of Id
+lw $al 0($al) //deferencing inner
+lw $al 0($al) //deferencing inner
+
+sw $a0 0($al) // 0($al) = $a0 duple=exp
+
+mv $fp $al //put in $al actual fp
+lw $a0 -2($al) //put in $a0 value of Id duple
+
+lw $a0 0($a0)
+lw $a0 0($a0)
+print $a0
+
+mv $fp $al //put in $al actual fp
+lw $a0 -1($al) //put in $a0 value of Id triple
+
+lw $a0 0($a0)
+lw $a0 0($a0)
+lw $a0 0($a0)
+print $a0
+
+halt

@@ -139,9 +139,9 @@ public class Compiler {
 	}
 	public static void main(String[] args) throws Exception {
 
-		int numberSingle = 33;
+		int numberSingle = 15;
 		String dire = "tommasoExamples/";
-		String fileAbsNameSingle = dire + baseName + numberSingle + ext;
+		String fileAbsNameSingle = dir + baseName + numberSingle + ext;
 		String fileNameSingle = baseName + numberSingle + ext;
 		compileFile(fileAbsNameSingle,fileNameSingle);
 
