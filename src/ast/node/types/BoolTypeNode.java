@@ -14,11 +14,14 @@ public class BoolTypeNode implements TypeNode {
   }
   
   public String toPrint(String s) {
-	return s+"BoolType\n";  
+	return s+"bool";
   }
   
-  public TypeNode dereference() throws SimplanPlusException {
-      throw new SimplanPlusException("Attempt to dereference a bool");
+  public TypeNode dereference() {
+      System.err.println("Attempt to dereference a Boolean");
+      System.exit(0);
+      return null;
+      //throw new SimplanPlusException("Attempt to dereference a bool");
   }
     
   //non utilizzato

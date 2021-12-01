@@ -28,7 +28,7 @@ public class IfNode extends MetaNode {
 
   }
   
-  public String toPrint(String s) throws SimplanPlusException {
+  public String toPrint(String s) {
       String print = s+"If\n" + cond.toPrint(s+"  ")
               + th.toPrint(s+"  ");
       if (el != null)
@@ -84,12 +84,11 @@ public class IfNode extends MetaNode {
         return errors;
     }
 
-    public TypeNode typeCheck() throws SimplanPlusException {
-    if (
-            !(TypeUtils.isSubtype(cond.typeCheck(),new BoolTypeNode()))
-
-    ) {
-        throw new SimplanPlusException("non boolean condition in if");
+    public TypeNode typeCheck() {
+    if ( !(TypeUtils.isSubtype(cond.typeCheck(),new BoolTypeNode()))) {
+        System.err.println("Non boolean condition in if: "+cond.toPrint(""));
+        System.exit(0);
+        //throw new SimplanPlusException("non boolean condition in if");
     }
     TypeNode t = th.typeCheck();
     if(el == null){
@@ -103,11 +102,6 @@ public class IfNode extends MetaNode {
         if (TypeUtils.isSubtype(e,t))
             return t;
     }
-
-//	non più necessari dal momento che l'if-then-esle non è più un'espressione
-    
-//    System.out.println("Incompatible types in then else branches");
-//    System.exit(0);
     return null;
   }
   

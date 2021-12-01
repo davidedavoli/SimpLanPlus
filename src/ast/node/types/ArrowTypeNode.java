@@ -20,24 +20,27 @@ public class ArrowTypeNode implements TypeNode {
     ret=r;
   }
   
-  public TypeNode dereference() throws SimplanPlusException {//TODO qualcosa di più elegante?
-      throw new SimplanPlusException("Attempt to dereference a bool");
+  public TypeNode dereference() {
+    System.err.println("Attempt to dereference a function");
+    System.exit(0);
+    return null;
+      //throw new SimplanPlusException("Attempt to dereference a bool");
   }
 
   public String toString(){
     String s="";
-    s=String.join("x", parlist.stream()
-            .map(item -> item.toString())
-            .collect(Collectors.toList()));
+    s= parlist.stream()
+            .map(Object::toString)
+            .collect(Collectors.joining("x"));
     s+="->";
     s+= ret.getClass().getName();
     return s;
   }
     
-  public String toPrint(String s) throws SimplanPlusException { //
-	String parlstr="";
+  public String toPrint(String s) { //
+	StringBuilder parlstr= new StringBuilder();
     for (Node par:parlist)
-      parlstr+=par.toPrint(s+"  ");
+      parlstr.append(par.toPrint(s + "  "));
 	return s+"ArrowType\n" + parlstr + ret.toPrint(s+"  ->") ; 
   }
   
@@ -56,7 +59,7 @@ public class ArrowTypeNode implements TypeNode {
 	}
   
   //non utilizzato
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck() {
     return null;
   }
   

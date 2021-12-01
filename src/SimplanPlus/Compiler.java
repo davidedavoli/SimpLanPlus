@@ -52,8 +52,7 @@ public class Compiler {
 
 		System.out.println("You had: "+semanticError.size()+" semantic errors.");
 		if(semanticError.size()>0){
-			for(SemanticError e : semanticError)
-				System.out.println("\t" + e);
+			semanticError.stream().filter(KeySet.keySet(SemanticError::toString)).forEach(System.err::println);
 			System.exit(1);
 		}
 		//System.out.println("Visualizing AST...");
@@ -61,7 +60,7 @@ public class Compiler {
 
 	}
 
-	private static void typeCheck(Node ast) throws SimplanPlusException {
+	private static void typeCheck(Node ast) {
 		TypeNode type = ast.typeCheck(); //type-checking bottom-up
 		System.out.println(type.toPrint("Type checking ok! Type of the program is: "));
 	}
@@ -70,8 +69,7 @@ public class Compiler {
 		ArrayList<EffectError> effectErrors = ast.checkEffects(env);
 		System.out.println("You had: "+effectErrors.size()+" effects errors.");
 		if(effectErrors.size()>0){
-			for(EffectError e : effectErrors)
-				System.out.println("\t" + e);
+			effectErrors.stream().filter(KeySet.keySet(EffectError::toString)).forEach(System.err::println);
 			System.exit(1);
 		}
 	}
@@ -143,8 +141,7 @@ public class Compiler {
 	}
 	public static void main(String[] args) throws Exception {
 
-		//32 dovrebbe andare bene
-		int numberSingle = 4;
+		int numberSingle = 31;
 		String dire = "tommasoExamples/";
 		String fileAbsNameSingle = dire + baseName + numberSingle + ext;
 		String fileNameSingle = baseName + numberSingle + ext;

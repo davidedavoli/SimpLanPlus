@@ -79,12 +79,12 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
         return res;
   }
   
-  public String toPrint(String s) throws SimplanPlusException {
+  public String toPrint(String s) {
 	return s+"lhs: " + this.getDereferenceLevel()+" "+this.getID()+"\n";
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () throws SimplanPlusException {
+  public TypeNode typeCheck() {
 	if (inner != null) {
         return inner.typeCheck().dereference();
     }
@@ -118,12 +118,12 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
         Effect actualStatus = innerEntry.getDereferenceLevelVariableStatus(getDereferenceLevel()-1);
 
         if (actualStatus.equals(new Effect(Effect.INITIALIZED))) {
-            errors.add(new EffectError(inner.getID() + " used before writing value. LhsExpNode"));
+            errors.add(new EffectError(inner.getID() + " used before writing value."));
         }
         for(int i=0;i<innerEntry.getMaxDereferenceLevel();i++){
             Effect status = innerEntry.getDereferenceLevelVariableStatus(i);
             if (status.equals(new Effect(Effect.DELETED))) {
-                errors.add(new EffectError(inner.getID() + " used after deleting. LhsExpNode"));
+                errors.add(new EffectError(inner.getID() + " used after deleting."));
             }
         }
         errors.addAll(checkExpStatus(env));

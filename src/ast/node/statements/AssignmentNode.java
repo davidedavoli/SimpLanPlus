@@ -49,16 +49,19 @@ public class AssignmentNode extends MetaNode {
         return res;
   }
   
-  public String toPrint(String s) throws SimplanPlusException {
+  public String toPrint(String s) {
 	return s+"Var:" + lhs.getID() +"\n"
 	  	   +lhs.typeCheck().toPrint(s+"  ")  
            +exp.toPrint(s+"  "); 
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () throws SimplanPlusException {
-    if (! (TypeUtils.isSubtype(exp.typeCheck(),lhs.typeCheck())) )
-        throw new SimplanPlusException("incompatible value in assignment for variable "+lhs.getID());
+  public TypeNode typeCheck() {
+    if (! (TypeUtils.isSubtype(exp.typeCheck(),lhs.typeCheck())) ){
+      System.err.println("Incompatible value in assignment for variable "+lhs.getID() + " of type: "+lhs.typeCheck().toPrint("") + " when exp is of type: "+exp.typeCheck().toPrint(""));
+      System.exit(0);
+    }
+        //throw new SimplanPlusException("incompatible value in assignment for variable "+lhs.getID());
     
     return lhs.typeCheck();
   }

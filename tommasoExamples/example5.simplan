@@ -5,7 +5,7 @@
     The program is not correct because the function g could delete x twice.
     */
     ^int a = new int;
-    int b = 0;
+    int b;
     void g(^int x, int y) {
         if (y==0)
             delete x;

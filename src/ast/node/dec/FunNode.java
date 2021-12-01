@@ -60,21 +60,21 @@ public class FunNode extends MetaNode {
 		return parlist;
 	}
 
-	public String toPrint(String s) throws SimplanPlusException {
-		StringBuilder parlstr= new StringBuilder();
-		for (Node par:parlist)
-	  		parlstr.append(par.toPrint(s + "  "));
-    	return s+"Fun:" + id +"\n"
+	public String toPrint(String s) {
+	StringBuilder parlstr= new StringBuilder();
+	for (Node par:parlist)
+	  parlstr.append(par.toPrint(s + "  "));
+    return s+"Fun:" + id +"\n"
 		   +type.toPrint(s+"  ")
 		   +parlstr
            +body.toPrint(s+"  ") ;
   	}
 
-  	//valore di ritorno non utilizzato
-  	public TypeNode typeCheck () throws SimplanPlusException {
-		body.typeCheck();
-    	return new ArrowTypeNode(partypes, type);
-  	}
+  //valore di ritorno non utilizzato
+  public TypeNode typeCheck() {
+	body.typeCheck();
+    return new ArrowTypeNode(partypes, type);
+  }
 
   	public HasReturn retTypeCheck() {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);

@@ -31,35 +31,7 @@ public class VarNode extends MetaNode {
     }
 
 
-    //  @Override
-    //  public ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl) {
-    //
-    //	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-    //
-    //	  if (!(type instanceof PointerTypeNode)) {
-    //		HashSet<Pair<String, Integer>> tmp = new HashSet<Pair<String, Integer>>();
-    //		tmp.add(new Pair<String, Integer>(id, nl));
-    //		env.add(new AliasingDomain(tmp, new DelList()));
-    //		res.addAll(exp.delTypeCheck(env, nl));
-    //	  }
-    //	  else {
-    //		HashSet<Pair<String, Integer>> tmp = new HashSet<Pair<String, Integer>>();
-    //		tmp.add(new Pair<String, Integer>(id, nl));
-    //
-    //		DelList l = new DelList(((PointerTypeNode)type).getDerefLevel());
-    //
-    //		if ((exp instanceof NewNode)) {
-    //			l.put(0,new DelEffType(DelEffType.DelT.NIL));// statement del tipo ^type = exp dovrebbero essere consentiti solo se exp è new ^type.
-    //		}
-    //		else {
-    //			res.add(new SemanticError("Errore grave! non dovremmo nemmeno entrare in questo ramo"));
-    //		}
-    //	  }
-    //
-    //	  return res;
-    //  }
-
-    public String toPrint(String s) throws SimplanPlusException {
+    public String toPrint(String s) {
         return s+"Var:" + id.getID() +"\n"
             +type.toPrint(s+"  ")
             +((exp==null)?"":exp.toPrint(s+"  "));
@@ -69,11 +41,10 @@ public class VarNode extends MetaNode {
     return new HasReturn(HasReturn.hasReturnType.ABS);
     }
 
-
-    //valore di ritorno non utilizzato
-    public TypeNode typeCheck () throws SimplanPlusException {
+    public TypeNode typeCheck() {
         if (exp != null && ! (TypeUtils.isSubtype(exp.typeCheck(),type)) ){
-            System.out.println("incompatible value for variable "+id.getID());
+            System.err.println("Incompatible value in assignment for variable "+id.getID() + " of type: "+id.typeCheck().toPrint("") + " when exp is of type: "+exp.typeCheck().toPrint(""));
+            //System.err.println("Incompatible value for variable "+id.getID());
             System.exit(0);
         }
         return type;
@@ -115,7 +86,7 @@ public class VarNode extends MetaNode {
         }
 
         if ( hm.put(id.getID(),entry) != null )
-            res.add(new SemanticError("Var id '"+id+"' already declared"));
+            res.add(new SemanticError("Var id '"+id.getID()+"' already declared"));
 
         return res;
     }

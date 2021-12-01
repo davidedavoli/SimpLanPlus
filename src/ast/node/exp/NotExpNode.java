@@ -33,16 +33,19 @@ public class NotExpNode extends ExpNode {
  	  return res;
  	}
   
-  public String toPrint(String s) throws SimplanPlusException {
+  public String toPrint(String s) {
     return "not " + exp.toPrint(s);
     }
   
-  public TypeNode typeCheck() throws SimplanPlusException {
+  public TypeNode typeCheck() {
 	  TypeNode expType = exp.typeCheck();
 
-	  if (! (expType instanceof BoolTypeNode)){
-		  throw new SimplanPlusException("Exp not bool, throw exception");
+	  if (! (expType instanceof BoolTypeNode)) {
+		  System.err.println("Try to do negate (!) of a non bool");
+		  System.exit(0);
 	  }
+		  //throw new SimplanPlusException("Exp not bool, throw exception");
+
 	  return new BoolTypeNode();
 
   }

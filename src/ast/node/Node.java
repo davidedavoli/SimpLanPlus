@@ -13,12 +13,12 @@ import semantic.SimplanPlusException;
 
 public interface Node {
 
-  String toPrint(String indent) throws SimplanPlusException;
+  String toPrint(String indent);
 
   //fa il type checking e ritorna: 
   //  per una espressione, il suo tipo (oggetto BoolTypeNode o IntTypeNode)
   //  per una dichiarazione, "null"
-  TypeNode typeCheck() throws SimplanPlusException;
+  TypeNode typeCheck();
   
   String codeGeneration(Label labelManager) throws SimplanPlusException;
 

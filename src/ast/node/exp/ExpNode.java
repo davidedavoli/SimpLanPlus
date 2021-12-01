@@ -16,12 +16,12 @@ import java.util.List;
 
 public abstract class ExpNode extends MetaNode {
     @Override
-    public String toPrint(String indent) throws SimplanPlusException {
+    public String toPrint(String indent) {
         return null;
     }
 
     @Override
-    public TypeNode typeCheck() throws SimplanPlusException {
+    public TypeNode typeCheck() {
         return null;
     }
 

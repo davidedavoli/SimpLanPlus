@@ -35,7 +35,7 @@ public class RetNode extends MetaNode {
 	  return etype;
   }
 
-  public String toPrint(String s) throws SimplanPlusException {
+  public String toPrint(String s) {
     return s+"Return\n" + (val!= null ? val.toPrint(s+"  ") : "");
   }
 
@@ -60,17 +60,29 @@ public class RetNode extends MetaNode {
  	}
 
   
-  public TypeNode typeCheck() throws SimplanPlusException {
-        if(etype instanceof VoidTypeNode && val != null)
-          throw new SimplanPlusException("Returning val in void function");
-        else if(etype.getClass() == PointerTypeNode.class)
-            throw new SimplanPlusException("Trying to return pointer inside a function.");
-        else if(val == null)
-            return new VoidTypeNode();
-        else if (TypeUtils.isSubtype(val.typeCheck(), etype))
-            return etype;
-        else
-            throw new SimplanPlusException("Wrong return type for function");
+  public TypeNode typeCheck() {
+        if(etype instanceof VoidTypeNode && val != null){
+            System.err.println("Trying to return value in void function: "+parent_f.getId());
+            System.exit(0);
+        }
+          //throw new SimplanPlusException("Returning val in void function");
+        else if(etype.getClass() == PointerTypeNode.class){
+          System.err.println("Trying to return pointer inside of function: "+parent_f.getId());
+          System.exit(0);
+        }
+            //throw new SimplanPlusException("Trying to return pointer inside a function.");
+        else if(val == null) {
+          return new VoidTypeNode();
+        }
+        else if (TypeUtils.isSubtype(val.typeCheck(), etype)) {
+          return etype;
+        }
+        else{
+          System.err.println("Wrong return type for function "+parent_f.getId());
+          System.exit(0);
+        }
+           // throw new SimplanPlusException("Wrong return type for function");
+      return null;
   }  
   
   public HasReturn retTypeCheck() {

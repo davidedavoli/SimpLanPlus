@@ -40,10 +40,10 @@ public class CallNode extends MetaNode {
     isAlreadyCalled = false;
 }
 
-public String toPrint(String s) throws SimplanPlusException {  //
-    String parlstr="";
+public String toPrint(String s) {  //
+    StringBuilder parlstr= new StringBuilder();
 	for (ExpNode par:parameterlist)
-	  parlstr+=par.toPrint(s+"  ");		
+	  parlstr.append(par.toPrint(s + "  "));
 	return s+"Call:" + id + " at nestlev " + nestinglevel +"\n" 
            +entry.toPrint(s+"  ")
            +parlstr;        
@@ -90,8 +90,6 @@ public HasReturn retTypeCheck() {
         }
         id.setEntry(env.effectsLookUp(id.getID()));
         List<List<Effect>> functionEffects = id.getEntry().getFunctionStatusList();
-
-        System.out.println(functionEffects);
         /**
          * Non pointer parameters
          */
@@ -207,7 +205,7 @@ public HasReturn retTypeCheck() {
 
         entry = env.lookUp(id.getID());
         if (entry == null)
-            res.add(new SemanticError("Id "+id.getID()+" not declared in call node"));
+            res.add(new SemanticError("Id "+id.getID()+" not declared."));
         else{
             nestinglevel = env.getNestingLevel();
             for(ExpNode arg : parameterlist)
@@ -219,20 +217,29 @@ public HasReturn retTypeCheck() {
 		return res;
   }
   
-  public TypeNode typeCheck () throws SimplanPlusException {  //
+  public TypeNode typeCheck() {  //
 	 ArrowTypeNode t=null;
      if (entry.getType() instanceof ArrowTypeNode)
          t=(ArrowTypeNode) entry.getType();
-     else 
-         throw new SimplanPlusException("Invocation of a non-function "+id);
+     else {
+         System.err.println("Trying to invoke "+id.getID()+". But it is not a function.");
+         System.exit(0);
+     }
+         //throw new SimplanPlusException("Invocation of a non-function "+id);
      
      List<TypeNode> p = t.getParList();
-     if ( !(p.size() == parameterlist.size()) )
-         throw new SimplanPlusException("Wrong number of parameters in the invocation of "+id);
+     if ( !(p.size() == parameterlist.size()) ){
+         System.err.println("Wrong number of parameters in the invocation of "+id.getID());
+         System.exit(0);
+     }
+         //throw new SimplanPlusException("Wrong number of parameters in the invocation of "+id);
     
      for (int i=0; i<parameterlist.size(); i++)
-       if ( !(TypeUtils.isSubtype( (parameterlist.get(i)).typeCheck(), p.get(i)) ) )
-           throw new SimplanPlusException("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id);
+       if ( !(TypeUtils.isSubtype( (parameterlist.get(i)).typeCheck(), p.get(i)) ) ){
+           System.err.println("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id.getID());
+           System.exit(0);
+       }
+           //throw new SimplanPlusException("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id);
        
      return t.getRet();
   }

@@ -34,13 +34,13 @@ public class ArgNode extends MetaNode {
 	  return new ArrayList<SemanticError>();
 	}
   
-  public String toPrint(String s) throws SimplanPlusException {
+  public String toPrint(String s) {
 	  return s+"Par:" + id +"\n"
 			 +type.toPrint(s+"  ") ; 
   }
 
     //non utilizzato
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck() {
      return null;
   }
   

@@ -45,9 +45,12 @@ public class DeletionNode extends MetaNode {
   }
   
   //valore di ritorno non utilizzato
-  public TypeNode typeCheck () throws SimplanPlusException {
-	  if (! (type instanceof PointerTypeNode))
-          throw new SimplanPlusException("attempted deletion of a non-pointer variable");
+  public TypeNode typeCheck() {
+	  if (! (type instanceof PointerTypeNode)){
+        System.err.println("Attempt to delete a non pointer variable: "+id.getID());
+        System.exit(0);
+      }
+          //throw new SimplanPlusException("attempted deletion of a non-pointer variable");
     return id.typeCheck();
   }
   

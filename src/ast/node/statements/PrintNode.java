@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.exp.ExpNode;
+import ast.node.exp.IdExpNode;
 import ast.node.types.*;
 import effect.EffectError;
 import semantic.Environment;
@@ -20,14 +21,17 @@ public class PrintNode extends MetaNode {
     val=v;
   }
   
-  public String toPrint(String s) throws SimplanPlusException {
+  public String toPrint(String s) {
     return s+"Print\n" + val.toPrint(s+"  ") ;
   }
   
-  public TypeNode typeCheck() throws SimplanPlusException {
+  public TypeNode typeCheck() {
     TypeNode valType = val.typeCheck();
-    if(valType instanceof PointerTypeNode)
-      throw new SimplanPlusException("Print of a pointer");
+    if(valType instanceof PointerTypeNode){
+      System.err.println("Trying to print a pointer "+((IdExpNode)val).getID());
+      System.exit(0);
+    }
+      //throw new SimplanPlusException("Print of a pointer");
     return valType;
   }  
   

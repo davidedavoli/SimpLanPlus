@@ -350,7 +350,7 @@ public class Environment {
 			idEntry.setDereferenceLevelVariableStatus(newStatus, variable.getDereferenceLevel());
 
 			if (newStatus.equals(new Effect(Effect.ERROR))) {
-				errors.add(new EffectError(variable.getID() + " used after delete(env)."));
+				errors.add(new EffectError(variable.getID() + " used after deleting."));
 			}
 		} catch (Exception exception) {
 			errors.add(new EffectError(variable.getID() + " not declared. Aborting."));

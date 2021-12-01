@@ -115,7 +115,7 @@ public class STentry {
   
   public int getNestingLevel() {return this.nestingLevel;}
   
-  public String toPrint(String s) throws SimplanPlusException { //
+  public String toPrint(String s) { //
 	   return s+"STentry: nestlev " + nestingLevel +"\n"+
 			  s+"STentry: type\n" + 
 			  type.toPrint(s+"  ") + 

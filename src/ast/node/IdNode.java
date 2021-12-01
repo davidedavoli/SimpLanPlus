@@ -51,20 +51,20 @@ public class IdNode extends LhsNode implements Dereferenceable {
 	  return entry;
   }
 
-  public String toPrint(String s) throws SimplanPlusException {
+  public String toPrint(String s) {
 	return s+"Id:" + id + " at nestlev " + nestinglevel +"\n" + entry.toPrint(s+"  ") ;  
   }
   
 
   
   @Override
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck() {
       if(entry == null){
-          System.out.println("TypeCheck: Entry of identifier "+ id +" is null");
+          System.err.println("TypeCheck: Entry of identifier "+ id +" is null");
           System.exit(0);
       }
 	if (entry.getType() instanceof ArrowTypeNode) { //
-	  System.out.println("Wrong usage of function identifier");
+	  System.err.println("Wrong usage of function identifier");
       System.exit(0);
     }
     return entry.getType();
@@ -99,7 +99,7 @@ public class IdNode extends LhsNode implements Dereferenceable {
         ArrayList<SemanticError> res = new ArrayList<SemanticError>();
         entry = env.lookUp(id);
         if (entry == null)
-            res.add(new SemanticError("Id "+id+" not declared in idNode"));
+            res.add(new SemanticError("Id "+id+" not declared."));
         else
             nestinglevel = env.getNestingLevel();
         return res;

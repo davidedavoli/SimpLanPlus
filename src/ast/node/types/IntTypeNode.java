@@ -14,10 +14,13 @@ public class IntTypeNode implements TypeNode {
   }
   
   public String toPrint(String s) {
-	return s+"IntType\n";  
+	return s+"int";
   }
-  public TypeNode dereference() throws SimplanPlusException {
-      throw new SimplanPlusException("Attempt to dereference an int");
+  public TypeNode dereference() {
+      System.err.println("Attempt to dereference an Integer");
+      System.exit(0);
+      return null;
+      //throw new SimplanPlusException("Attempt to dereference an int");
   }
   //non utilizzato
   public TypeNode typeCheck() {

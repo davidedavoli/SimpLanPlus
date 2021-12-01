@@ -58,7 +58,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
         this.entry = entry;
     }
 
-  public String toPrint(String s) throws SimplanPlusException {
+  public String toPrint(String s) {
 	return s+"Id:" + id + " at nestlev " + nestinglevel +"\n" + entry.toPrint(s+"  ") ;
   }
   
@@ -76,9 +76,11 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
 	  return res;
 	}
   
-  public TypeNode typeCheck () throws SimplanPlusException {
+  public TypeNode typeCheck() {
 	if (entry.getType() instanceof ArrowTypeNode) {
-	  throw new SimplanPlusException("Wrong usage of function identifier");
+        System.err.println("Wrong usage of function identifier");
+        System.exit(0);
+	  //throw new SimplanPlusException();
     }
     return entry.getType();
   }
@@ -119,7 +121,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
         for(int i=0;i<entry.getMaxDereferenceLevel();i++){
             Effect status = entry.getDereferenceLevelVariableStatus(i);
             if (status.equals(new Effect(Effect.DELETED))) {
-                errors.add(new EffectError(this.getID() + " used after deleting. IdExpNode"));
+                errors.add(new EffectError(this.getID() + " used after deleting."));
             }
         }
 

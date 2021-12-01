@@ -32,12 +32,12 @@ public class NewNode extends ExpNode {
 	      return res;
 	  }
 	  
-	  public String toPrint(String s) throws SimplanPlusException {
+	  public String toPrint(String s) {
 		return s+"New:\n" + type.toPrint(s+"   ") +"\n";
 	  }
 	  
 	  //valore di ritorno non utilizzato
-	  public TypeNode typeCheck () {
+	  public TypeNode typeCheck() {
 	    return new PointerTypeNode(type);
 	  }
 	  

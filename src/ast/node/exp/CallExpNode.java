@@ -21,7 +21,7 @@ public class CallExpNode extends ExpNode {
     }
 
     @Override
-    public String toPrint(String indent) throws SimplanPlusException {
+    public String toPrint(String indent) {
         return inner.toPrint(indent);
     }
     public STentry innerEntry(){
@@ -31,7 +31,7 @@ public class CallExpNode extends ExpNode {
         return inner.getIdName();
     }
     @Override
-    public TypeNode typeCheck() throws SimplanPlusException {
+    public TypeNode typeCheck() {
         return inner.typeCheck();
     }
 

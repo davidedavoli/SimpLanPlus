@@ -30,18 +30,21 @@ public class BinExpNode extends ExpNode {
     }
 
     @Override
-    public String toPrint(String indent) throws SimplanPlusException {
+    public String toPrint(String indent) {
         return indent + lhs + " " + operator + " " + rhs.toPrint(indent);
     }
 
     @Override
-    public TypeNode typeCheck() throws SimplanPlusException {
+    public TypeNode typeCheck() {
         TypeNode lhsType = lhs.typeCheck();
         TypeNode rhsType = rhs.typeCheck();
 
         if(!(lhsType instanceof IntTypeNode && rhsType instanceof IntTypeNode))
-            if(!(lhsType instanceof BoolTypeNode && rhsType instanceof BoolTypeNode))
-                throw new SimplanPlusException("Operands are of different type");
+            if(!(lhsType instanceof BoolTypeNode && rhsType instanceof BoolTypeNode)){
+                System.err.println("Operands are of different type");
+                System.exit(0);
+            }
+                //throw new SimplanPlusException("Operands are of different type");
 
 
         /**
@@ -60,8 +63,11 @@ public class BinExpNode extends ExpNode {
             case "/":
                 // Both must be integer type
                 if (!(lhsType instanceof IntTypeNode)) {
-                    throw new SimplanPlusException("Operands are not int in division");
+                    System.err.println("Operands are not int in math operator ([ + | - | * | / ])");
+                    System.exit(0);
                 }
+                    //throw new SimplanPlusException("Operands are not int in division");
+
                 return new IntTypeNode();
 
             case "<":
@@ -69,7 +75,9 @@ public class BinExpNode extends ExpNode {
             case ">":
             case ">=":
                 if (!(lhsType instanceof IntTypeNode)) {
-                    throw new SimplanPlusException("Operands are not int in >=");
+                    System.err.println("Operands are not int in >=");
+                    System.exit(0);
+                    //throw new SimplanPlusException("Operands are not int in >=");
                 }
                 return new BoolTypeNode();
             /**
@@ -84,7 +92,9 @@ public class BinExpNode extends ExpNode {
             case "&&":
             case "||":
                 if(!(lhsType instanceof  BoolTypeNode)){
-                    throw new SimplanPlusException("Operands are not bool in division");
+                    System.err.println("Operands are not bool in [ or(||) | and[&&] ");
+                    System.exit(0);
+                    //throw new SimplanPlusException("Operands are not bool in division");
                 }
                 return new BoolTypeNode();
         }
@@ -99,8 +109,7 @@ public class BinExpNode extends ExpNode {
 
         StringBuilder cgen = new StringBuilder();
 
-        cgen.append("//Start codegen of ").append(lhs.getClass().getName()).append(operator).append(rhs.getClass().getName())
-                .append("\n");
+        cgen.append("//Start codegen of ").append(lhs.getClass().getName()).append(operator).append(rhs.getClass().getName()).append("\n");
         /**
          * Cgen for lhs and rhs to push them on the stack
          */
@@ -187,24 +196,6 @@ public class BinExpNode extends ExpNode {
         return cgen.toString();
     }
 
-    /*private void makeBoolExp(StringBuilder cgen, String boolCondition, String trueLabel, String endLabel, String comment){
-
-        cgen.append(boolCondition).append(trueLabel).append(comment); 
-        // eq $a0 $t1 $a0 //a0 = t1==a0
-        // minus $a0 $t1 $a0 //a0 = t1<a0
-
-
-        //CORPO FALSE BRANCH
-        cgen.append("li $a0 0 // load false result in $a0 \n");
-        cgen.append("b ").append(endLabel).append("\n");
-
-        //CORPO TRUE BRANCH
-        cgen.append(trueLabel).append(":\n");
-        cgen.append("li $a0 1 // load true result in $a0 \n");
-        cgen.append(endLabel).append(":\n");
-
-    }
-    */
     @Override
     public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
         ArrayList<SemanticError> binExpNodeErrors = new ArrayList<>();

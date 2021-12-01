@@ -41,13 +41,13 @@ public class BlockNode extends MetaNode {
       isFunction = isFunctionBlock;
     }
 
-    public String toPrint(String s) throws SimplanPlusException {
-	String declstr="";
-	String statstr="";
+    public String toPrint(String s) {
+	StringBuilder declstr= new StringBuilder();
+	StringBuilder statstr= new StringBuilder();
     for (Node dec:declarations)
-      declstr += dec.toPrint(s+"  ");
+      declstr.append(dec.toPrint(s + "  "));
     for (Node stat:statements)
-      statstr += stat.toPrint(s+"  ");
+      statstr.append(stat.toPrint(s + "  "));
 	return s+"Block\n" + declstr + statstr ; 
   }
   
@@ -106,16 +106,15 @@ public class BlockNode extends MetaNode {
         return res;
     }
 
-    public TypeNode typeCheck () throws SimplanPlusException {
-	  //ne siamo sicuri?
-	TypeNode last =null;
-    for (Node dec:declarations)
-      last = dec.typeCheck();
-    for (Node stat:statements)
-      last = stat.typeCheck();
-    return last;
- }
-  
+    public TypeNode typeCheck() {
+        TypeNode last =null;
+        for (Node dec:declarations)
+          last = dec.typeCheck();
+        for (Node stat:statements)
+          last = stat.typeCheck();
+        return last;
+     }
+
   public ArrayList<TypeNode> getReturnList() throws SimplanPlusException {
       ArrayList<TypeNode> res = new ArrayList<TypeNode>();
       for (Node s: statements) {

@@ -34,13 +34,16 @@ public class NegExpNode extends ExpNode {
  	  return res;
  	}
   
-  public String toPrint(String s) throws SimplanPlusException {
+  public String toPrint(String s) {
     return "neg " + exp.toPrint(s);
     }
   
-  public TypeNode typeCheck() throws SimplanPlusException {
-	  if (! TypeUtils.isSubtype(exp.typeCheck(),new IntTypeNode())) 
-		  	  throw new SimplanPlusException("Non int negate");
+  public TypeNode typeCheck() {
+	  if (! TypeUtils.isSubtype(exp.typeCheck(),new IntTypeNode())) {
+		  System.err.println("Try to do negative on a non int");
+		  System.exit(0);
+	  }
+		  	  //throw new SimplanPlusException("Non int negate");
 	  return new IntTypeNode();
   }
 

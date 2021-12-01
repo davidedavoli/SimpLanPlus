@@ -66,12 +66,12 @@ public class LhsNode extends MetaNode implements Dereferenceable {
         return inner.checkSemantics(env);
     }
 
-    public String toPrint(String s) throws SimplanPlusException {
+    public String toPrint(String s) {
         return s+"lhs: " + this.getDereferenceLevel()+" "+this.getID()+"\n";
     }
 
     //valore di ritorno non utilizzato
-    public TypeNode typeCheck() throws SimplanPlusException {
+    public TypeNode typeCheck() {
         if (inner != null) {
             return inner.typeCheck().dereference();
         }
@@ -95,7 +95,7 @@ public class LhsNode extends MetaNode implements Dereferenceable {
 
         errors.addAll(inner.checkEffects(env));
         if (!inner.getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()-1).equals(new Effect(Effect.READWRITE))) {
-            errors.add(new EffectError(inner.getID() + " has not all pointer to rw (LhsNode)"));
+            errors.add(new EffectError(inner.getID() + " has not all pointer to rw."));
         }
         return  errors;
     }

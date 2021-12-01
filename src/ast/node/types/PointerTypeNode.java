@@ -19,8 +19,9 @@ public class PointerTypeNode implements TypeNode {
     return type.toString()+"^";
   }
 
-  public String toPrint(String s) throws SimplanPlusException {
-	return s+"Pointer type\n"+type.toPrint(s+"   ");  
+  public String toPrint(String s) {
+      //return s+"Pointer type\n"+type.toPrint(s+"   ");
+      return s+"^"+type.toPrint("");
   }
     
   //non utilizzato
