@@ -75,39 +75,62 @@ public class Environment {
 		return maxEnvironment;
 	}
 
+	/**
+	 * Returns the par environment applied to the head of {@code firstEnv} and
+	 * {@code secondEnv}.
+	 *
+	 * @param firstEnv environment which has at least one scope
+	 * @param secondEnv environment which has at least one scope
+	 * @return the par environment
+	 */
 	public static Environment parallelEnvironment(Environment firstEnv, Environment secondEnv) {
 		Environment resultingEnvironment = new Environment();
-
 		resultingEnvironment.createVoidScope();
 
 		Map<String, STentry> scope1 = firstEnv.symTable.get(firstEnv.symTable.size() - 1);
 		Map<String, STentry> scope2 = secondEnv.symTable.get(secondEnv.symTable.size() - 1);
 
+		// CASE 1: Exists x in scope1 that not belongs to scope2
+		checkParEnv(scope1, scope2, resultingEnvironment);
+		// CASE 2: Exists x in scope2 that non belongs to scope1
+		checkParEnv(scope2, scope1, resultingEnvironment);
+		// CASE 3: The scopes contains the same variables, parallel operation occurs
+		parEnv(scope1, scope2, resultingEnvironment);
+
+		return resultingEnvironment;
+	}
+
+	/**
+	 * Given two environment {@code scope1} and {@scope2}, check if there are some variables is {@code scope1},
+	 * that not belongs to {@code scope2}. If it is true, the variables are added to {@code resultingEnvironment}
+	 *
+	 * @param scope1 environment which has at least one scope
+	 * @param scope2 environment which has at least one scope
+	 * @param resultingEnvironment environment resulting after the check
+	 */
+	private static void checkParEnv(Map<String, STentry> scope1, Map<String, STentry> scope2, Environment resultingEnvironment) {
 		for (var xInE1 : scope1.entrySet()) {
 			if (!scope2.containsKey(xInE1.getKey())) {
-
 				STentry entry = resultingEnvironment.createNewDeclaration(xInE1.getKey(),
 						xInE1.getValue().getType());
-
-
 				entry.setFunctionNode(xInE1.getValue().getFunctionNode());
 				for (int j = 0; j < xInE1.getValue().getMaxDereferenceLevel(); j++) {
 					entry.setDereferenceLevelVariableStatus(xInE1.getValue().getDereferenceLevelVariableStatus(j), j);
 				}
 			}
 		}
+	}
 
-		for (var xInE2 : scope2.entrySet()) {
-			if (!scope1.containsKey(xInE2.getKey())) {
-				STentry entry = resultingEnvironment.createNewDeclaration(xInE2.getKey(),
-						xInE2.getValue().getType());
-				entry.setFunctionNode(xInE2.getValue().getFunctionNode());
-				for (int j = 0; j < xInE2.getValue().getMaxDereferenceLevel(); j++) {
-					entry.setDereferenceLevelVariableStatus(xInE2.getValue().getDereferenceLevelVariableStatus(j), j);
-				}
-			}
-		}
-
+	/**
+	 * Given two environment {@code scope1} and {@scope2} which contains the same variables,
+	 * execute Parallel effect operation between {@code scope1} and {@scope2} and store the result in
+	 * {@code resultingEnvironment}
+	 *
+	 * @param scope1 environment which has at least one scope
+	 * @param scope2 environment which has at least one scope
+	 * @param resultingEnvironment environment resulting after the parallel effect operation
+	 */
+	private static void parEnv(Map<String, STentry> scope1, Map<String, STentry> scope2, Environment resultingEnvironment){
 		for (var xInE1 : scope1.entrySet()) {
 			for (var xInE2 : scope2.entrySet()) {
 				if (xInE1.getKey().equals(xInE2.getKey())) {
@@ -120,8 +143,6 @@ public class Environment {
 				}
 			}
 		}
-
-		return resultingEnvironment;
 	}
 
 	public static Environment updateEnvironment(Environment env1, Environment env2) {
@@ -372,6 +393,14 @@ public class Environment {
 		return null; // Does not happen if preconditions are met.
 	}
 
+	/**
+	 * Adds a new variable named [id] of type [type] into the current scope. The
+	 * caller is sure that [id] does not exist in the current scope: if it does,
+	 * then unexpected behavior could occur.
+	 *
+	 * @param id   the identifier of the variable or function.
+	 * @param type the type of the variable or function.
+	 */
 	public STentry createNewDeclaration(final String id, final TypeNode type) {
 		STentry stEntry;
 		if (type instanceof ArrowTypeNode) {
