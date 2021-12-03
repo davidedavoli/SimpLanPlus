@@ -2,6 +2,7 @@ package ast.node;
 
 import java.util.ArrayList;
 
+import GraphEffects.EffectsManager;
 import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.types.HasReturn;
@@ -114,5 +115,10 @@ public class LhsNode extends MetaNode implements Dereferenceable {
 
     public void setIdStatus(Effect effect, int level){
         this.inner.setIdStatus(effect,level);
+    }
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+      //Non facciamo niente perché facciamo tutto in Assignment
     }
 }

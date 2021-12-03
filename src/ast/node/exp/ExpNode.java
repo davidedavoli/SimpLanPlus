@@ -1,5 +1,6 @@
 package ast.node.exp;
 
+import GraphEffects.EffectsManager;
 import ast.Dereferenceable;
 import ast.Label;
 import ast.node.MetaNode;
@@ -55,4 +56,8 @@ public abstract class ExpNode extends MetaNode {
 
         return errors;
     }
+
+    public abstract void readGraphEffect(EffectsManager m);
+
+    public abstract void checkGraphEffects(EffectsManager m);
 }

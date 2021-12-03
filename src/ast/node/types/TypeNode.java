@@ -2,6 +2,7 @@ package ast.node.types;
 
 import java.util.ArrayList;
 
+import GraphEffects.EffectsManager;
 import ast.node.Node;
 import semantic.Environment;
 import ast.Label;
@@ -20,7 +21,8 @@ public interface TypeNode extends Node {
   TypeNode dereference() throws SimplanPlusException;
   
   String codeGeneration(Label labelManager);
-  
+
   ArrayList<SemanticError> checkSemantics(Environment env);
-  
+
+
 }  

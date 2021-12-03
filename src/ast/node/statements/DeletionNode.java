@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 //import org.stringtemplate.v4.compiler.STParser.notConditional_return;
 
+import GraphEffects.EffectsManager;
 import ast.STentry;
 import ast.node.IdNode;
 import ast.node.MetaNode;
@@ -88,6 +89,12 @@ public class DeletionNode extends MetaNode {
       cgen.append("free $a0 //free address in $a0\n");
 
       return cgen.toString();
-  }  
-    
-}  
+  }
+
+
+  @Override
+  public void checkGraphEffects(EffectsManager m) {
+    m.delete(id.getID(), 0);
+    System.out.println(m.getG());
+  }
+}

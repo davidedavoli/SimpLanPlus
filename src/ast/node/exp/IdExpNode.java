@@ -2,6 +2,7 @@ package ast.node.exp;
 
 import java.util.ArrayList;
 
+import GraphEffects.EffectsManager;
 import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.types.ArrowTypeNode;
@@ -43,7 +44,7 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
 	  return this;
   }
   
-  public int detDerefLevel() {
+  public int getDerefLevel() {
 	  return 0;
   }
   
@@ -125,4 +126,16 @@ public class IdExpNode extends LhsExpNode implements Dereferenceable {
 
         return errors;
     }
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+        m.read(id, getDereferenceLevel());
+    }
+
+
+    @Override
+    public void readGraphEffect(EffectsManager m) {
+        m.read(id, getDereferenceLevel());
+    }
+
 }  

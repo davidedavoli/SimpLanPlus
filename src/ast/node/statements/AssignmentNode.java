@@ -3,6 +3,7 @@ package ast.node.statements;
 import java.util.ArrayList;
 import java.util.List;
 
+import GraphEffects.EffectsManager;
 import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.LhsNode;
@@ -11,6 +12,7 @@ import ast.node.dec.FunNode;
 import ast.node.exp.CallExpNode;
 import ast.node.exp.ExpNode;
 import ast.node.exp.LhsExpNode;
+import ast.node.exp.single_exp.NewNode;
 import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import ast.node.types.TypeUtils;
@@ -126,5 +128,23 @@ public class AssignmentNode extends MetaNode {
 
       return cgen.toString();
   }
+
+  public void checkGraphEffects (EffectsManager m) {
+    if (exp instanceof CallExpNode){
+      //TODO
+    }
+    if (exp instanceof LhsExpNode){
+      m.assign(lhs.getID(),((LhsExpNode)exp).getID(), lhs.getDereferenceLevel(), ((LhsExpNode)exp).getDereferenceLevel());
+    }
+    if (exp instanceof NewNode){
+      m.assign_new(lhs.getID(),  lhs.getDereferenceLevel());
+    }
+    else{
+      //System.out.println("writing: "+lhs.getID()+ " "+ lhs.getDereferenceLevel());
+      m.write(lhs.getID(), lhs.getDereferenceLevel());
+    }
+    //System.out.println(m.getG());
+  }
+
 
 }  

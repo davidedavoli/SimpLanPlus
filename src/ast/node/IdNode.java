@@ -2,6 +2,7 @@ package ast.node;
 
 import java.util.ArrayList;
 
+import GraphEffects.EffectsManager;
 import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.types.ArrowTypeNode;
@@ -129,4 +130,10 @@ public class IdNode extends LhsNode implements Dereferenceable {
     public Boolean isPointer() {
         return entry.getType() instanceof PointerTypeNode;
     }
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+        //Non facciamo niente perché facciamo tutto in Assignment
+    }
+
 }

@@ -2,9 +2,13 @@ package ast.node.statements;
 
 import java.util.ArrayList;
 
+import GraphEffects.EffectsManager;
 import ast.node.MetaNode;
 import ast.node.Node;
+import ast.node.exp.CallExpNode;
 import ast.node.exp.ExpNode;
+import ast.node.exp.LhsExpNode;
+import ast.node.exp.single_exp.NewNode;
 import ast.node.types.*;
 import effect.EffectError;
 import semantic.Environment;
@@ -54,5 +58,8 @@ public class PrintNode extends MetaNode {
         cgen.append("print $a0\n");
 		return cgen.toString();
   }
-    
+  public void checkGraphEffects (EffectsManager m) {
+    ((ExpNode)val).checkGraphEffects(m);
+  }
+
 }  

@@ -2,6 +2,9 @@ package ast.node.statements;
 import java.util.ArrayList;
 import java.util.List;
 
+import GraphEffects.EffectsManager;
+import GraphEffects.Graph;
+import GraphEffects.SetWithIdentity;
 import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.*;
@@ -279,5 +282,16 @@ public HasReturn retTypeCheck() {
         }
         return res;
     }
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+        //TODO
+        Graph effectGraphOfF = entry.getFunctionNode().aliasingMap;
+        Graph effectGraphOfRet = entry.getFunctionNode().returnGraphEffect;
+
+        Graph currentGraph = m.getG().copy();
+
+    }
+
 
 }

@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import GraphEffects.EffectsManager;
 import ast.node.Node;
 import effect.EffectError;
 import semantic.Environment;
@@ -23,6 +24,7 @@ public class ArrowTypeNode implements TypeNode {
   public TypeNode dereference() throws SimplanPlusException {//TODO qualcosa di più elegante?
       throw new SimplanPlusException("Attempt to dereference a bool");
   }
+
 
   public String toString(){
     String s="";
@@ -73,5 +75,10 @@ public class ArrowTypeNode implements TypeNode {
   public String codeGeneration(Label labelManager) {
 		return "";
   }
+  @Override
+  public void checkGraphEffects(EffectsManager m) {
+    return;
+  }
+
 
 }  

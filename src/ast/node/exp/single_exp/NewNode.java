@@ -3,6 +3,7 @@ package ast.node.exp.single_exp;
 import java.util.ArrayList;
 import java.util.List;
 
+import GraphEffects.EffectsManager;
 import ast.Dereferenceable;
 import ast.node.exp.ExpNode;
 import ast.node.types.PointerTypeNode;
@@ -53,6 +54,15 @@ public class NewNode extends ExpNode {
 	@Override
 	public List<Dereferenceable> variables() {
 		return new ArrayList<Dereferenceable>();
+	}
+
+	@Override
+	public void readGraphEffect(EffectsManager m) {
+	}
+
+	@Override
+	public void checkGraphEffects(EffectsManager m) {
+
 	}
 
 	public String codeGeneration(Label labelManager){

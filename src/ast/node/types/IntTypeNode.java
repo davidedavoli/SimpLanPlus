@@ -2,6 +2,7 @@ package ast.node.types;
 
 import java.util.ArrayList;
 
+import GraphEffects.EffectsManager;
 import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
@@ -38,10 +39,17 @@ public class IntTypeNode implements TypeNode {
         return new ArrayList<>();
     }
 
+
     @Override
 	public ArrayList<SemanticError> checkSemantics(Environment env) {
 
 	  return new ArrayList<SemanticError>();
 	}
-  
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+        return;
+    }
+
+
 }  

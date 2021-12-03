@@ -2,6 +2,7 @@ package ast.node;
 
 import java.util.ArrayList;
 
+import GraphEffects.EffectsManager;
 import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.EffectError;
@@ -61,4 +62,10 @@ public class ArgNode extends MetaNode {
     public IdNode getIdNode() {
       return this.id;
     }
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+        //Non facciamo niente perché faremo tutto in Function
+    }
+
 }  

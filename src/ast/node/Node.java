@@ -1,5 +1,6 @@
 package ast.node;
 
+import GraphEffects.EffectsManager;
 import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 
@@ -32,8 +33,9 @@ public interface Node {
 
   ArrayList<EffectError> checkEffects(Environment env);
 
-    default int getDereferenceLevel(){
+  default int getDereferenceLevel(){
       return 0;
     }
 
+  public  void checkGraphEffects(EffectsManager m);
 }

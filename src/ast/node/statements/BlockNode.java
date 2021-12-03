@@ -1,5 +1,6 @@
 package ast.node.statements;
 
+import GraphEffects.EffectsManager;
 import ast.STentry;
 import ast.node.MetaNode;
 import ast.node.Node;
@@ -216,5 +217,21 @@ public class BlockNode extends MetaNode {
 
     public void addMissingReturnFunctionCode(String missingReturnCode) {
         this.missingReturnCode = missingReturnCode;
+    }
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+        m.incNl();
+        m.afterOp("block application");
+        for (Node d: declarations){
+            d.checkGraphEffects(m);
+        }
+        for (Node s: statements){
+            s.checkGraphEffects(m);
+        }
+        m.popNl(m.getNl());
+        m.afterOp("block application");
+        m.getNl();
+        m.decNl();
     }
 }

@@ -3,6 +3,7 @@ package ast.node.exp;
 import java.util.ArrayList;
 import java.util.List;
 
+import GraphEffects.EffectsManager;
 import ast.Dereferenceable;
 import ast.node.types.IntTypeNode;
 import ast.node.types.TypeUtils;
@@ -68,6 +69,17 @@ public class NegExpNode extends ExpNode {
 		errors.addAll(exp.checkEffects(env));
 		errors.addAll(checkExpStatus(env));
 		return errors;
+	}
+
+	@Override
+	public void checkGraphEffects(EffectsManager m) {
+	  exp.checkGraphEffects(m);
+	}
+
+
+	@Override
+	public void readGraphEffect(EffectsManager m) {
+		exp.readGraphEffect(m);
 	}
 
 }  

@@ -2,6 +2,7 @@ package ast.node.types;
 
 import java.util.ArrayList;
 
+import GraphEffects.EffectsManager;
 import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
@@ -59,5 +60,11 @@ public class PointerTypeNode implements TypeNode {
 		return "";
   }
 
-    
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+        return;
+    }
+
+
+
 }  

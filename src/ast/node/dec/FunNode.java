@@ -2,6 +2,7 @@ package ast.node.dec;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import GraphEffects.*;
 import ast.FuncBodyUtils;
 import ast.Label;
 import ast.STentry;
@@ -21,7 +22,7 @@ import semantic.SimplanPlusException;
 public class FunNode extends MetaNode {
 	private final String id;
 	private final IdNode functionIdNode;
-	private final TypeNode type;
+	public final TypeNode type;
 	private ArrowTypeNode functionType; //just for ST
 	private ArrayList<TypeNode> partypes;
 	private final ArrayList<Node> parlist = new ArrayList<>();
@@ -29,7 +30,8 @@ public class FunNode extends MetaNode {
 	private BlockNode body;
 	private String beginFuncLabel;
 	private String endFuncLabel;
-
+	public Graph aliasingMap;
+	public Graph returnGraphEffect;
 
 
 	public FunNode (String i, TypeNode t, IdNode functionIdNode) {
@@ -366,5 +368,51 @@ public class FunNode extends MetaNode {
 
 	public String getId() {
 		return id;
+	}
+
+	@Override
+	public void checkGraphEffects(EffectsManager m) {
+		Graph ng = m.prepareFunction(this, m.getNl()+1);
+		Graph functions_view = m.getG().copy().partition((n) ->m.getG().variables().contains(n));
+
+		functions_view.map((n) -> { n.setId(WithId.makeId());
+									n.setEffect(GraphEffects.Effect.UNTOUCHED);
+									n.setNext(new SetWithIdentity<>());
+									return n;
+									});
+
+		functions_view.collect();
+
+		SetWithIdentity<GNode> vars = functions_view.variables();
+
+		for (GNode n: vars){
+
+			for (int i =0; i< n.getType().getDereferenceLevel(); i++){
+				functions_view.appendUntouched(n);
+			}
+		}
+
+
+		EffectsManager m1 = new EffectsManager(m.getNl()+1, Graph.sup(functions_view, ng));
+
+		System.out.println("m1's: "+m1.getG());
+		Graph old_g;
+
+
+		int c=0;
+
+		do {
+			old_g =m1.getG().copy();
+			body.checkGraphEffects(m1);
+			if (c==2)
+				break;
+			c++;
+		} while (!Graph.sameTraces(m1.getG(), old_g));
+
+		aliasingMap = m1.getG();
+		returnGraphEffect = new Graph(m1.getG().get("+"+this.getId()+"+return", m.getNl()+1).reachableSubGraph());
+		System.out.println(aliasingMap);
+		System.out.println(returnGraphEffect);
+
 	}
 }

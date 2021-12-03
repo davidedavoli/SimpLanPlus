@@ -1,6 +1,8 @@
 package ast.node;
 
 
+import GraphEffects.EffectsManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,8 +45,6 @@ public abstract class MetaNode implements Node {
         }
         return res;
     }
-
-
 
 
 }

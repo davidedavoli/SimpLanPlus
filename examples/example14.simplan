@@ -1,37 +1,20 @@
-/*{
-   ^int global;
-   ^int newGlobal(){
-       global=new int;
-       if(false){
-            return global;
-       }
-       else{
-
-       }
-       return global;
-    }
-   ^int x;
-   x = newGlobal();
-   print x^; // errore a run time
-   x^ = 2;
-
-}*/
 {
-   ^int global;
-   int newGlobal(){
-       global=new int;
-        if(false){
-            //delete global;
-            return global^;
-        }
-        else{
-            return global^;
-        }
 
-    }
-   ^int x = new int;
-   x^ = newGlobal();
-   delete global;
-   x^ = 2;
+^^int x;
+^int y;
+^int z;
+x = new ^int;
+x^ = new int;
+
+y = x^;
+z = y;
+z^ = 2;
+print x^^;
+print y^;
+print z^;
+delete x;
+print x^^;
+print y^;
+print z^;
 
 }

@@ -2,6 +2,8 @@ package ast.node.statements;
 
 import java.util.ArrayList;
 
+import GraphEffects.EffectsManager;
+import GraphEffects.Graph;
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.exp.ExpNode;
@@ -148,5 +150,29 @@ public class IfNode extends MetaNode {
 
       return cgen.toString();
   }
-  
-}  
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+        EffectsManager m1;
+        EffectsManager m2;
+
+        Graph new_graph;
+
+        cond.checkGraphEffects(m);
+
+        m1 = new EffectsManager(m.getNl(), m.getG().copy());
+        m2 = new EffectsManager(m.getNl(), m.getG().copy());
+
+        th.checkGraphEffects(m1);
+
+        new_graph= Graph.sup(m.getG(), m1.getG());
+
+        if (el!=null) {
+            th.checkGraphEffects(m2);
+            new_graph = Graph.sup(new_graph, m2.getG());
+        }
+
+
+        m.setG(new_graph);
+    }
+}

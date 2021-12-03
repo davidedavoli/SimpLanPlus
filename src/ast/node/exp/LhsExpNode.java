@@ -3,6 +3,7 @@ package ast.node.exp;
 import java.util.ArrayList;
 import java.util.List;
 
+import GraphEffects.EffectsManager;
 import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.LhsNode;
@@ -102,6 +103,19 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
 
         return variable;
     }
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+      //System.out.println("reading: "+getID()+" with deref: "+ getDereferenceLevel());
+      m.read(this.getID(), getDereferenceLevel());
+    }
+
+
+    @Override
+    public void readGraphEffect(EffectsManager m) {
+        m.read(this.getID(), getDereferenceLevel());
+    }
+
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
         ArrayList<EffectError> errors = new ArrayList<>();

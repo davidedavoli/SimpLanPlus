@@ -1,4 +1,4 @@
-package effect;
+package GraphEffects;
 
 /**
  * Effect type and function for semantic analysis
@@ -10,20 +10,23 @@ package effect;
 //public static final Effect IS_ERR = new Effect(ERR);
 
 public class Effect {
-    // init effect
-    public static final int INIT = 0;
+
+    public static final int NT = 0;
+    public static final Effect UNTOUCHED = new Effect(NT);
+
+    public static final int INIT = 1;
     public static final Effect INITIALIZED = new Effect(INIT);
 
     // read & write effect
-    public static final int RW = 1;
+    public static final int RW = 2;
     public static final Effect READWRITE = new Effect(RW);
 
     // delete effect
-    public static final int DEL = 2;
+    public static final int DEL = 3;
     public static final Effect DELETED = new Effect(DEL);
 
     // error effect
-    public static final int ERR = 3;
+    public static final int ERR = 4;
     public static final Effect ERROR = new Effect(ERR);
 
 
@@ -35,7 +38,7 @@ public class Effect {
     }
 
     public Effect() {
-        this(INIT);
+        this(NT);
     }
 
     public Effect(final Effect effect) {
@@ -44,6 +47,9 @@ public class Effect {
 
     public static Effect read(Effect effect) {
         //return sequenceEffect(effect, READWRITE);
+        if (UNTOUCHED.equals(effect)) {
+            return READWRITE;
+        }
         if (INITIALIZED.equals(effect)) {
             return ERROR;
         }
@@ -61,6 +67,9 @@ public class Effect {
 
     public static Effect write(Effect effect) {
         //return sequenceEffect(effect, READWRITE);
+        if (UNTOUCHED.equals(effect)) {
+            return READWRITE;
+        }
         if (INITIALIZED.equals(effect)) {
             return READWRITE;
         }
@@ -78,6 +87,9 @@ public class Effect {
 
     public static Effect delete(Effect effect) {
         //return sequenceEffect(effect, READWRITE);
+        if (UNTOUCHED.equals(effect)) {
+            return DELETED;
+        }
         if (INITIALIZED.equals(effect)) {
             return DELETED;
         }
@@ -127,9 +139,15 @@ public class Effect {
         return parEffect;
     }
 
+    public boolean le(Effect e){
+        return status<=e.status;
+    }
+
     @Override
     public String toString() {
         switch (status) {
+            case NT:
+                return "IS_NT";
             case INIT:
                 return "IS_INIT";
             case RW:

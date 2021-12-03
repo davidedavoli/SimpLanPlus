@@ -1,5 +1,6 @@
 package ast.node.exp;
 
+import GraphEffects.EffectsManager;
 import ast.Dereferenceable;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.IntTypeNode;
@@ -223,6 +224,19 @@ public class BinExpNode extends ExpNode {
 
         return variables;
     }
+
+    @Override
+    public void readGraphEffect(EffectsManager m) {
+        lhs.readGraphEffect(m);
+        rhs.readGraphEffect(m);
+    }
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+        lhs.checkGraphEffects(m);
+        rhs.checkGraphEffects(m);
+    }
+
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
         ArrayList<EffectError> errors = new ArrayList<>();

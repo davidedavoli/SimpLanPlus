@@ -3,10 +3,14 @@ package ast.node.statements;
 import java.util.ArrayList;
 import java.util.List;
 
+import GraphEffects.EffectsManager;
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
+import ast.node.exp.CallExpNode;
 import ast.node.exp.ExpNode;
+import ast.node.exp.LhsExpNode;
+import ast.node.exp.single_exp.NewNode;
 import ast.node.types.*;
 import effect.EffectError;
 import semantic.Environment;
@@ -104,5 +108,24 @@ public class RetNode extends MetaNode {
         cgen.append("b ").append(parent_f.get_end_fun_label()).append("\n");
 		return cgen.toString();
   }
-    
-}  
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+        //HEHEHE
+        ExpNode exp = (ExpNode) val;
+        String id ="+"+parent_f.getId()+"+return";
+        if(((ExpNode) val) != null){
+            val.checkGraphEffects(m);
+            m.write(id, 0);
+        }
+        if (exp instanceof CallExpNode){
+            //TODO
+        }
+        if (exp instanceof LhsExpNode){
+            m.assign(id,((LhsExpNode)exp).getID(),  0, ((LhsExpNode)exp).getDereferenceLevel());
+        }
+        if (exp instanceof NewNode){
+            m.assign_new(id,  0);
+        }
+    }
+}

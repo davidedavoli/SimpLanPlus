@@ -1,10 +1,14 @@
 package ast.node.dec;
 
+import GraphEffects.EffectsManager;
+import ast.Dereferenceable;
 import ast.STentry;
 import ast.node.IdNode;
 import ast.node.MetaNode;
 import ast.node.Node;
-    import ast.node.types.HasReturn;
+import ast.node.exp.*;
+import ast.node.exp.single_exp.NewNode;
+import ast.node.types.HasReturn;
     import ast.node.types.TypeNode;
 
     import java.util.ArrayList;
@@ -29,7 +33,6 @@ public class VarNode extends MetaNode {
         type=t;
         exp=v;
     }
-
 
     //  @Override
     //  public ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl) {
@@ -129,5 +132,23 @@ public class VarNode extends MetaNode {
         env.addEntry(id.getID(), id.getEntry());
         return errors;
     }
+
+    public void checkGraphEffects (EffectsManager m) {
+        m.declare(id.getID(), id.getEntry().getType(), id.getNestingLevel());
+        if(exp != null){
+            exp.checkGraphEffects(m);
+            m.write(id.getID(), 0);
+
+        }
+        if (exp instanceof CallExpNode){
+            //TODO
+        }
+        if (exp instanceof LhsExpNode){
+            m.assign(id.getID(),((LhsExpNode)exp).getID(),  0, ((LhsExpNode)exp).getDereferenceLevel());
+        }
+        if (exp instanceof NewNode){
+            m.assign_new(id.getID(),  0);
+        }
+        }
 
 }

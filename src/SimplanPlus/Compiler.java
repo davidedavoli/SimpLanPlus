@@ -3,6 +3,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import GraphEffects.EffectsManager;
 import Interpreter.SVM;
 import Interpreter.ast.Instruction;
 import Interpreter.ast.SVMVisitorImpl;
@@ -126,7 +127,10 @@ public class Compiler {
 		 */
 		checkErrorAst(ast, env);
 		typeCheck(ast);
-		checkEffects(ast,env);
+		//checkEffects(ast,env);
+		EffectsManager m=new EffectsManager(-1);
+		ast.checkGraphEffects(m);
+		System.out.println(m.getG());
 
 		codeGeneration(fileAsm,ast);
 
@@ -144,8 +148,8 @@ public class Compiler {
 	public static void main(String[] args) throws Exception {
 
 		//32 dovrebbe andare bene
-		int numberSingle = 4;
-		String dire = "tommasoExamples/";
+		int numberSingle = 14;
+		String dire = "examples/";
 		String fileAbsNameSingle = dire + baseName + numberSingle + ext;
 		String fileNameSingle = baseName + numberSingle + ext;
 		compileFile(fileAbsNameSingle,fileNameSingle);

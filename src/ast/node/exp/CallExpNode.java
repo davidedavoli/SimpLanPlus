@@ -1,5 +1,6 @@
 package ast.node.exp;
 
+import GraphEffects.EffectsManager;
 import ast.Dereferenceable;
 import ast.Label;
 import ast.STentry;
@@ -62,4 +63,18 @@ public class CallExpNode extends ExpNode {
             l.addAll(par.variables());
         return l;
     }
+
+    @Override
+    public void readGraphEffect(EffectsManager m) {
+        for (ExpNode e: inner.getParlist())
+            e.readGraphEffect(m);
+    }
+
+    @Override
+    public void checkGraphEffects(EffectsManager m) {
+        // TODO
+        inner.checkGraphEffects(m);
+    }
+
+
 }

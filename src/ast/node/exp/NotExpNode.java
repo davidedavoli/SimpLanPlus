@@ -3,6 +3,7 @@ package ast.node.exp;
 import java.util.ArrayList;
 import java.util.List;
 
+import GraphEffects.EffectsManager;
 import ast.Dereferenceable;
 import ast.node.types.BoolTypeNode;
 import ast.node.types.HasReturn;
@@ -72,4 +73,14 @@ public class NotExpNode extends ExpNode {
 	  return cgen.toString();
 
   }
+	@Override
+	public void checkGraphEffects(EffectsManager m) {
+		exp.checkGraphEffects(m);
+	}
+
+	@Override
+	public void readGraphEffect(EffectsManager m) {
+		exp.readGraphEffect(m);
+	}
+
 }  
