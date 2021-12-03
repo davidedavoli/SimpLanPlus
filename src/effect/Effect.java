@@ -109,6 +109,17 @@ public class Effect {
             return effect2;
     }
 
+    public static Effect readEffect(final Effect effect1) {
+
+        if (effect1.status <= INIT)
+            return new Effect(ERR);
+        if (effect1.status <= RW)
+            return new Effect(RW);
+
+        return new Effect(ERR);
+    }
+
+
     public static Effect sequenceEffect(final Effect effect1, final Effect effect2) {
 
         if (maxEffect(effect1, effect2).status <= RW)
@@ -145,6 +156,10 @@ public class Effect {
 
     public boolean equals(Effect e) {
         return status == e.status;
+    }
+
+    public boolean le(Effect e) {
+        return status <= e.status;
     }
 
 }

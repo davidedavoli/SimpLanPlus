@@ -17,6 +17,9 @@ import ast.Label;
 import semantic.SemanticError;
 import semantic.SimplanPlusException;
 
+import static effect.Effect.readEffect;
+import static effect.Effect.sequenceEffect;
+
 public class LhsExpNode extends ExpNode implements Dereferenceable {
 
     protected LhsExpNode inner;
@@ -130,18 +133,29 @@ public class LhsExpNode extends ExpNode implements Dereferenceable {
 
         STentry innerEntry = getEntry();
         Effect actualStatus = innerEntry.getDereferenceLevelVariableStatus(getDereferenceLevel()-1);
+        Object[] sl = innerEntry.getStatusList().toArray();
 
+        for (int i=0; i<getDereferenceLevel(); i++){
+            if (innerEntry.getDereferenceLevelVariableStatus(i).equals(new Effect(Effect.INITIALIZED))){
+                sl[i]=readEffect((Effect) sl[i]);
+                if (new Effect(Effect.ERROR).le((Effect) sl[i])) {
+                    errors.add(new EffectError(inner.getID() + " read of not-initialized or deleted pointer. LhsExpNode"));
+                }
+            }
+        }
+        /*
         if (actualStatus.equals(new Effect(Effect.INITIALIZED))) {
             errors.add(new EffectError(inner.getID() + " used before writing value. LhsExpNode"));
         }
         for(int i=0;i<innerEntry.getMaxDereferenceLevel();i++){
             Effect status = innerEntry.getDereferenceLevelVariableStatus(i);
+
             if (status.equals(new Effect(Effect.DELETED))) {
                 errors.add(new EffectError(inner.getID() + " used after deleting. LhsExpNode"));
             }
         }
         errors.addAll(checkExpStatus(env));
-
+        */
         return errors;
     }
 

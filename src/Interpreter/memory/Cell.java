@@ -17,6 +17,7 @@ public class Cell {
     }
 
     public void free(){
+        val = null;
         pointed=false;
         val=null;
     }
