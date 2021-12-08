@@ -1,7 +1,8 @@
 package SimplanPlus;
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.regex.Pattern;
 
 import Interpreter.SVM;
 import Interpreter.ast.Instruction;
@@ -23,10 +24,7 @@ import effect.EffectError;
 
 
 public class Compiler {
-	private final static String dir = "examples/";
 	private final static String asmDir = "asm/";
-	private final static String baseName = "example";
-	private final static String ext = ".simplan";
 
 
 	private static CommonTokenStream lexer(String codeFile) throws IOException {
@@ -109,8 +107,7 @@ public class Compiler {
 	}
 
 
-	private static void compileFile(String fileAbsName,String fileName) throws IOException {
-		System.out.println("COMPILING "+fileAbsName);
+	private static void compileRunFile(String fileAbsName, String fileName) throws IOException {
 		String fileAsm = asmDir+fileName+".asm";
 		CommonTokenStream tokens = lexer(fileAbsName);
 
@@ -137,22 +134,32 @@ public class Compiler {
 		SVM vm = new SVM(code);
 		vm.cpu();
 	}
-	public static void main(String[] args) throws Exception {
 
-		int numberSingle = 15;
-		String dire = "tommasoExamples/";
-		String fileAbsNameSingle = dir + baseName + numberSingle + ext;
-		String fileNameSingle = baseName + numberSingle + ext;
-		compileFile(fileAbsNameSingle,fileNameSingle);
+	public static void main(String[] args) {
+		try {
+			/* Starting compiler */
+			System.out.println("### SimpLanPlus Compiler&Interpreter ###");
+			if(args.length == 0){
+				System.err.println("No file to compile & run provided.");
+				System.exit(0);
+			}
+			String file = args[0];
 
+			if(!Paths.get(file).toFile().exists()) {
+				throw new FileNotFoundException("File: " + file + " not found.");
+			}
+			System.out.println("File to compile:\t" + file);
 
-		int numberOfTest = Objects.requireNonNull(new File(dire).list()).length;
-		//System.out.println("NUMBER OF TEST IS " + numberOfTest);
-		for(int number = 1; number<=numberOfTest;number++){
-			String fileAbsName = dire + baseName + number + ext;
-			String fileName = baseName + number + ext;
-		//	compileFile(fileAbsName,fileName);
+			String[] path = file.split(Pattern.quote(File.separator));
+			String name = path[path.length-1];
+			compileRunFile(file,name);
+
+		} catch (Exception exc) {
+			System.err.println(exc.getMessage());
+			System.exit(2);
 		}
 
 	}
+
+
 }

@@ -71,7 +71,6 @@ public class IdExpNode extends LhsExpNode implements Dereferences {
 	if (entry.getType() instanceof ArrowTypeNode) {
         System.err.println("Wrong usage of function identifier");
         System.exit(0);
-	  //throw new SimplanPlusException();
     }
     return entry.getType();
   }
