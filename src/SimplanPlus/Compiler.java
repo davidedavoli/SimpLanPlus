@@ -107,9 +107,9 @@ public class Compiler {
 	}
 
 
-	private static void compileRunFile(String fileAbsName, String fileName) throws IOException {
+	private static Instruction[] compile(String fileAbsoluteName, String fileName) throws IOException {
 		String fileAsm = asmDir+fileName+".asm";
-		CommonTokenStream tokens = lexer(fileAbsName);
+		CommonTokenStream tokens = lexer(fileAbsoluteName);
 
 		Node ast = parser(tokens);
 		Environment env = new Environment();
@@ -125,11 +125,11 @@ public class Compiler {
 
 		CommonTokenStream tokensASM = SVMLexer(fileAsm);
 		SVMVisitorImpl visitorSVM = SVMParser(tokensASM);
+		return visitorSVM.getCode();
 
-		interpreterCode(visitorSVM.getCode(),fileName);
 	}
 
-	private static void interpreterCode(Instruction[] code,String filename) {
+	private static void interpreter(Instruction[] code, String filename) {
 		System.out.println("Starting Virtual Machine for "+filename+"...");
 		SVM vm = new SVM(code);
 		vm.cpu();
@@ -152,8 +152,10 @@ public class Compiler {
 
 			String[] path = file.split(Pattern.quote(File.separator));
 			String name = path[path.length-1];
-			compileRunFile(file,name);
 
+			Instruction[] code = compile(file,name);
+
+			interpreter(code,name);
 		} catch (Exception exc) {
 			System.err.println(exc.getMessage());
 			System.exit(2);
