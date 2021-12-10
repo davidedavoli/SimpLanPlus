@@ -1,0 +1,22 @@
+{
+    /*^int global;
+    ^int myglobal(){
+        global = new int;
+        return global;
+    }*/
+    ^int mynew(){
+        ^int x;
+        x = new int;
+        return x;
+    }
+
+    ^^int x;
+    x = new ^int;
+    x^ = mynew();
+    print x^^;
+    //x^ = 2;
+
+    //print global^;
+    //delete global;
+    //print global^;
+}

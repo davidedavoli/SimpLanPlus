@@ -1,0 +1,13 @@
+{
+    int x;
+    int c = 2;
+    int z = (c+3)*2;
+    int f = (z+2)*2;
+    print z;
+    print f;
+}
+/*
+ should print:
+     ;10
+     ;24
+ */

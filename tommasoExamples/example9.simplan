@@ -1,0 +1,18 @@
+{
+    /*
+    This example shows all the possible types of declarations.
+    It is well formed and should not output anything.
+    */
+    int a = 5;
+    bool b = false;
+    ^int c;
+    void f(int x, bool y) {
+        int z;
+        print x;
+        print y;
+    }
+    bool d = true;
+    int e = 6;
+    c = new int;
+    c^ = 10;
+}

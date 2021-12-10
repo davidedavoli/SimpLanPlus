@@ -1,115 +1,93 @@
 package ast.node.dec;
 
 import ast.STentry;
+import ast.node.IdNode;
+import ast.node.MetaNode;
 import ast.node.Node;
-import ast.node.types.RetEffType;
-import ast.node.types.TypeNode;
+    import ast.node.types.HasReturn;
+    import ast.node.types.TypeNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+    import java.util.ArrayList;
+    import java.util.HashMap;
 
-import ast.node.types.TypeUtils;
+    import ast.node.types.TypeUtils;
+import effect.Effect;
+import effect.EffectError;
 import semantic.Environment;
-import ast.Label;
-import semantic.SemanticError;
-import semantic.SimplanPlusException;
+    import ast.Label;
+    import semantic.SemanticError;
 
-public class VarNode implements Node {
+public class VarNode extends MetaNode {
 
-  private String id;
-  private TypeNode type;
-  private Node exp;
-  
-  public VarNode (String i, TypeNode t, Node v) {
-    id=i;
-    type=t;
-    exp=v;
-  }
-  
-  @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
-  		//create result list
-  		ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-  	  
-  		//env.offset = -2;
-  		HashMap<String, STentry> hm = env.symTable.get(env.nestingLevel);
+    private final IdNode id;
+    private final TypeNode type;
+    private final Node exp;
 
-          int new_offset = env.offset--;
-          //System.out.println("NEW OFFSET "+new_offset);
-        STentry entry = new STentry(env.nestingLevel,type, new_offset); //separo introducendo "entry"
-        
-        if (exp!=null)
-        	res.addAll(exp.checkSemantics(env));
+    public VarNode (IdNode i, TypeNode t, Node v) {
+        id=i;
+        type=t;
+        exp=v;
+    }
 
-        if ( hm.put(id,entry) != null )
-        		res.add(new SemanticError("Var id '"+id+"' already declared"));
-                
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+        ArrayList<SemanticError> res = new ArrayList<>();
+
+        HashMap<String, STentry> hm = env.getCurrentST();
+
+        //return offset and decrement it by 1
+        int new_offset = env.decOffset();
+        STentry entry = new STentry(env.getNestingLevel(), type, new_offset);
+        id.setEntry(entry);
+
+        if (exp != null){
+            res.addAll(exp.checkSemantics(env));
+            //  dereferenceLevel = 0 because we set the status of a variable
+            id.setIdStatus(new Effect(Effect.READWRITE), 0);
+        }
+
+        if ( hm.put(id.getID(),entry) != null )
+            res.add(new SemanticError("Var id '"+id.getID()+"' already declared"));
+
         return res;
-  }
+    }
 
-//  @Override
-//  public ArrayList<SemanticError> delTypeCheck(DelEnv env, int nl) {
-//	  
-//	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-//	  
-//	  if (!(type instanceof PointerTypeNode)) {
-//		HashSet<Pair<String, Integer>> tmp = new HashSet<Pair<String, Integer>>();
-//		tmp.add(new Pair<String, Integer>(id, nl));
-//		env.add(new AliasingDomain(tmp, new DelList()));
-//		res.addAll(exp.delTypeCheck(env, nl));
-//	  }
-//	  else {
-//		HashSet<Pair<String, Integer>> tmp = new HashSet<Pair<String, Integer>>();
-//		tmp.add(new Pair<String, Integer>(id, nl));
-//		
-//		DelList l = new DelList(((PointerTypeNode)type).getDerefLevel());
-//		
-//		if ((exp instanceof NewNode)) {
-//			l.put(0,new DelEffType(DelEffType.DelT.NIL));// statement del tipo ^type = exp dovrebbero essere consentiti solo se exp è new ^type.
-//		}
-//		else {
-//			res.add(new SemanticError("Errore grave! non dovremmo nemmeno entrare in questo ramo"));
-//		}
-//	  }
-//	  
-//	  return res;
-//  }
+    public TypeNode typeCheck() {
+        if (exp != null && ! (TypeUtils.isSubtype(exp.typeCheck(),type)) ){
+            System.err.println("Incompatible value in assignment for variable "+id.getID() + " of type: "+id.typeCheck().toPrint("") + " when exp is of type: "+exp.typeCheck().toPrint(""));
+            System.exit(0);
+        }
+        return type;
+    }
+    public HasReturn retTypeCheck() {
+        return new HasReturn(HasReturn.hasReturnType.ABS);
+    }
 
-  public String toPrint(String s) throws SimplanPlusException {
-	return s+"Var:" + id +"\n"
-	  	   +type.toPrint(s+"  ")
-         +((exp==null)?"":exp.toPrint(s+"  ")); 
-  }
-  
-  public RetEffType retTypeCheck(FunNode funNode) {
-	  return new RetEffType(RetEffType.RetT.ABS);
-  }
-  
-  //valore di ritorno non utilizzato
-  public TypeNode typeCheck () throws SimplanPlusException {
-    if (exp != null && ! (TypeUtils.isSubtype(exp.typeCheck(),type)) ){
-      System.out.println("incompatible value for variable "+id);
-      System.exit(0);
-    }     
-    return type;
-  }
-  
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
-      StringBuilder cgen = new StringBuilder();
-      if(exp != null){
-          cgen.append(exp.codeGeneration(labelManager)).append("\n");
-          cgen.append("push $a0\n");
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
+        if(exp != null){
+            errors.addAll(exp.checkEffects(env));
+        }
+        env.addEntry(id.getID(), id.getEntry());
+        return errors;
+    }
 
-      }
-      else{
-          /**
-           * Decidere se pushare 0 per dire che non c'è nulla o alzare solamente lo stack pointer
-           */
-          cgen.append("subi $sp $sp 1 // non assegnato nulla\n");
-          //cgen.append("push 0\n");
-      }
+    public String codeGeneration(Label labelManager) {
+        StringBuilder codeGenerated = new StringBuilder();
+        if(exp != null){
+            codeGenerated.append(exp.codeGeneration(labelManager)).append("\n");
+            codeGenerated.append("push $a0\n");
+        }
+        else{
+            codeGenerated.append("subi $sp $sp 1 // No value assigned\n");
+        }
+        return codeGenerated.toString();
+    }
 
-	  return cgen.toString();
-  }  
-    
-}  
+    public String toPrint(String s) {
+        return s+"Var:" + id.getID() +"\n"
+                +type.toPrint(s+"  ")
+                +((exp==null)?"":exp.toPrint(s+"  "));
+    }
+}

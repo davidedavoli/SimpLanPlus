@@ -2,99 +2,118 @@ package ast.node.exp;
 
 import java.util.ArrayList;
 
+import ast.Dereferences;
 import ast.STentry;
-import ast.node.dec.FunNode;
 import ast.node.types.ArrowTypeNode;
-import ast.node.types.RetEffType;
+import ast.node.types.PointerTypeNode;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
+import effect.Effect;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
-public class IdExpNode extends LhsExpNode {
+public class IdExpNode extends LhsExpNode implements Dereferences {
 
-  private String id;
-  private STentry entry;
-  private int nestinglevel;
-  
-  public IdExpNode (String i) {
-	  super(null);
-	  id=i;
-  }
-  
-  @Override
-  public String getID(){
-	  return this.id;
-  }
+    private final String id;
+    private STentry entry;
+    private int nestingLevel;
 
-  @Override
-  public LhsExpNode getInner(){
-	  return this;
-  }
-  
-  public int detDerefLevel() {
-	  return 0;
-  }
-  
-  public int getNestingLevel() {
-	  return nestinglevel;
-  }
-  
-  public STentry getEntry() {
-	  return entry;
-  }
-
-  public String toPrint(String s) throws SimplanPlusException {
-	return s+"Id:" + id + " at nestlev " + nestinglevel +"\n" + entry.toPrint(s+"  ") ;  
-  }
-  
-  @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) {
-	  
-	  //create result list
-	  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-	  
-	  int j=env.nestingLevel;
-	  STentry tmp=null; 
-	  while (j>=0 && tmp==null)
-		  tmp=(env.symTable.get(j--)).get(id);
-      if (tmp==null)
-          res.add(new SemanticError("Id "+id+" not declared"));
-      else{
-    	  		entry = tmp;
-    	  		nestinglevel = env.nestingLevel;
+    public IdExpNode (String i) {
+          super(null);
+          id=i;
       }
-	  
-	  return res;
-	}
-  
-  public TypeNode typeCheck () throws SimplanPlusException {
-	if (entry.getType() instanceof ArrowTypeNode) { //
-	  throw new SimplanPlusException("Wrong usage of function identifier");
-     // System.exit(0);
+
+    @Override
+    public String getID(){
+        return this.id;
     }
-    return entry.getType();
-  }
-  
-  public RetEffType retTypeCheck(FunNode funNode) {
-	  return new RetEffType(RetEffType.RetT.ABS);
-  }
-  
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
-      /**
-       * Ritorna valore di ID
-       */
+    @Override
+    public LhsExpNode getInner(){
+        return this;
+    }
 
-      StringBuilder cgen = new StringBuilder();
+    public Effect getIdStatus(int dereferenceLevel) {
+        return this.entry.getDereferenceLevelVariableStatus(dereferenceLevel);
+    }
+    public STentry getEntry() {
+        return entry;
+    }
 
-      cgen.append("mv $fp $al //put in $al actual fp\n");
 
-      for (int i=0; i<nestinglevel-entry.getNestinglevel(); i++)
-          cgen.append("lw $al 0($al) //go up to chain\n");
+    public void setEntry(STentry entry) {
+        this.entry = entry;
+    }
 
-      cgen.append("lw $a0 ").append(entry.getOffset()).append("($al) //put in $a0 value of Id\n");
 
-      return cgen.toString();
-  }
-}  
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+        //create result list
+        ArrayList<SemanticError> res = new ArrayList<>();
+        entry = env.lookUp(id);
+        if (entry == null)
+          res.add(new SemanticError("Id "+id+" in expNode not declared"));
+        else
+          nestingLevel = env.getNestingLevel();
+
+        return res;
+    }
+
+    public TypeNode typeCheck() {
+        if (entry.getType() instanceof ArrowTypeNode) {
+            System.err.println("Wrong usage of function identifier");
+            System.exit(0);
+        }
+        return entry.getType();
+    }
+    public HasReturn retTypeCheck() {
+        return new HasReturn(HasReturn.hasReturnType.ABS);
+    }
+
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        entry = env.effectsLookUp(id);
+
+        Effect actualStatus = entry.getDereferenceLevelVariableStatus(entry.getMaxDereferenceLevel()-1);
+
+        if (actualStatus.equals(Effect.INITIALIZED)) {
+            entry.setDereferenceLevelVariableStatus(Effect.READWRITE, entry.getMaxDereferenceLevel()-1);
+            //errors.add(new EffectError(this.getID() + " used before writing value. IdExpNode"));
+        }
+        ArrayList<EffectError> errors = new ArrayList<>(checkExpStatus(env));
+        for(int i=0;i<entry.getMaxDereferenceLevel();i++){
+            Effect status = entry.getDereferenceLevelVariableStatus(i);
+            if (status.equals(new Effect(Effect.DELETED))) {
+                errors.add(new EffectError(this.getID() + " used after deleting."));
+            }
+        }
+
+        return errors;
+    }
+
+    public String codeGeneration(Label labelManager) {
+        /**
+         * Return value of id
+         */
+
+        StringBuilder codeGenerated = new StringBuilder();
+
+        codeGenerated.append("mv $fp $al //put in $al actual fp\n");
+
+        codeGenerated.append("lw $al 0($al) //go up to chain\n".repeat(Math.max(0, nestingLevel - entry.getNestingLevel())));
+
+        codeGenerated.append("lw $a0 ").append(entry.getOffset()).append("($al) //put in $a0 value of Id ").append(id).append("\n");
+
+        return codeGenerated.toString();
+    }
+
+
+    public Boolean isPointer() {
+        return entry.getType() instanceof PointerTypeNode;
+    }
+
+    public String toPrint(String s) {
+        return s+"Id:" + id + " at nesting level " + nestingLevel +"\n" + entry.toPrint(s+"  ") ;
+    }
+}

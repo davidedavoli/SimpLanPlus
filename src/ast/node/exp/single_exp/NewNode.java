@@ -1,115 +1,56 @@
-//package ast;
-//
-//import java.util.ArrayList;
-//
-//import util.Environment;
-//import util.SemanticError;
-//
-//public class NewNode implements Node {
-//	
-//	  private TypeNode type;
-//	  private String id;
-//	  
-//	  public NewNode (TypeNode t) {
-//		    type=t;
-//		  }
-//	  public void setID(String i) {
-//		  id = i;
-//	  }
-//	  
-//	  @Override
-//	  public ArrayList<SemanticError> checkSemantics(Environment env) {
-//		  //create result list
-//		  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-//		  
-//		  if (id != "") {
-//			  System.out.println(id);
-//			  int j=env.nestingLevel;
-//			  STentry tmp=null; //È impossibile che non si trovi id: se così fosse allora, controllando la semantica della lhs dell'assegnamento, l'errore sarebbe già sollevato
-//			  while (j>=0 && tmp==null)
-//				  tmp=(env.symTable.get(j--)).get(id);
-//			  type=tmp.getType();
-//		  }
-//		  
-//	  	  if (type == null)
-//	  		  res.add(new SemanticError("new operator in compound expression"));
-//	      return res;
-//	  }
-//	  
-//	  public String toPrint(String s) {
-//		return s+"New:" + type +"\n";
-//	  }
-//	  
-//	  //valore di ritorno non utilizzato
-//	  public TypeNode typeCheck () {
-//	  	  if (!(type instanceof PointerTypeNode)) {
-//	  		  System.out.println("Attempted allocation of non-pointer type");
-//	  		  System.exit(0);
-//	  	  }
-//	  		  
-//	    return type;
-//	  }
-//	  
-//	  public RetEffType retTypeCheck() {
-//		  return new RetEffType(RetEffType.RetT.ABS);
-//	  }
-//	  
-//	  public String codeGeneration() {
-//			return "";//TODO
-//	  }  
-//
-//         
-//}  
-
-
 package ast.node.exp.single_exp;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import ast.node.Node;
-import ast.node.dec.FunNode;
+import ast.Dereferences;
+import ast.node.exp.ExpNode;
 import ast.node.types.PointerTypeNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
-public class NewNode implements Node {
-	
-	  private TypeNode type;
+public class NewNode extends ExpNode {
+
+	private final TypeNode type;
 	  
-	  public NewNode (TypeNode t) {
+	public NewNode (TypeNode t) {
 		    type=t;
 		  }
-	  
-	  @Override
-	  public ArrayList<SemanticError> checkSemantics(Environment env) {
-		  //create result list
-		  ArrayList<SemanticError> res = new ArrayList<SemanticError>();
-		  
-	  	  if (type == null)
-	  		  res.add(new SemanticError("new operator in compound expression"));
-	      return res;
-	  }
-	  
-	  public String toPrint(String s) throws SimplanPlusException {
-		return s+"New:\n" + type.toPrint(s+"   ") +"\n";
-	  }
-	  
-	  //valore di ritorno non utilizzato
-	  public TypeNode typeCheck () {
+
+	@Override
+	public ArrayList<SemanticError> checkSemantics(Environment env) {
+		ArrayList<SemanticError> res = new ArrayList<>();
+		if (type == null)
+	  		res.add(new SemanticError("new operator in compound expression"));
+		return res;
+	}
+
+	public TypeNode typeCheck() {
 	    return new PointerTypeNode(type);
 	  }
-	  
-	  public RetEffType retTypeCheck(FunNode funNode) {
-		  return new RetEffType(RetEffType.RetT.ABS);
+	public HasReturn retTypeCheck() {
+		  return new HasReturn(HasReturn.hasReturnType.ABS);
 	  }
-	  
-	  public String codeGeneration(Label labelManager){
-		  StringBuilder cgen = new StringBuilder();
-		  cgen.append("new $a0").append("// put new address in a0\n");
-		  return cgen.toString();
-	  }  
+
+	@Override
+	public ArrayList<EffectError> checkEffects (Environment env) {
+		return new ArrayList<>();
+	}
+
+	@Override
+	public List<Dereferences> variables() {
+		return new ArrayList<>();
+	}
+
+	public String codeGeneration(Label labelManager) {
+		return "new $a0" + "// put new address in a0\n";
+	  }
+
+	public String toPrint(String s) {
+		return s+"New:\n" + type.toPrint(s+"   ") +"\n";
+	}
 }  

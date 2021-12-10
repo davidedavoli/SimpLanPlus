@@ -2,41 +2,44 @@ package ast.node.types;
 
 import java.util.ArrayList;
 
-import ast.node.dec.FunNode;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class IntTypeNode implements TypeNode {
   
-  public IntTypeNode () {
-  }
+    public IntTypeNode () { }
   
-  public String toPrint(String s) {
-	return s+"IntType\n";  
-  }
-  public TypeNode dereference() throws SimplanPlusException {
-      throw new SimplanPlusException("Attempt to dereference an int");
-  }
-  //non utilizzato
-  public TypeNode typeCheck() {
+
+    public TypeNode dereference() {
+        System.err.println("Attempt to dereference an Integer");
+        System.exit(0);
+        return null;
+    }
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+        return new ArrayList<>();
+    }
+
+    public TypeNode typeCheck() {
     return null;
   }
-
-  //non utilizzato
-  public String codeGeneration(Label labelManager) {
-		return "";
+    public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
-  
-  public RetEffType retTypeCheck(FunNode funNode) {
-	  return new RetEffType(RetEffType.RetT.ABS);
-  }
-  
-  @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) {
 
-	  return new ArrayList<SemanticError>();
-	}
-  
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        return new ArrayList<>();
+    }
+
+    public String codeGeneration(Label labelManager) {
+        return "";
+    }
+
+
+    public String toPrint(String s) {
+        return s+"int";
+    }
 }  

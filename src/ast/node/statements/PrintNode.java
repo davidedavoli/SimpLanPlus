@@ -2,46 +2,54 @@ package ast.node.statements;
 
 import java.util.ArrayList;
 
+import ast.node.MetaNode;
 import ast.node.Node;
-import ast.node.dec.FunNode;
-import ast.node.types.RetEffType;
-import ast.node.types.TypeNode;
+import ast.node.exp.IdExpNode;
+import ast.node.types.*;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
-public class PrintNode implements Node {
+public class PrintNode extends MetaNode {
 
-  private Node val;
+  private final Node val;
   
   public PrintNode (Node v) {
     val=v;
   }
-  
-  public String toPrint(String s) throws SimplanPlusException {
+
+  @Override
+  public ArrayList<SemanticError> checkSemantics(Environment env) {
+    return val.checkSemantics(env);
+  }
+
+  public TypeNode typeCheck() {
+    TypeNode valType = val.typeCheck();
+    if(valType instanceof PointerTypeNode){
+      System.err.println("Trying to print a pointer "+((IdExpNode)val).getID());
+      System.exit(0);
+    }
+    return valType;
+  }
+  public HasReturn retTypeCheck() {
+    return new HasReturn(HasReturn.hasReturnType.ABS);
+  }
+
+  @Override
+  public ArrayList<EffectError> checkEffects (Environment env) {
+    return new ArrayList<>(val.checkEffects(env));
+  }
+
+  public String codeGeneration(Label labelManager) {
+    StringBuilder codeGenerated = new StringBuilder();
+    codeGenerated.append(val.codeGeneration(labelManager)).append("\n");
+    codeGenerated.append("print $a0\n");
+    return codeGenerated.toString();
+  }
+
+
+  public String toPrint(String s) {
     return s+"Print\n" + val.toPrint(s+"  ") ;
   }
-  
-  public TypeNode typeCheck() throws SimplanPlusException {
-    return val.typeCheck();
-  }  
-  
-  @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) throws SimplanPlusException {
-
- 	  return val.checkSemantics(env);
- 	}
-  
-  public RetEffType retTypeCheck(FunNode funNode) {
-	  return new RetEffType(RetEffType.RetT.ABS);
-  }
-  
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
-        StringBuilder cgen = new StringBuilder();
-        cgen.append(val.codeGeneration(labelManager)).append("\n");
-        cgen.append("print $a0\n");
-		return cgen.toString();
-  }
-    
 }  

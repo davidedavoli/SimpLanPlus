@@ -1,47 +1,57 @@
 package ast.node.exp.single_exp;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import ast.node.Node;
-import ast.node.dec.FunNode;
+import ast.Dereferences;
+import ast.node.exp.ExpNode;
 import ast.node.types.BoolTypeNode;
-import ast.node.types.RetEffType;
-import ast.node.types.TypeNode;
+  import ast.node.types.HasReturn;
+  import ast.node.types.TypeNode;
+import effect.EffectError;
 import semantic.Environment;
-import ast.Label;
-import semantic.SemanticError;
+  import ast.Label;
+  import semantic.SemanticError;
 
-public class BoolNode implements Node {
+public class BoolNode extends ExpNode {
 
-  private boolean val;
-  
-  public BoolNode (boolean n) {
+    private final boolean val;
+
+    public BoolNode (boolean n) {
     val=n;
-  }
-  
-  public String toPrint(String s) {
-    if (val) return s+"Bool:true\n";
-    else return s+"Bool:false\n";  
-  }
-  
-  public TypeNode typeCheck() {
-    return new BoolTypeNode();
-  }    
-  
-  public RetEffType retTypeCheck(FunNode funNode) {
-	  return new RetEffType(RetEffType.RetT.ABS);
-  }
-  
-  @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
+    }
 
- 	  return new ArrayList<SemanticError>();
- 	}
-  
-  public String codeGeneration(Label labelManager){
-      StringBuilder cgen = new StringBuilder();
-      cgen.append("li $a0 ").append(val?1:0).append("\n");
-      return cgen.toString();
-	  }
-         
-}  
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+    return new ArrayList<>();
+  }
+
+    public TypeNode typeCheck() {
+    return new BoolTypeNode();
+    }
+    public HasReturn retTypeCheck() {
+      return new HasReturn(HasReturn.hasReturnType.ABS);
+    }
+
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
+      return new ArrayList<>();
+    }
+
+    public String codeGeneration(Label labelManager) {
+      StringBuilder codeGenerated = new StringBuilder();
+      codeGenerated.append("li $a0 ").append(val?1:0).append("\n");
+      return codeGenerated.toString();
+    }
+
+    @Override
+    public List<Dereferences> variables() {
+      return new ArrayList<>();
+    }
+
+
+    public String toPrint(String s) {
+      if (val) return s+"Bool:true\n";
+      else return s+"Bool:false\n";
+    }
+}

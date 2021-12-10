@@ -1,0 +1,14 @@
+{
+    /*
+    This example shows the correct working of recursion.
+    The program is correct but should not output anything.
+    */
+    void f(int a) {
+        if (a == 0)
+            return;
+        else
+            f(a-1);
+    }
+
+    f(1);
+}

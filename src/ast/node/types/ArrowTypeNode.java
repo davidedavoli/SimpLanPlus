@@ -1,60 +1,76 @@
 package ast.node.types;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import ast.node.Node;
-import ast.node.dec.FunNode;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class ArrowTypeNode implements TypeNode {
 
-  private ArrayList<TypeNode> parlist; 
-  private TypeNode ret;
+  private final List<TypeNode> parameterList;
+  private final TypeNode ret;
   
-  public ArrowTypeNode (ArrayList<TypeNode> p, TypeNode r) {
-    parlist=p;
+  public ArrowTypeNode (List<TypeNode> p, TypeNode r) {
+    parameterList =p;
     ret=r;
   }
-  
-  public TypeNode dereference() throws SimplanPlusException {//TODO qualcosa di più elegante?
-      throw new SimplanPlusException("Attempt to dereference a bool");
-  }
-    
-  public String toPrint(String s) throws SimplanPlusException { //
-	String parlstr="";
-    for (Node par:parlist)
-      parlstr+=par.toPrint(s+"  ");
-	return s+"ArrowType\n" + parlstr + ret.toPrint(s+"  ->") ; 
-  }
-  
   public TypeNode getRet () { //
     return ret;
   }
+
+  public List<TypeNode> getParList () { //
+    return parameterList;
+  }
   
-  public ArrayList<TypeNode> getParList () { //
-    return parlist;
+  public TypeNode dereference() {
+    System.err.println("Attempt to dereference a function");
+    System.exit(0);
+    return null;
   }
 
+
   @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) {
-		// TODO Auto-generated method stub
-		return new ArrayList<SemanticError>();
-	}
+  public ArrayList<SemanticError> checkSemantics(Environment env) {
+    return new ArrayList<>();
+  }
   
-  //non utilizzato
-  public TypeNode typeCheck () {
+  public TypeNode typeCheck() {
     return null;
   }
   
-  public RetEffType retTypeCheck(FunNode funNode) {
-	  return new RetEffType(RetEffType.RetT.ABS);
+  public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
-  //non utilizzato
+  @Override
+  public ArrayList<EffectError> checkEffects (Environment env) {
+    return new ArrayList<>();
+  }
+
   public String codeGeneration(Label labelManager) {
 		return "";
+  }
+
+
+  public String toString(){
+    String s;
+    s= parameterList.stream()
+            .map(Object::toString)
+            .collect(Collectors.joining("x"));
+    s+="->";
+    s+= ret.getClass().getName();
+    return s;
+  }
+
+  public String toPrint(String s) { //
+    StringBuilder parameterListString= new StringBuilder();
+    for (Node par: parameterList)
+      parameterListString.append(par.toPrint(s + "  "));
+    return s+"ArrowType\n" + parameterListString + ret.toPrint(s+"  ->") ;
   }
 
 }  

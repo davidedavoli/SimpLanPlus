@@ -2,54 +2,56 @@ package ast.node.types;
 
 import java.util.ArrayList;
 
-import ast.node.dec.FunNode;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
 public class PointerTypeNode implements TypeNode {
-  private TypeNode type;
+
+    private final TypeNode type;
   
-  public PointerTypeNode (TypeNode t) {
+    public PointerTypeNode (TypeNode t) {
 	  type=t;
   }
-  
-  public String toPrint(String s) throws SimplanPlusException {
-	return s+"Pointer type\n"+type.toPrint(s+"   ");  
-  }
-    
-  //non utilizzato
-  public TypeNode typeCheck() {
-    return null; //non bisognerebbe chiamare typecheck su questo nodo
-  }
-  
-  public TypeNode dereference() {
-	    return type;
-	  }
-  
-  public int getDerefLevel(){
-	  if (type instanceof PointerTypeNode)
-		  return 1+((PointerTypeNode)type).getDerefLevel();
-	  else
-		  return 0;
-  }
-  
-  @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
 
- 	  return new ArrayList<SemanticError>();
- 	}
-  
-  
-  public RetEffType retTypeCheck(FunNode funNode) {
-	  return new RetEffType(RetEffType.RetT.ABS);
+    public TypeNode dereference() {
+	    return type;
   }
   
-  //TODO Generare il codice
-  public String codeGeneration(Label labelManager) {
+    public int getDereferenceLevel(){
+        if (type instanceof PointerTypeNode)
+		    return 1+ type.getDereferenceLevel();
+	    else
+		    return 1;
+    }
+  
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+      return new ArrayList<>();
+  }
+
+    public TypeNode typeCheck() {
+        return null;
+    }
+    public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
+  }
+
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        return new ArrayList<>();
+    }
+
+    public String codeGeneration(Label labelManager) {
 		return "";
   }
 
-    
+    public String toString() {
+        return type.toString()+"^";
+    }
+
+    public String toPrint(String s) {
+        return s+"^"+type.toPrint("");
+    }
 }  

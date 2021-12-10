@@ -2,86 +2,123 @@ package ast.node;
 
 import java.util.ArrayList;
 
+import ast.Dereferences;
 import ast.STentry;
-import ast.node.dec.FunNode;
-import ast.node.types.RetEffType;
+import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
+import effect.Effect;
+import effect.EffectError;
 import semantic.Environment;
 import ast.Label;
 import semantic.SemanticError;
-import semantic.SimplanPlusException;
 
-public class LhsNode implements Node {
+public class LhsNode extends MetaNode implements Dereferences {
 
-  protected LhsNode inner;
-  
-  public LhsNode (LhsNode i) {
-	  inner=i;
-  }
-  
-  public String getID() {
-	  return inner.getID();
-  }
-  
-  public LhsNode getInner() {
-	  return inner.getInner();
-  }
-  
-  public int getDerefLevel(){
-	  if (inner!=null)
-		  return 1+inner.getDerefLevel();
-	  else
-		  return 0;
-  }
+    protected LhsNode inner;
 
-  public STentry getEntry(){
-	  if (inner!=null)
-		  return inner.getEntry();
-	  else
-		  return null; 
-  }
-  
-  public int getNestingLevel(){
-	  if (inner!=null)
-		  return inner.getNestingLevel();
-	  else
-		  return -1; //sarà un valore sensato?
-  }
-  
-  @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {		 
+    public LhsNode (LhsNode i) {
+          inner=i;
+      }
+
+
+/**
+ * =====================================================
+ * Getter
+ * =====================================================
+ **/
+    public String getID() {
+            return inner.getID();
+        }
+
+    @Override
+    public Effect getIdStatus(int j) {
+        return this.inner.getIdStatus(j);
+    }
+
+    public LhsNode getInner() {
+        return inner.getInner();
+    }
+
+    public int getDereferenceLevel(){
+        if (inner!=null)
+            return 1+inner.getDereferenceLevel();
+        else
+            return 0;
+    }
+
+    public STentry getEntry(){
+        if (inner!=null)
+            return inner.getEntry();
+        else
+            return null;
+    }
+
+/**
+ * =====================================================
+ * Setter
+ * =====================================================
+ **/
+    public void setEntry(STentry entry) {
+      inner.setEntry(entry);
+    }
+
+    public void setIdStatus(Effect effect, int level){
+        this.inner.setIdStatus(effect,level);
+    }
+
+
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
         return inner.checkSemantics(env);
+    }
+
+    public TypeNode typeCheck() {
+        if (inner != null) {
+            return inner.typeCheck().dereference();
+        }
+        else // Should never happen thanks to Visitor.
+            return null;
+    }
+
+    public HasReturn retTypeCheck() {
+      return new HasReturn(HasReturn.hasReturnType.ABS);
   }
-  
-  public String toPrint(String s) throws SimplanPlusException {
-	return s+"lhs: " + this.getDerefLevel()+" "+this.getID()+"\n";
-  }
-  
-  //valore di ritorno non utilizzato
-  public TypeNode typeCheck () throws SimplanPlusException {
-	if (inner != null) {
-		return inner.typeCheck().dereference();
-	}
-	else //Questo caso non dovrebbe mai verificarsi per l'implementazione di Visitor.
-		return null;
-  }
-  
-  public RetEffType retTypeCheck(FunNode funNode) {
-	  return new RetEffType(RetEffType.RetT.ABS);
-  }
-  
-  public String codeGeneration(Label labelManager) throws SimplanPlusException {
+
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        /**
+         * Getting new entry if it was modified from some operation on environments
+         */
+        String id = inner.getID();
+        STentry actualEntry = env.effectsLookUp(id);
+        inner.setEntry(actualEntry);
+
+        ArrayList<EffectError> errors = new ArrayList<>(inner.checkEffects(env));
+        if (!inner.getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()-1).equals(new Effect(Effect.READWRITE))) {
+            errors.add(new EffectError(inner.getID() + " has not all pointer to rw."));
+        }
+        return  errors;
+    }
+
+    public String codeGeneration(Label labelManager) {
       /**
-       * Ritorna indirizzo del puntatore
+       * Load Pointer address
        */
 
-      StringBuilder cgen = new StringBuilder();
-      inner.codeGeneration(labelManager);
-      cgen.append("lw $al 0($al)");
+      StringBuilder codeGenerated = new StringBuilder();
+      codeGenerated.append(inner.codeGeneration(labelManager));
+      codeGenerated.append("lw $al 0($al) // de referencing inner\n");
 
-      return cgen.toString();
+      return codeGenerated.toString();
+    }
 
 
-  }
-    
-}  
+    public Boolean isPointer() {
+        return inner.isPointer();
+    }
+
+    public String toPrint(String s) {
+        return s+"lhs: " + this.getDereferenceLevel()+" "+this.getID()+"\n";
+    }
+
+}

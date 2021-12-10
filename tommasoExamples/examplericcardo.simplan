@@ -1,0 +1,47 @@
+{
+      /*
+       [ [c0] ]
+       [c0,c1,c2,c3,c4]
+
+
+       [ [c0,c1] ]
+       [c0,c1,c2,c3,c4]
+
+       [ [c0,c1,c2] ]
+        c4-> valore puntato
+        c0 -> c2
+        c1 -> c3
+        c2 -> c4
+       [c0,c1,c2,c3,c4]
+       */
+
+
+    void plusint(^int c){
+        print c^+1;
+        return;
+    }
+    int minusint(int c){
+        return c-1;
+    }
+    ^int c = new int;
+    c^ = 5;
+    c = new int;
+    c^ = 9;
+    //prova(c);
+    plusint(c);
+    print c^;
+    //print minusint(c^);
+    //print c^;
+
+}
+/*
+ should print:
+     ;6
+     ;8
+     ;5
+     ;0
+     ;10
+     ;1
+     ;8
+     ;9
+ */

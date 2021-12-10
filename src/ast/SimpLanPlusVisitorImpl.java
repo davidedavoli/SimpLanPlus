@@ -2,10 +2,7 @@ package ast;
 
 import java.util.ArrayList;
 
-import ast.node.ArgNode;
-import ast.node.IdNode;
-import ast.node.LhsNode;
-import ast.node.Node;
+import ast.node.*;
 import ast.node.dec.FunNode;
 import ast.node.exp.single_exp.NewNode;
 import ast.node.dec.VarNode;
@@ -35,8 +32,8 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		BlockNode res;
 
 		//list of declarations in @res
-		ArrayList<Node> declarations = new ArrayList<Node>();
-		ArrayList<Node> statements = new ArrayList<Node>();
+		ArrayList<Node> declarations = new ArrayList<>();
+		ArrayList<Node> statements = new ArrayList<>();
 		
 		//visit all nodes corresponding to declarations inside the let context and store them in @declarations
 		//notice that the ctx.let().dec() method returns a list, this is because of the use of * or + in the grammar
@@ -58,32 +55,44 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		//build @res accordingly with the result of the visits to its content
 		res = new BlockNode(declarations,  statements,false);
 
+		for (Node dc : declarations){
+			((MetaNode) dc).setParent(res);
+		}
+
+		for (Node st : statements){
+			((MetaNode) st).setParent(res);
+		}
+
 		return res;
 	}
 	
 	@Override
 	public Node visitStatement(StatementContext ctx){
-		Node tmp=null;
+		MetaNode tmp=null;
 		if (ctx.assignment()!= null) {//WARNING Casting
-			tmp = new AssignmentNode((LhsNode)visit(ctx.assignment().lhs()), visit(ctx.assignment().exp()));
+			LhsNode l = (LhsNode)visit(ctx.assignment().lhs());
+			ExpNode e = (ExpNode) visit(ctx.assignment().exp());
+			tmp = new AssignmentNode(l, e);
+			l.setParent(tmp);
+			e.setParent(tmp);
 		}
 		else if (ctx.deletion()!= null) {
-			tmp = visit(ctx.deletion());
+			tmp = (DeletionNode) visit(ctx.deletion());
 		}
 		else if (ctx.print()!= null) {
-			tmp = visit(ctx.print());
+			tmp = (PrintNode) visit(ctx.print());
 		}
 		else if (ctx.ret()!= null) {
-			tmp = visit(ctx.ret());
+			tmp = (RetNode) visit(ctx.ret());
 		}
 		else if (ctx.ite()!= null) {
-			tmp = visit(ctx.ite());
+			tmp = (IfNode) visit(ctx.ite());
 		}
 		else if (ctx.call()!= null) {
-			tmp = visit(ctx.call());
+			tmp = (CallNode) visit(ctx.call());
 		}
 		else if (ctx.block()!= null) {
-			tmp = visitBlock(ctx.block());
+			tmp = (BlockNode) visitBlock(ctx.block());
 		}
 		return tmp;
 	}
@@ -104,22 +113,28 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	@Override 
 	public Node visitDecFun(DecFunContext ctx) {
 		//initialize @res with the visits to the type and its ID
-		FunNode res =null;
-		//System.out.println("VISITOR "+ctx.ID().getText());
+		FunNode res;
+		IdNode id = new IdNode(ctx.ID().getText());
 		if (ctx.type()!=null)
-			res = new FunNode(ctx.ID().getText(), (TypeNode) visit(ctx.type()));//WARNING casting
+			res = new FunNode(ctx.ID().getText(), (TypeNode) visit(ctx.type()),id);//WARNING casting
 		else
-			res = new FunNode(ctx.ID().getText(), new VoidTypeNode());//WARNING casting
+			res = new FunNode(ctx.ID().getText(), new VoidTypeNode(),id);//WARNING casting
 
 		//add argument declarations
 		//we are getting a shortcut here by constructing directly the ParNode
 		//this could be done differently by visiting instead the VardecContext
-		for(ArgContext arg : ctx.arg())
-			res.addPar( new ArgNode(arg.ID().getText(), (TypeNode)visit( arg.type() )) );//WARNING casting
-		
+		for(ArgContext arg : ctx.arg()){
+			res.addPar( visitArg(arg));//WARNING casting
+		}
+
 		//add body
 		BlockNode block = (BlockNode) visitBlock(ctx.block());
-		
+
+		block.setParent(res);
+		for (Node arg: res.getPars()) {
+			((MetaNode) arg).setParent(res);
+		}
+
 		//add the body and the inner declarations to the function
 		res.addFunBlock( block);
 		
@@ -131,14 +146,20 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		//visit the type
 		TypeNode typeNode = (TypeNode) visit(ctx.type());//WARING occhio al casting
 		
-		Node expNode = null;
+		ExpNode expNode = null;
 		//visit the exp
 		if (ctx.exp()!=null) {
-			 expNode = visit(ctx.exp());
+			 expNode = (ExpNode) visit(ctx.exp());
 		}
+
+		IdNode id = new IdNode(ctx.ID().getText());
 		
 		//build the varNode
-		return new VarNode(ctx.ID().getText(), typeNode, expNode);
+		VarNode res = new VarNode(id, typeNode, expNode);
+		id.setParent(res);
+		if (expNode!=null)
+			expNode.setParent(res);
+		return res;
 	}
 
 	@Override
@@ -156,47 +177,82 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	}
 	
 	@Override
-	public Node visitArg(ArgContext ctx) {
-		return new ArgNode(ctx.ID().getText(), (TypeNode)  visit(ctx.type() )); //WARNING CASTING
+	public ArgNode visitArg(ArgContext ctx) {
+		ArgNode res;
+		TypeNode type = visitType(ctx.type());
+		IdNode id = new IdNode(ctx.ID().getText());
+		res = new ArgNode(id, type);
+		id.setParent(res);
+		return res;
 	}
 	
 	@Override
 	public Node visitAssignment(AssignmentContext ctx) {
-		return new AssignmentNode(visitLhs(ctx.lhs()), visit(ctx.exp()));
+		MetaNode res;
+
+		LhsNode l = visitLhs(ctx.lhs());
+		ExpNode e = (ExpNode) visit(ctx.exp());
+		res = new AssignmentNode(l, e);
+
+		l.setParent(res);
+		e.setParent(res);
+
+		return res;
 	}
 	
 	@Override 
 	public LhsNode visitLhs(LhsContext ctx) {
-		if (ctx.lhs()!=null)
-			return new LhsNode(visitLhs(ctx.lhs()));
+		LhsNode res;
+		if (ctx.lhs()!=null) {
+			LhsNode inner = visitLhs(ctx.lhs());
+			res = new LhsNode(inner);
+			inner.setParent(res);
+		}
 		else
-			return new IdNode(ctx.ID().getText());
+			res = new IdNode(ctx.ID().getText());
+		return res;
 	}
 	
 	@Override
 	public Node visitDeletion(DeletionContext ctx) {
-		return new DeletionNode(new IdExpNode(ctx.ID().getText()));
+		MetaNode res;
+
+		IdExpNode id = new IdExpNode(ctx.ID().getText());
+		res = new DeletionNode(id);
+		id.setParent(res);
+
+		return res;
 	}
 	
 	@Override
 	public Node visitPrint(PrintContext ctx) {
-		return new PrintNode(visit(ctx.exp()));
-		//WARNING C'è il caso che non funizoni: nella grammatica SimpLan, la linea print era commentata
+		ExpNode e = (ExpNode) visit(ctx.exp());
+		PrintNode res = new PrintNode(e);
+		e.setParent(res);
+		return res;
 	}
 	
 	@Override
 	public Node visitRet(RetContext ctx) {
+
+		MetaNode res;
 		
 		ParserRuleContext fct=ctx.getParent();
 		while (fct !=null && !(fct instanceof DecFunContext))
 			fct=fct.getParent();
 
+		ExpNode e = (ExpNode) visit(ctx.exp());
+
 		if (fct==null)
-			return new RetNode(visit(ctx.exp()), null);//in caso in cui il ret non sia in una funzione
+			res = new RetNode(e, null);//in caso in cui il ret non sia in una funzione
 		else if (((DecFunContext)fct).type()!= null)
-			return new RetNode(visit(ctx.exp()), (TypeNode)visit(((DecFunContext)fct).type())); //WARNING Double casting
+			res = new RetNode(e, (TypeNode)visit(((DecFunContext)fct).type())); //WARNING Double casting
 		else
-			return new RetNode(visit(ctx.exp()), new VoidTypeNode());
+			res = new RetNode(e, new VoidTypeNode());
+
+		if (e!=null)
+			e.setParent(res);
+		return res;
 	}
 	
 	@Override
@@ -209,16 +265,21 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		//notice once again the need of named terminals in the rule, this is because
 		//we need to point to the right expression among the 3 possible ones in the rule
 		
-		Node condExp = visit (ctx.exp());
+		ExpNode condExp = (ExpNode) visit (ctx.exp());
 		
-		Node thenExp = visit (ctx.statement(0));
-		Node elseExp = null;
+		MetaNode thenExp = (MetaNode) visit (ctx.statement(0));
+		MetaNode elseExp = null;
 		if(ctx.statement(1) != null){
-			elseExp = visit (ctx.statement(1));
+			elseExp = (MetaNode) visit (ctx.statement(1));
 		}
 		//build the @res properly and return it
-		res = new IfNode(condExp, thenExp, elseExp);
-		
+		res = new IfNode( condExp, thenExp, elseExp);
+
+		condExp.setParent(res);
+		thenExp.setParent(res);
+		if (elseExp!=null)
+			elseExp.setParent(res);
+
 		return res;
 	}
 	
@@ -226,17 +287,20 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	public Node visitCall(CallContext ctx) {
 		//this corresponds to a function invocation
 		//declare the result
-		Node res;
-		
+		MetaNode res;
+		IdNode id = new IdNode(ctx.ID().getText());
 		//get the invocation arguments
-		ArrayList<Node> args = new ArrayList<Node>();
-		
+		ArrayList<ExpNode> args = new ArrayList<>();
+
 		for(ExpContext exp : ctx.exp())
-			args.add(visit(exp));
+			args.add((ExpNode) visit(exp));
 
 		//instantiate the invocation
-		res = new CallNode(ctx.ID().getText(), args);
-		
+		res = new CallNode(id, args);
+
+		for(ExpNode exp : args)
+			exp.setParent(res);
+
 		return res;
 	}
 	
@@ -256,46 +320,38 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	
 	@Override
 	public Node visitBinExp(BinExpContext ctx) {
-		return new BinExpNode(visit(ctx.left), ctx.op.getText(), visit(ctx.right));
+		ExpNode l = (ExpNode) visit(ctx.left);
+		ExpNode r = (ExpNode) visit(ctx.right);
+		MetaNode res = new BinExpNode(l, ctx.op.getText(), r);
+
+		l.setParent(res);
+		r.setParent(res);
+
+		return res;
 	}
 	
 	private LhsExpNode visitLhsExp(LhsContext ctx) {
-		if (ctx.ID() != null)
+		LhsExpNode res;
+		if (ctx.ID() != null){
 			return new IdExpNode(ctx.ID().getText());
-		else
-			return new LhsExpNode(visitLhsExp(ctx.lhs()));
+		}
+		else {
+			LhsExpNode l = visitLhsExp(ctx.lhs());
+			res = new LhsExpNode(l);
+			l.setParent(res);
+			return res;
+		}
 	}
 	
 	@Override
-	public Node visitDerExp(DerExpContext ctx) { 
+	public Node visitDerExp(DerExpContext ctx) {
 		return visitLhsExp(ctx.lhs());
 	}
-	
-//	@Override
-//	public Node visitNewExp(NewExpContext ctx){ 
-//		if (ctx.getParent() instanceof AssignmentContext) {
-//			NewNode tmp = new NewNode(null);
-//			tmp.setID(visitLhsExp(((AssignmentContext)ctx.getParent()).lhs()).getID());
-//			return tmp;//usiamo la visitLhsExp dal momento che non ha side-effects sulla ST in modo da poter usare getID()
-//		}
-//		else if (ctx.getParent() instanceof DecVarContext)
-//			return new NewNode((TypeNode)visit(((DecVarContext)(ctx.getParent())).type()));
-//		else if (ctx.getParent() instanceof RetContext) {
-//			ParserRuleContext fct=ctx.getParent();
-//			while (fct !=null && !(fct instanceof DecFunContext))
-//				fct=fct.getParent();
-//			//in questo caso non ha senso chiedersi se siamo nel corpo di una funzione perché ne siamo certi dal momento che il medesimo check è stato fatto nel ramo return
-//			return new NewNode((((DecFunContext)fct).type()==null)?new VoidTypeNode(): (TypeNode) visit(((DecFunContext)fct).type()));
-//		}
-//		else return new NewNode(null); //WARNING in questo modo stiamo ammettendo solo uso di new nella forma type? id=new o return new.
-//	}
 
 	@Override
-	public Node visitNewExp(NewExpContext ctx){ 
+	public Node visitNewExp(NewExpContext ctx){
 		if (ctx.getParent() instanceof AssignmentContext) {
-			NewNode tmp = new NewNode((TypeNode)visit(ctx.type()));
-//			tmp.setID(visitLhsExp(((AssignmentContext)ctx.getParent()).lhs()).getID());
-			return tmp;//usiamo la visitLhsExp dal momento che non ha side-effects sulla ST in modo da poter usare getID()
+			return new NewNode((TypeNode)visit(ctx.type()));
 		}
 		else if (ctx.getParent() instanceof DecVarContext)
 			return new NewNode((TypeNode)visit(ctx.type()));
@@ -303,22 +359,22 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 			ParserRuleContext fct=ctx.getParent();
 			while (fct !=null && !(fct instanceof DecFunContext))
 				fct=fct.getParent();
-			//in questo caso non ha senso chiedersi se siamo nel corpo di una funzione perché ne siamo certi dal momento che il medesimo check è stato fatto nel ramo return
+
 			return new NewNode((TypeNode)visit(ctx.type()));
 		}
-		else return new NewNode(null); //WARNING in questo modo stiamo ammettendo solo uso di new nella forma type? id=new o return new.
+		else return new NewNode(null);
 	}
 
-	@Override public Node visitValExp(SimpLanPlusParser.ValExpContext ctx) { 
+	@Override public ExpNode visitValExp(SimpLanPlusParser.ValExpContext ctx) {
 		return new IntNode(Integer.parseInt(ctx.NUMBER().getText()));
 		}
 	
-	@Override public Node visitNotExp(SimpLanPlusParser.NotExpContext ctx) { 
-		return new NotExpNode(visit(ctx.exp()));
+	@Override public ExpNode visitNotExp(SimpLanPlusParser.NotExpContext ctx) {
+		return new NotExpNode((ExpNode) visit(ctx.exp()));
 		}
 	
-	@Override public Node visitNegExp(SimpLanPlusParser.NegExpContext ctx) {
-		return new NegExpNode(visit(ctx.exp())); 
+	@Override public ExpNode visitNegExp(SimpLanPlusParser.NegExpContext ctx) {
+		return new NegExpNode((ExpNode) visit(ctx.exp()));
 	}
 	
 	@Override
@@ -330,9 +386,12 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	
 	@Override
 	public Node visitCallExp(CallExpContext ctx) {
-		
+		MetaNode res;
+		Node inner = visit(ctx.call());
 		//there is no need to perform a check here, the lexer ensures this text is a boolean
-		return visit(ctx.call()); 
+		res = new CallExpNode((CallNode) inner);
+		((CallNode) inner).setParent(res);
+		return res;
 	}
 
 	public Node visitMainBlock(BlockContext ctx, Boolean isMainBlock) {
@@ -341,8 +400,8 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 		BlockNode res;
 
 		//list of declarations in @res
-		ArrayList<Node> declarations = new ArrayList<Node>();
-		ArrayList<Node> statements = new ArrayList<Node>();
+		ArrayList<Node> declarations = new ArrayList<>();
+		ArrayList<Node> statements = new ArrayList<>();
 
 		//visit all nodes corresponding to declarations inside the let context and store them in @declarations
 		//notice that the ctx.let().dec() method returns a list, this is because of the use of * or + in the grammar
@@ -363,6 +422,14 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 
 		//build @res accordingly with the result of the visits to its content
 		res = new BlockNode(declarations,  statements,isMainBlock);
+
+		for (Node dc : declarations){
+			((MetaNode) dc).setParent(res);
+		}
+
+		for (Node st : statements){
+			((MetaNode) st).setParent(res);
+		}
 
 		return res;
 	}

@@ -1,0 +1,15 @@
+{
+    /*
+    This example is the recursive version of the Fibonacci function.
+    fib(n) is the n-th number in the Fibonacci series.
+    */
+    int fib(int n) {
+        if (n <= 1) {
+            return n;
+        }
+        
+        return fib(n-1) + fib(n-2);
+    }
+
+    print fib(10);
+}

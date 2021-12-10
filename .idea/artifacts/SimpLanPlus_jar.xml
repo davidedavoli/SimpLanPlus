@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SimpLanPlus:jar">
+    <output-path>$PROJECT_DIR$</output-path>
+    <root id="archive" name="SimpLanPlus.jar">
+      <element id="module-output" name="SimpLanPlus" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/antlr-4.9.2-complete.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

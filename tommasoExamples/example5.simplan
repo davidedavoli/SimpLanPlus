@@ -1,0 +1,20 @@
+
+{
+    /*
+    This example shows the importance of having a fix-point method implemented for performing the effects analysis on functions.
+    The program is not correct because the function g could delete x twice.
+    */
+    ^int a = new int;
+    int b;
+    void g(^int x, int y) {
+        if (y==0)
+            delete x;
+        else {
+            x^ = x^ - 1;
+            g(x,y);
+            delete x;
+        }
+    }
+    a^ = 1;
+    g(a, b);
+}

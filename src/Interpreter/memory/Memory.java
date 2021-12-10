@@ -1,7 +1,7 @@
 package Interpreter.memory;
 
 public class Memory {
-    private Cell[] mem;
+    private final Cell[] mem;
 
     public Memory(int size){
         mem = new Cell[size];
@@ -14,8 +14,8 @@ public class Memory {
         return mem[n].read();
     }
 
-    public int write(int add, int val){
-        return mem[add].write(val);
+    public void write(int add, int val){
+        mem[add].write(val);
     }
 
     public void free(int add){
@@ -30,5 +30,11 @@ public class Memory {
             }
         }
         return -1;
+    }
+
+    public void cleanMemory(int start, int end) {
+        for (int indexStack = start;indexStack < end; indexStack++){
+            mem[indexStack] = new Cell();
+        }
     }
 }

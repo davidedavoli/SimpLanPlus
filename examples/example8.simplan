@@ -1,0 +1,83 @@
+/*{
+      /*
+       [ [c0] ]
+       [c0,c1,c2,c3,c4]
+
+
+       [ [c0,c1] ]
+       [c0,c1,c2,c3,c4]
+
+       [ [c0,c1,c2] ]
+        c4-> valore puntato
+        c0 -> c2
+        c1 -> c3
+        c2 -> c4
+       [c0,c1,c2,c3,c4]
+       */
+
+
+    void plusint(int c){
+        if(false){
+            return;
+        }
+        print c+1;
+        return;
+    }
+    int minusint(int c){
+        return c-1;
+    }
+    int x = 1;
+    ^int c = new int;
+
+    if(true){
+        x = 5;
+        c = new int;
+        c^ = 10;
+        print x;
+        f = 10;
+    }
+    else{
+        x = 8;
+        print 6;
+    }
+    print x;
+    c^ = 5;
+    print c^;
+    delete c;
+    c = new int;
+    c^ = 9;
+    //prova(c);
+    print c^;
+    plusint(c^);
+    print x;
+    print c^;
+    print minusint(c^);
+    print c^;
+
+}*/
+
+{
+   ^int global;
+   ^int newGlobal(){
+       global=new int;
+       global^ = 2;
+       return global;
+    }
+   ^int x;
+   x = newGlobal();
+   print x^;
+   delete global;
+   print global^;
+   print x^;
+}
+/*
+ should print:
+     ;6
+     ;8
+     ;5
+     ;0
+     ;10
+     ;1
+     ;8
+     ;9
+ */

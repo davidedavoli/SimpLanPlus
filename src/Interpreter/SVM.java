@@ -3,36 +3,28 @@ package Interpreter;
 import Interpreter.ast.Instruction;
 import Interpreter.memory.Memory;
 import Interpreter.parser.SVMParser;
-import ast.STentry;
-import ast.node.Node;
-import ast.node.dec.VarNode;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class SVM {
 
-    public static final int CODESIZE = 10000;
-    public static final int MEMSIZE = 10000;
+    public static final int CODE_SIZE = 10000;
+    public static final int MEMORY_SIZE = 10000;
 
     private final Instruction[] code;
-    private final Memory memory = new Memory(MEMSIZE);
+    private final Memory memory = new Memory(MEMORY_SIZE);
 
-    private int ip = 0;             // instruction pointer, internal register, no write nor read
-    private int sp = MEMSIZE;       // stack pointer
-    private int hp = 0;             // heap pointer read-only
-    private int fp = MEMSIZE-1;       // frame pointer
+    private int ip = 0;                 // instruction pointer, internal register, no write nor read
+    private int sp = MEMORY_SIZE;       // stack pointer
+    private int hp = 0;                 // heap pointer read-only
+    private int fp = MEMORY_SIZE -1;    // frame pointer
     private int ra;
     private int al;
-    private int bsp = MEMSIZE;
+    private int bsp = MEMORY_SIZE;
 
-    private int[] a = new int[10];
-    private int[] r = new int[10];
+    private final int[] a = new int[10];
+    private final int[] r = new int[10];
 
     public SVM(Instruction[] code) {
         this.code = code;
@@ -69,55 +61,48 @@ public class SVM {
                             break;
 
                         case SVMParser.ADD:
-                            regStore(arg1, regRead(arg2) + regRead(arg3));
+                            sum(arg1, regRead(arg2), regRead(arg3));
                             break;
                         case SVMParser.ADDI:
                             value = Integer.parseInt(arg3);
-                            regStore(arg1, regRead(arg2) + value);
+                            sum(arg1, regRead(arg2), value);
                             break;
 
                         case SVMParser.SUB:
-                            regStore(arg1, regRead(arg2) - regRead(arg3));
+                            sub(arg1, regRead(arg2), regRead(arg3));
                             break;
                         case SVMParser.SUBI:
                             value = Integer.parseInt(arg3);
-                            regStore(arg1, regRead(arg2) - value);
+                            sub(arg1, regRead(arg2), value);
                             break;
 
                         case SVMParser.MULT:
-                            regStore(arg1, regRead(arg2) * regRead(arg3));
+                            multiplication(arg1, regRead(arg2), regRead(arg3));
                             break;
                         case SVMParser.MULTI: //Also used for negate (*-1)
                             value = Integer.parseInt(arg3);
-                            regStore(arg1, regRead(arg2) * value);
+                            multiplication(arg1, regRead(arg2), value);
                             break;
 
                         case SVMParser.DIV:
-                            regStore(arg1, regRead(arg2) / regRead(arg3));
+                            value = regRead(arg3);
+                            division(arg1,regRead(arg2),value);
                             break;
                         case SVMParser.DIVI:
                             value = Integer.parseInt(arg3);
-                            regStore(arg1, regRead(arg2) / value);
+                            division(arg1,regRead(arg2),value);
                             break;
 
                         case SVMParser.STOREW:
                             offset = Integer.parseInt(arg2);
-                            int addr_sw = offset + regRead(arg3);
-                            memory.write(addr_sw, regRead(arg1));
+                            int addressStoreWord = offset + regRead(arg3);
+                            memory.write(addressStoreWord, regRead(arg1));
                             break;
                         case SVMParser.LOAD:
                             value = Integer.parseInt(arg2);
                             regStore(arg1,value);
                             break;
                         case SVMParser.LOADW:
-                            // check if object address where we take the method label
-                            // is null value (-10000) //TODO l'if è un fossile del codice di Simplan, si valuti se tenerlo o rimuoverlo
-                    /*
-                    if (memory[sp] == -10000) {
-                        System.out.println("\nError: Null pointer exception");
-                        return;
-                    }
-                     */
                             offset = Integer.parseInt(arg2);
                             address = offset + regRead(arg3);
                             regStore(arg1, memory.read(address));
@@ -133,7 +118,7 @@ public class SVM {
                             break;
                         case SVMParser.BCOND:
                             address = Integer.parseInt(code[ip].getArg1());
-                            ip++;  //aumentiamo ip, in caso non venga effettuato il branch
+                            ip++;
                             value = regRead(bytecode.getArg1());
                             if (value!=0) ip = address;
                             break;
@@ -146,7 +131,6 @@ public class SVM {
                         case SVMParser.JR:
                             ip = regRead(arg1);
                             break;
-
 
                         case SVMParser.EQ:
                             regStore(arg1, regRead(arg2)==regRead(arg3)?1:0);
@@ -176,152 +160,184 @@ public class SVM {
                             break;
 
                         case SVMParser.NEW:
-                            address = memory.allocate();
-                            if (address >= hp) hp = address + 1;
-                            if (address == -1 || hp > sp) {
-                                System.out.println("Memory is full!!");
-                                return;
-                            }
-                            regStore(arg1, address);
+                            allocatePointer(arg1);
                             break;
+
                         case SVMParser.FREE:
-                            address = regRead(arg1);
-                            if (address == hp - 1)
-                                hp--; //se è l'ultimo indirizzo occupato, allora hp viene decrementato
-                            memory.free(address);
+                            deallocatePointer(arg1);
                             break;
 
                         case SVMParser.PRINT:
                             if (arg1==null)
-                                System.out.println((sp < MEMSIZE) ? memory.read(sp) : "Empty stack!");
+                                System.out.println((sp < MEMORY_SIZE) ? memory.read(sp) : "Empty stack!");
                             else{
-                                System.out.println( "PRINTO IL VALORE NEL REGISTRO: "+arg1 +" CON VALORE: "+ regRead(arg1));
+                                System.out.println( "Print: "+ regRead(arg1));
                             }
-                            //System.out.println((sp < MEMSIZE) ? regRead(arg1) : "Empty stack!");
-
                             break;
 
                         case SVMParser.HALT:
-                            //to print the result
-                            System.out.println("\nResult: " + memory.read(sp) + "\n");
+                            System.out.println("Halting program...");
                             //printStack(20);
+                            //System.out.println("\nResult: " + memory.read(sp) + "\n");
+
                             return;
                     }
                 } catch (Exception e) {
-                    System.out.println("PROGRAMM STOPPED AT "+ip);
-                    //Map<String, STentry > hm = env.symTable.get(env.nestingLevel)
+                    System.out.println("Program stopped at program counter: "+ip);
+                    /*
                     String toPrint = "";
                     int cont = 0;
                     for (Instruction ins:code){
                         if(ins == null)
                             break;
-                        else{
+                        if(cont > ip -10){
                             String literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
                             String str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
                             toPrint += cont+": "+ str +"\n";
+                            //break;
                         }
-                        if(cont == ip)
+                        else if(cont == ip){
+                            String literalName = SVMParser._LITERAL_NAMES[ins.getCode()];
+                            String str = literalName +" "+(ins.getArg1()!=null?ins.getArg1():"") +" "+(ins.getArg2()!=null?ins.getArg2():"")+" "+(ins.getArg3()!=null?ins.getArg3():"");
+                            toPrint += cont+": "+ str +"\n";
                             break;
+                        }
                         cont++;
 
                     }
+                    */
 
                     e.printStackTrace();
-                    System.out.println(toPrint);
-                    printStack(20);
+                    //printStack(30);
                     return;
                 }
             }
         }
     }
-
-    private int pop() {
-        return memory.read(sp++);
-    }
-
-    private int regRead(String reg) {
-
-        if (reg.equals("$fp")){
-            return fp;
-        }
-        else if(reg.equals("$bsp")){
-            return bsp;
-        }
-        else if (reg.equals("$al")){
-            return al;
-        }
-        else if (reg.equals("$sp")) {
-            return sp;
-        }
-        else if (reg.equals("$ra")) {
-            return ra;
-
-        }
-        else{
-            switch (reg.charAt(1)) {
-                case 'r':
-                    return r[Integer.parseInt(reg.substring(2))];
-                case 'a':
-                    return a[Integer.parseInt(reg.substring(2))];
-
-            }
-        }
-        return 0;
-    }
-
-    private void regStore(String reg, int v) throws Exception {
-        if (reg.equals("$fp")){
-            fp = v;
-        }
-        else if(reg.equals("$bsp")){
-            bsp = v;
-        }
-        else if (reg.equals("$al")){
-            al = v;
-        }
-        else if (reg.equals("$sp")) {
-            sp = v;
-            if (sp <= hp) {
-                throw new Exception("Stack overflow!");
-            }
-        }
-        else if (reg.equals("$ra")) {
-            ra = v;
-
-        }
-        else{
-            switch (reg.charAt(1)) {
-                case 'r':
-                    r[Integer.parseInt(reg.substring(2))] = v;
-                    break;
-                case 'a':
-                    a[Integer.parseInt(reg.substring(2))] = v;
-
-                    break;
-            }
-        }
-
-    }
-
-    private void push(int v) {
-        memory.write(--sp, v);
-    }
-
     private boolean isRegister(String str) {
         Pattern p = Pattern.compile("\\$(([ar][0-9])|(sp)|(fp)|(hp)|(al)|(ra)|(bsp))");
         Matcher m = p.matcher(str);
         return m.matches();
     }
-    private void printStack(int numberOfVarToPrint){
-        int ind = MEMSIZE-1;
-        int to = ind-numberOfVarToPrint;
-        System.out.println("Inizio print stack");
 
-        while (ind > to){
-            System.out.println("CELL "+ ind + " Value: "+ memory.read(ind));
-            ind--;
+    private void push(int v) throws Exception {
+        regStore("$sp",sp-1);
+        memory.write(sp, v);
+    }
+    private Integer pop() throws Exception {
+        Integer val = memory.read(sp);
+        regStore("$sp",sp+1);
+
+        return val;
+    }
+
+    void sum(String lhs, int first, int second) throws Exception {
+        regStore(lhs, first + second);
+    }
+    void sub(String lhs, int first, int second) throws Exception {
+        regStore(lhs, first - second);
+    }
+    void multiplication(String lhs, int first, int second) throws Exception {
+        regStore(lhs, first * second);
+    }
+    void division(String lhs, int numerator, int denominator) throws Exception {
+        if(denominator == 0) {
+            System.err.println("Cannot divide per 0");
+            System.exit(0);
         }
-        System.out.println("Fine print stack, current sp_addr: "+sp);
+        regStore(lhs, numerator / denominator);
+    }
+
+    void allocatePointer(String lhs) throws Exception {
+        int address = memory.allocate();
+
+        if (address >= hp) hp = address + 1;
+        if (address == -1 || hp > sp) {
+            System.out.println("Memory is full!!");
+            return;
+        }
+        regStore(lhs, address);
+    }
+    void deallocatePointer(String lhs){
+        int address = regRead(lhs);
+        if (address == hp - 1)
+            hp--;
+        memory.free(address);
+    }
+
+    private int regRead(String reg) {
+
+        switch (reg) {
+            case "$fp":
+                return fp;
+            case "$bsp":
+                return bsp;
+            case "$al":
+                return al;
+            case "$sp":
+                return sp;
+            case "$ra":
+                return ra;
+
+            default:
+                switch (reg.charAt(1)) {
+                    case 'r':
+                        return r[Integer.parseInt(reg.substring(2))];
+                    case 'a':
+                        return a[Integer.parseInt(reg.substring(2))];
+
+                }
+                break;
+        }
+        return 0;
+    }
+    private void regStore(String reg, int v) throws Exception {
+        switch (reg) {
+            case "$fp":
+                fp = v;
+                break;
+            case "$bsp":
+                bsp = v;
+                break;
+            case "$al":
+                al = v;
+                break;
+            case "$sp":
+                if (v > sp) {
+                    memory.cleanMemory(sp, v);
+                }
+                sp = v;
+                if (sp <= hp) {
+                    throw new Exception("Stack overflow!");
+                }
+                break;
+            case "$ra":
+                ra = v;
+                break;
+            default:
+                switch (reg.charAt(1)) {
+                    case 'r':
+                        r[Integer.parseInt(reg.substring(2))] = v;
+                        break;
+                    case 'a':
+                        a[Integer.parseInt(reg.substring(2))] = v;
+
+                        break;
+                }
+                break;
+        }
 
     }
+    /*private void printStack(int numberOfVarToPrint) {
+        int ind = MEMORY_SIZE-1;
+        int to = ind-numberOfVarToPrint;
+        System.out.println("Actual stack pointer: "+sp+"\Starting print stack:\n");
+
+        while (ind > to){
+            System.out.println("Cell: "+ ind + "\tValue: "+memory.read(ind));
+            ind--;
+        }
+        System.out.println("End print stack, current stack pointer: "+sp);
+
+    }*/
 }

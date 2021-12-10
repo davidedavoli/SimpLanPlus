@@ -1,4 +1,3 @@
-// Generated from D:/universita/SimpLanPlus/src/Interpreter/lexer\SVM.g4 by ANTLR 4.9.1
 package Interpreter.parser;
 
 import Interpreter.ast.SVMListener;

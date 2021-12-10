@@ -1,27 +1,32 @@
 package Interpreter.memory;
 
 public class Cell {
-    private int val;
+    private Integer val;
     private boolean pointed;
 
     Cell(){
         pointed=false;
+        val = null;
     }
 
-    public int write(int v){
+    public void write(int v){
         val = v;
-        return val;
     }
 
     public void free(){
         pointed=false;
+        val=null;
     }
 
     public void allocate(){
         pointed=true;
     }
 
-    public int read(){
+    public Integer read() {
+        if(val == null){
+            System.err.println("Value is not written in memory");
+            System.exit(1);
+        }
         return val;
     }
 
