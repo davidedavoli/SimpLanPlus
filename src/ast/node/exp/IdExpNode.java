@@ -53,7 +53,7 @@ public class IdExpNode extends LhsExpNode implements Dereferences {
         ArrayList<SemanticError> res = new ArrayList<>();
         entry = env.lookUp(id);
         if (entry == null)
-          res.add(new SemanticError("Id "+id+" in expNode not declared"));
+          res.add(new SemanticError("Id "+id+" not declared"));
         else
           nestingLevel = env.getNestingLevel();
 

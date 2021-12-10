@@ -177,7 +177,7 @@ public class Environment {
 				errors.add(new EffectError(variable.getID() + " used after deleting."));
 			}
 		} catch (Exception exception) {
-			errors.add(new EffectError(variable.getID() + " not declared. Aborting."));
+			errors.add(new EffectError("Id "+variable.getID() + " not declared."));
 		}
 		return errors;
 	}

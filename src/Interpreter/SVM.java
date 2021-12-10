@@ -24,7 +24,7 @@ public class SVM {
     private int bsp = MEMORY_SIZE;
 
     private final int[] a = new int[10];
-    private final int[] r = new int[10];
+    //private final int[] r = new int[10];
 
     public SVM(Instruction[] code) {
         this.code = code;
@@ -282,7 +282,7 @@ public class SVM {
             default:
                 switch (reg.charAt(1)) {
                     case 'r':
-                        return r[Integer.parseInt(reg.substring(2))];
+                       // return r[Integer.parseInt(reg.substring(2))];
                     case 'a':
                         return a[Integer.parseInt(reg.substring(2))];
 
@@ -317,7 +317,7 @@ public class SVM {
             default:
                 switch (reg.charAt(1)) {
                     case 'r':
-                        r[Integer.parseInt(reg.substring(2))] = v;
+                       // r[Integer.parseInt(reg.substring(2))] = v;
                         break;
                     case 'a':
                         a[Integer.parseInt(reg.substring(2))] = v;

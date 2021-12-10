@@ -5,8 +5,7 @@ li $a0 1
 push $a0
 
 push $fp
-mv $fp $al //put in $al actual fp
-lw $a0 -1($al) //put in $a0 value of Id x
+li $a0 54
 
 push $a0
 mv $fp $al //put in $al actual fp

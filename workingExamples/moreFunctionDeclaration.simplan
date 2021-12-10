@@ -1,0 +1,8 @@
+{
+    void x(){
+        print 1;
+    }
+    void x(){
+        print 2;
+    }
+}

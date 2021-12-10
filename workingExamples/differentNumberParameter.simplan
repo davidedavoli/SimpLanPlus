@@ -1,0 +1,6 @@
+{
+    void sum(int a, int b){
+        print a+b;
+    }
+    sum(1);
+}

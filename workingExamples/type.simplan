@@ -1,0 +1,19 @@
+{
+    ^int x = new int;
+    int c = 10;
+
+    bool boolean = true;
+    ^bool pointerBoolean = new bool;
+
+    print c;
+    print boolean;
+
+    x^ = 2;
+    pointerBoolean^ = false;
+    c = x^;
+    boolean = pointerBoolean^;
+
+    print c;
+    print boolean;
+
+}
