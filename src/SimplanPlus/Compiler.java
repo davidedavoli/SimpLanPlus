@@ -62,8 +62,8 @@ public class Compiler {
 
 	private static void checkEffects(Node ast, Environment env){
 		ArrayList<EffectError> effectErrors = ast.checkEffects(env);
-		System.out.println("You had: "+effectErrors.size()+" effects errors.");
-		if(effectErrors.size()>0){
+		System.out.println("You had: "+effectErrors.stream().filter(KeySet.keySet(EffectError::toString)).count()+" effects errors.");
+		if(effectErrors.stream().anyMatch(KeySet.keySet(EffectError::toString))){
 			effectErrors.stream().filter(KeySet.keySet(EffectError::toString)).forEach(System.err::println);
 			System.exit(1);
 		}
