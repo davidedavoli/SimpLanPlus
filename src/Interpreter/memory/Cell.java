@@ -9,9 +9,8 @@ public class Cell {
         val = null;
     }
 
-    public Integer write(int v){
+    public void write(int v){
         val = v;
-        return val;
     }
 
     public void free(){

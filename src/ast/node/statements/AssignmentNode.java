@@ -22,30 +22,24 @@ public class AssignmentNode extends MetaNode {
   private final LhsNode lhs;
   private final ExpNode exp;
 
-  
+
   public AssignmentNode (LhsNode l, ExpNode e) {
     lhs=l;
     exp=e;
-  }	  
+  }
 
   @Override
   public ArrayList<SemanticError> checkSemantics(Environment env) {
 
-	  //create result list
-	  ArrayList<SemanticError> res = new ArrayList<>();
+    //create result list
+    ArrayList<SemanticError> res = new ArrayList<>();
 
-	  res.addAll(lhs.checkSemantics(env));
-      res.addAll(exp.checkSemantics(env));
-        
-        return res;
+    res.addAll(lhs.checkSemantics(env));
+    res.addAll(exp.checkSemantics(env));
+
+    return res;
   }
-  
-  public String toPrint(String s) {
-	return s+"Var:" + lhs.getID() +"\n"
-	  	   +lhs.typeCheck().toPrint(s+"  ")  
-           +exp.toPrint(s+"  "); 
-  }
-  
+
   public TypeNode typeCheck() {
     if (! (TypeUtils.isSubtype(exp.typeCheck(),lhs.typeCheck())) ){
       System.err.println("Incompatible value in assignment for variable "+lhs.getID() + " of type: "+lhs.typeCheck().toPrint("") + " when exp is of type: "+exp.typeCheck().toPrint(""));
@@ -53,37 +47,35 @@ public class AssignmentNode extends MetaNode {
     }
     return lhs.typeCheck();
   }
-
-
   public HasReturn retTypeCheck() {
-	  return new HasReturn(HasReturn.hasReturnType.ABS);
+    return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
-    @Override
-    public ArrayList<EffectError> checkEffects (Environment env) {
-      ArrayList<EffectError> errors = new ArrayList<>();
+  @Override
+  public ArrayList<EffectError> checkEffects (Environment env) {
+    ArrayList<EffectError> errors = new ArrayList<>();
 
-      errors.addAll(lhs.checkEffects(env));
-      errors.addAll(exp.checkEffects(env));
+    errors.addAll(lhs.checkEffects(env));
+    errors.addAll(exp.checkEffects(env));
 
-      if (lhs.getEntry().getDereferenceLevelVariableStatus(lhs.getDereferenceLevel()).equals(new Effect(Effect.ERROR))) {
-        errors.addAll(env.checkStmStatus(lhs, Effect::sequenceEffect, Effect.READWRITE));
+    if (lhs.getEntry().getDereferenceLevelVariableStatus(lhs.getDereferenceLevel()).equals(new Effect(Effect.ERROR))) {
+      errors.addAll(env.checkStmStatus(lhs, Effect::sequenceEffect, Effect.READWRITE));
+    }
+
+    else if (exp instanceof LhsExpNode) {
+
+      List<Dereferences> rhsPointerList = exp.variables();
+      var rhsPointer = rhsPointerList.get(0);
+
+      int lhsDereferenceLevel = lhs.getDereferenceLevel();
+      int rhsPointerDereferenceLevel = rhsPointer.getDereferenceLevel();
+      int lhsMaxDereferenceLevel = lhs.getEntry().getMaxDereferenceLevel();
+
+      for (int i = lhsDereferenceLevel, j = rhsPointerDereferenceLevel; i < lhsMaxDereferenceLevel; i++, j++) {
+        Effect status = rhsPointer.getEntry().getDereferenceLevelVariableStatus(j);
+        lhs.setIdStatus(status,i);
       }
-
-      else if (exp instanceof LhsExpNode) {
-
-        List<Dereferences> rhsPointerList = exp.variables();
-        var rhsPointer = rhsPointerList.get(0);
-
-        int lhsDereferenceLevel = lhs.getDereferenceLevel();
-        int rhsPointerDereferenceLevel = rhsPointer.getDereferenceLevel();
-        int lhsMaxDereferenceLevel = lhs.getEntry().getMaxDereferenceLevel();
-
-        for (int i = lhsDereferenceLevel, j = rhsPointerDereferenceLevel; i < lhsMaxDereferenceLevel; i++, j++) {
-          Effect status = rhsPointer.getEntry().getDereferenceLevelVariableStatus(j);
-          lhs.setIdStatus(status,i);
-        }
-      }
+    }
 
       /*else if(exp instanceof CallExpNode){
         STentry returnedEffectEntry = env.effectsLookUp( ((CallExpNode) exp).getIdName());//.innerEntry();
@@ -98,23 +90,28 @@ public class AssignmentNode extends MetaNode {
         //
       }
       */
-      else { // lhs is not in error status and exp is not a pointer.
-        lhs.getEntry().setDereferenceLevelVariableStatus(new Effect(Effect.READWRITE), lhs.getDereferenceLevel());
+    else { // lhs is not in error status and exp is not a pointer.
+      lhs.getEntry().setDereferenceLevelVariableStatus(new Effect(Effect.READWRITE), lhs.getDereferenceLevel());
 
-      }
-      return errors;
     }
-
+    return errors;
+  }
 
   public String codeGeneration(Label labelManager) {
-      StringBuilder codeGenerated = new StringBuilder();
-      codeGenerated.append(exp.codeGeneration(labelManager)).append("\n");
+    StringBuilder codeGenerated = new StringBuilder();
+    codeGenerated.append(exp.codeGeneration(labelManager)).append("\n");
 
-      codeGenerated.append(lhs.codeGeneration(labelManager)).append("\n");
-      //$al address di lhs
-      codeGenerated.append("sw $a0 0($al) // 0($al) = $a0 ").append(lhs.getID()).append("=exp\n");
+    codeGenerated.append(lhs.codeGeneration(labelManager)).append("\n");
+    //$al address di lhs
+    codeGenerated.append("sw $a0 0($al) // 0($al) = $a0 ").append(lhs.getID()).append("=exp\n");
 
-      return codeGenerated.toString();
+    return codeGenerated.toString();
+  }
+
+  public String toPrint(String s) {
+    return s+"Var:" + lhs.getID() +"\n"
+            +lhs.typeCheck().toPrint(s+"  ")
+            +exp.toPrint(s+"  ");
   }
 
 }  

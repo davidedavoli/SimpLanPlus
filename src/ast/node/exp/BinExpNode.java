@@ -29,8 +29,13 @@ public class BinExpNode extends ExpNode {
     }
 
     @Override
-    public String toPrint(String indent) {
-        return indent + lhs + " " + operator + " " + rhs.toPrint(indent);
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+        ArrayList<SemanticError> binExpNodeErrors = new ArrayList<>();
+
+        binExpNodeErrors.addAll(lhs.checkSemantics(env));
+        binExpNodeErrors.addAll(rhs.checkSemantics(env));
+
+        return binExpNodeErrors;
     }
 
     @Override
@@ -87,6 +92,22 @@ public class BinExpNode extends ExpNode {
          */
         return null;
     }
+    @Override
+    public HasReturn retTypeCheck() {
+        return null;
+    }
+
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        ArrayList<EffectError> errors = new ArrayList<>();
+
+        errors.addAll(lhs.checkEffects(env));
+        errors.addAll(rhs.checkEffects(env));
+
+        errors.addAll(checkExpStatus(env));
+
+        return errors;
+    }
 
     @Override
     public String codeGeneration(Label labelManager) {
@@ -95,7 +116,7 @@ public class BinExpNode extends ExpNode {
 
         codeGenerated.append("//Start codegen of ").append(lhs.getClass().getName()).append(operator).append(rhs.getClass().getName()).append("\n");
         /**
-         * Cgen for lhs and rhs to push them on the stack
+         * Code generation for lhs and rhs to push them on the stack
          */
         String lhs_generated = lhs.codeGeneration(labelManager);
         codeGenerated.append(lhs_generated);
@@ -180,15 +201,8 @@ public class BinExpNode extends ExpNode {
         return codeGenerated.toString();
     }
 
-    @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) {
-        ArrayList<SemanticError> binExpNodeErrors = new ArrayList<>();
 
-        binExpNodeErrors.addAll(lhs.checkSemantics(env));
-        binExpNodeErrors.addAll(rhs.checkSemantics(env));
 
-        return binExpNodeErrors;
-    }
     @Override
     public List<Dereferences> variables() {
         List<Dereferences> variables = new ArrayList<>();
@@ -198,20 +212,9 @@ public class BinExpNode extends ExpNode {
 
         return variables;
     }
-    @Override
-    public ArrayList<EffectError> checkEffects (Environment env) {
-        ArrayList<EffectError> errors = new ArrayList<>();
-
-        errors.addAll(lhs.checkEffects(env));
-        errors.addAll(rhs.checkEffects(env));
-
-        errors.addAll(checkExpStatus(env));
-
-        return errors;
-    }
 
     @Override
-    public HasReturn retTypeCheck() {
-        return null;
+    public String toPrint(String indent) {
+        return indent + lhs + " " + operator + " " + rhs.toPrint(indent);
     }
 }

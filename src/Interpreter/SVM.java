@@ -15,10 +15,10 @@ public class SVM {
     private final Instruction[] code;
     private final Memory memory = new Memory(MEMORY_SIZE);
 
-    private int ip = 0;             // instruction pointer, internal register, no write nor read
+    private int ip = 0;                 // instruction pointer, internal register, no write nor read
     private int sp = MEMORY_SIZE;       // stack pointer
-    private int hp = 0;             // heap pointer read-only
-    private int fp = MEMORY_SIZE -1;       // frame pointer
+    private int hp = 0;                 // heap pointer read-only
+    private int fp = MEMORY_SIZE -1;    // frame pointer
     private int ra;
     private int al;
     private int bsp = MEMORY_SIZE;
@@ -61,35 +61,36 @@ public class SVM {
                             break;
 
                         case SVMParser.ADD:
-                            regStore(arg1, regRead(arg2) + regRead(arg3));
+                            sum(arg1, regRead(arg2), regRead(arg3));
                             break;
                         case SVMParser.ADDI:
                             value = Integer.parseInt(arg3);
-                            regStore(arg1, regRead(arg2) + value);
+                            sum(arg1, regRead(arg2), value);
                             break;
 
                         case SVMParser.SUB:
-                            regStore(arg1, regRead(arg2) - regRead(arg3));
+                            sub(arg1, regRead(arg2), regRead(arg3));
                             break;
                         case SVMParser.SUBI:
                             value = Integer.parseInt(arg3);
-                            regStore(arg1, regRead(arg2) - value);
+                            sub(arg1, regRead(arg2), value);
                             break;
 
                         case SVMParser.MULT:
-                            regStore(arg1, regRead(arg2) * regRead(arg3));
+                            multiplication(arg1, regRead(arg2), regRead(arg3));
                             break;
                         case SVMParser.MULTI: //Also used for negate (*-1)
                             value = Integer.parseInt(arg3);
-                            regStore(arg1, regRead(arg2) * value);
+                            multiplication(arg1, regRead(arg2), value);
                             break;
 
                         case SVMParser.DIV:
-                            regStore(arg1, regRead(arg2) / regRead(arg3));
+                            value = regRead(arg3);
+                            division(arg1,regRead(arg2),value);
                             break;
                         case SVMParser.DIVI:
                             value = Integer.parseInt(arg3);
-                            regStore(arg1, regRead(arg2) / value);
+                            division(arg1,regRead(arg2),value);
                             break;
 
                         case SVMParser.STOREW:
@@ -131,7 +132,6 @@ public class SVM {
                             ip = regRead(arg1);
                             break;
 
-
                         case SVMParser.EQ:
                             regStore(arg1, regRead(arg2)==regRead(arg3)?1:0);
                             break;
@@ -160,20 +160,11 @@ public class SVM {
                             break;
 
                         case SVMParser.NEW:
-                            address = memory.allocate();
-
-                            if (address >= hp) hp = address + 1;
-                            if (address == -1 || hp > sp) {
-                                System.out.println("Memory is full!!");
-                                return;
-                            }
-                            regStore(arg1, address);
+                            allocatePointer(arg1);
                             break;
+
                         case SVMParser.FREE:
-                            address = regRead(arg1);
-                            if (address == hp - 1)
-                                hp--;
-                            memory.free(address);
+                            deallocatePointer(arg1);
                             break;
 
                         case SVMParser.PRINT:
@@ -185,7 +176,6 @@ public class SVM {
                             break;
 
                         case SVMParser.HALT:
-                            //to print the result
                             System.out.println("Halting program...");
                             //printStack(20);
                             //System.out.println("\nResult: " + memory.read(sp) + "\n");
@@ -224,12 +214,55 @@ public class SVM {
             }
         }
     }
+    private boolean isRegister(String str) {
+        Pattern p = Pattern.compile("\\$(([ar][0-9])|(sp)|(fp)|(hp)|(al)|(ra)|(bsp))");
+        Matcher m = p.matcher(str);
+        return m.matches();
+    }
 
+    private void push(int v) throws Exception {
+        regStore("$sp",sp-1);
+        memory.write(sp, v);
+    }
     private Integer pop() throws Exception {
         Integer val = memory.read(sp);
         regStore("$sp",sp+1);
 
         return val;
+    }
+
+    void sum(String lhs, int first, int second) throws Exception {
+        regStore(lhs, first + second);
+    }
+    void sub(String lhs, int first, int second) throws Exception {
+        regStore(lhs, first - second);
+    }
+    void multiplication(String lhs, int first, int second) throws Exception {
+        regStore(lhs, first * second);
+    }
+    void division(String lhs, int numerator, int denominator) throws Exception {
+        if(denominator == 0) {
+            System.err.println("Cannot divide per 0");
+            System.exit(0);
+        }
+        regStore(lhs, numerator / denominator);
+    }
+
+    void allocatePointer(String lhs) throws Exception {
+        int address = memory.allocate();
+
+        if (address >= hp) hp = address + 1;
+        if (address == -1 || hp > sp) {
+            System.out.println("Memory is full!!");
+            return;
+        }
+        regStore(lhs, address);
+    }
+    void deallocatePointer(String lhs){
+        int address = regRead(lhs);
+        if (address == hp - 1)
+            hp--;
+        memory.free(address);
     }
 
     private int regRead(String reg) {
@@ -258,7 +291,6 @@ public class SVM {
         }
         return 0;
     }
-
     private void regStore(String reg, int v) throws Exception {
         switch (reg) {
             case "$fp":
@@ -295,17 +327,6 @@ public class SVM {
                 break;
         }
 
-    }
-
-    private void push(int v) throws Exception {
-        regStore("$sp",sp-1);
-        memory.write(sp, v);
-    }
-
-    private boolean isRegister(String str) {
-        Pattern p = Pattern.compile("\\$(([ar][0-9])|(sp)|(fp)|(hp)|(al)|(ra)|(bsp))");
-        Matcher m = p.matcher(str);
-        return m.matches();
     }
     /*private void printStack(int numberOfVarToPrint) {
         int ind = MEMORY_SIZE-1;

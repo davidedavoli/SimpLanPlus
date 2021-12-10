@@ -2,7 +2,6 @@ package ast.node;
 
 
 import java.util.ArrayList;
-import java.util.List;
 
 public abstract class MetaNode implements Node {
     private MetaNode parent;

@@ -29,38 +29,6 @@ public class VarNode extends MetaNode {
         exp=v;
     }
 
-
-    public String toPrint(String s) {
-        return s+"Var:" + id.getID() +"\n"
-            +type.toPrint(s+"  ")
-            +((exp==null)?"":exp.toPrint(s+"  "));
-    }
-
-    public HasReturn retTypeCheck() {
-    return new HasReturn(HasReturn.hasReturnType.ABS);
-    }
-
-    public TypeNode typeCheck() {
-        if (exp != null && ! (TypeUtils.isSubtype(exp.typeCheck(),type)) ){
-            System.err.println("Incompatible value in assignment for variable "+id.getID() + " of type: "+id.typeCheck().toPrint("") + " when exp is of type: "+exp.typeCheck().toPrint(""));
-            //System.err.println("Incompatible value for variable "+id.getID());
-            System.exit(0);
-        }
-        return type;
-    }
-
-    public String codeGeneration(Label labelManager) {
-        StringBuilder codeGenerated = new StringBuilder();
-        if(exp != null){
-            codeGenerated.append(exp.codeGeneration(labelManager)).append("\n");
-            codeGenerated.append("push $a0\n");
-        }
-        else{
-            codeGenerated.append("subi $sp $sp 1 // No value assigned\n");
-        }
-        return codeGenerated.toString();
-    }
-
     @Override
     public ArrayList<SemanticError> checkSemantics(Environment env) {
         ArrayList<SemanticError> res = new ArrayList<>();
@@ -84,6 +52,17 @@ public class VarNode extends MetaNode {
         return res;
     }
 
+    public TypeNode typeCheck() {
+        if (exp != null && ! (TypeUtils.isSubtype(exp.typeCheck(),type)) ){
+            System.err.println("Incompatible value in assignment for variable "+id.getID() + " of type: "+id.typeCheck().toPrint("") + " when exp is of type: "+exp.typeCheck().toPrint(""));
+            System.exit(0);
+        }
+        return type;
+    }
+    public HasReturn retTypeCheck() {
+        return new HasReturn(HasReturn.hasReturnType.ABS);
+    }
+
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
         ArrayList<EffectError> errors = new ArrayList<>();
@@ -94,4 +73,21 @@ public class VarNode extends MetaNode {
         return errors;
     }
 
+    public String codeGeneration(Label labelManager) {
+        StringBuilder codeGenerated = new StringBuilder();
+        if(exp != null){
+            codeGenerated.append(exp.codeGeneration(labelManager)).append("\n");
+            codeGenerated.append("push $a0\n");
+        }
+        else{
+            codeGenerated.append("subi $sp $sp 1 // No value assigned\n");
+        }
+        return codeGenerated.toString();
+    }
+
+    public String toPrint(String s) {
+        return s+"Var:" + id.getID() +"\n"
+                +type.toPrint(s+"  ")
+                +((exp==null)?"":exp.toPrint(s+"  "));
+    }
 }

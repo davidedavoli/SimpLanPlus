@@ -19,7 +19,7 @@ public class FunNode extends MetaNode {
 	private final String id;
 	private final IdNode functionIdNode;
 	private final TypeNode type;
-	private ArrowTypeNode functionType; //just for ST
+	private ArrowTypeNode functionType;
 	private ArrayList<TypeNode> parameterTypes;
 	private final ArrayList<Node> parameterList = new ArrayList<>();
 	private final List<Effect> returnEffect = new ArrayList<>();
@@ -36,19 +36,12 @@ public class FunNode extends MetaNode {
 		beginFuncLabel = FuncBodyUtils.freshFunLabel();
 		endFuncLabel = FuncBodyUtils.endFreshFunLabel();
   	}
-
-  	public void addFunBlock(BlockNode b) {
-		body=b;
-		body.setIsFunction(true);
-  	}
-
-  	public String get_end_fun_label(){
+	public String getId() {
+		return id;
+	}
+	public String get_end_fun_label(){
 		return endFuncLabel;
 	}
-
-  	public void addPar (ArgNode p) {
-    	parameterList.add(p);
-  	}
 
 	public BlockNode getBody() {
 		return body;
@@ -57,24 +50,14 @@ public class FunNode extends MetaNode {
 		return parameterList;
 	}
 
-	public String toPrint(String s) {
-	StringBuilder parameterString= new StringBuilder();
-	for (Node par: parameterList)
-	  parameterString.append(par.toPrint(s + "  "));
-    return s+"Fun:" + id +"\n"
-		   +type.toPrint(s+"  ")
-		   +parameterString
-           +body.toPrint(s+"  ") ;
+  	public void addFunBlock(BlockNode b) {
+		body=b;
+		body.setIsFunction(true);
+  	}
+  	public void addPar (ArgNode p) {
+    	parameterList.add(p);
   	}
 
-  public TypeNode typeCheck() {
-	body.typeCheck();
-    return new ArrowTypeNode(parameterTypes, type);
-  }
-
-  	public HasReturn retTypeCheck() {
-	  return new HasReturn(HasReturn.hasReturnType.ABS);
-  	}
 
 	@Override
 	public ArrayList<SemanticError> checkSemantics(Environment env) {
@@ -128,6 +111,14 @@ public class FunNode extends MetaNode {
 		return res;
 	}
 
+	public TypeNode typeCheck() {
+		body.typeCheck();
+		return new ArrowTypeNode(parameterTypes, type);
+	}
+	public HasReturn retTypeCheck() {
+		return new HasReturn(HasReturn.hasReturnType.ABS);
+	}
+
 	/**
 	 * @param env Environment
 	 * @return ArrayList<SemanticError>
@@ -158,7 +149,6 @@ public class FunNode extends MetaNode {
 
 		return new ArrayList<>(fixPointCheckEffect(env, startingEffect));
 	}
-
 	/**
 	 *
 	 * @param env Environment
@@ -237,7 +227,6 @@ public class FunNode extends MetaNode {
 		*/
 		return errors;
 	}
-
 	/*public List<Effect> getMaxEffect(){
 		List<RetNode> listOfReturnNodeFunction = returnNodeInBlock();
 		List<List<Effect>> returnNodeEffect = new ArrayList<>();
@@ -274,11 +263,9 @@ public class FunNode extends MetaNode {
 		}
 		return  maxReturnEffect;
 	}*/
-
 	private boolean effectsAreDifferent(STentry effectsFunEntry, List<List<Effect>> effectsCopy) {
 		return !effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
 	}
-
 	private ArrayList<EffectError> checkInstructions(Environment env, STentry innerFunEntry){
 		ArrayList<EffectError> errors = new ArrayList<>(body.checkEffects(env));
 
@@ -307,7 +294,6 @@ public class FunNode extends MetaNode {
 		}*/
 		return errors;
 	}
-
 
 	public String codeGeneration(Label labelManager) {
 	  int declaration_size = 0;
@@ -355,7 +341,14 @@ public class FunNode extends MetaNode {
 	  return codeGenerated.toString();
   }
 
-	public String getId() {
-		return id;
+
+	public String toPrint(String s) {
+		StringBuilder parameterString= new StringBuilder();
+		for (Node par: parameterList)
+			parameterString.append(par.toPrint(s + "  "));
+		return s+"Fun:" + id +"\n"
+				+type.toPrint(s+"  ")
+				+parameterString
+				+body.toPrint(s+"  ") ;
 	}
 }

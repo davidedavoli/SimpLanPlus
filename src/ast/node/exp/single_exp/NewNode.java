@@ -24,20 +24,14 @@ public class NewNode extends ExpNode {
 	@Override
 	public ArrayList<SemanticError> checkSemantics(Environment env) {
 		ArrayList<SemanticError> res = new ArrayList<>();
-		  
 		if (type == null)
 	  		res.add(new SemanticError("new operator in compound expression"));
 		return res;
 	}
-	  
-	public String toPrint(String s) {
-		return s+"New:\n" + type.toPrint(s+"   ") +"\n";
-	  }
 
 	public TypeNode typeCheck() {
 	    return new PointerTypeNode(type);
 	  }
-	  
 	public HasReturn retTypeCheck() {
 		  return new HasReturn(HasReturn.hasReturnType.ABS);
 	  }
@@ -54,5 +48,9 @@ public class NewNode extends ExpNode {
 
 	public String codeGeneration(Label labelManager) {
 		return "new $a0" + "// put new address in a0\n";
-	  }  
+	  }
+
+	public String toPrint(String s) {
+		return s+"New:\n" + type.toPrint(s+"   ") +"\n";
+	}
 }  

@@ -17,40 +17,83 @@ import semantic.SemanticError;
 
 public class CallNode extends MetaNode {
 
-  private final IdNode id;
-  private STentry entry;
-  private final ArrayList<ExpNode> parameterList;
-  private int nestingLevel;
-  private Boolean isAlreadyCalled;
-
-
-  public STentry getEntry(){
-      return this.entry;
-  }
-
-    public String getIdName(){
-        return this.id.getID();
-    }
+    private final IdNode id;
+    private STentry entry;
+    private final ArrayList<ExpNode> parameterList;
+    private int nestingLevel;
+    private Boolean isAlreadyCalled;
 
     public CallNode(IdNode id, ArrayList<ExpNode> args) {
-	this.id=id;
-    parameterList = args;
-    isAlreadyCalled = false;
-}
+        this.id=id;
+        parameterList = args;
+        isAlreadyCalled = false;
+    }
 
-public String toPrint(String s) {  //
-    StringBuilder parameterString= new StringBuilder();
-	for (ExpNode par: parameterList)
-	  parameterString.append(par.toPrint(s + "  "));
-	return s+"Call:" + id + " at nesting level " + nestingLevel +"\n"
-           +entry.toPrint(s+"  ")
-           +parameterString;
-  }
+    public ArrayList<ExpNode> getParameterList() {
+        return parameterList;
+    }
 
-public HasReturn retTypeCheck() {
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+        //create the result
+        ArrayList<SemanticError> res = new ArrayList<>();
 
-	  return new HasReturn(HasReturn.hasReturnType.ABS);
-}
+
+        entry = env.lookUp(id.getID());
+        if (entry == null)
+            res.add(new SemanticError("Id "+id.getID()+" not declared."));
+        else{
+            nestingLevel = env.getNestingLevel();
+            for(ExpNode arg : parameterList)
+                res.addAll(arg.checkSemantics(env));
+        }
+
+        res.addAll(checkAncestorCall());
+
+        return res;
+    }
+    private ArrayList<SemanticError> checkAncestorCall(){
+        ArrayList<SemanticError> res = new ArrayList<>();
+        FunNode f = new FunNode("foo", new VoidTypeNode(),id);
+        FunNode g;
+        ArrayList<Node> path = this.getAncestorsInstanceOf(f.getClass());
+        if(!path.isEmpty())
+            path.remove(0);//plain recursive functions are ok
+        for (Node parF: path) {
+            g = (FunNode) parF;
+            if(g.getId().equals(id.getID())){
+                res.add(new SemanticError("call of ancestor function in (grand-)child "));
+            }
+        }
+        return res;
+    }
+
+    public TypeNode typeCheck() {  //
+        ArrowTypeNode t=null;
+        if (entry.getType() instanceof ArrowTypeNode)
+            t=(ArrowTypeNode) entry.getType();
+        else {
+            System.err.println("Trying to invoke "+id.getID()+". But it is not a function.");
+            System.exit(0);
+        }
+
+        List<TypeNode> p = t.getParList();
+        if ( !(p.size() == parameterList.size()) ){
+            System.err.println("Wrong number of parameters in the invocation of "+id.getID());
+            System.exit(0);
+        }
+
+        for (int i = 0; i< parameterList.size(); i++)
+            if ( !(TypeUtils.isSubtype( (parameterList.get(i)).typeCheck(), p.get(i)) ) ){
+                System.err.println("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id.getID());
+                System.exit(0);
+            }
+
+        return t.getRet();
+    }
+    public HasReturn retTypeCheck() {
+
+        return new HasReturn(HasReturn.hasReturnType.ABS);
+    }
 
     @Override
     public ArrayList<EffectError> checkEffects(Environment env) {
@@ -195,89 +238,33 @@ public HasReturn retTypeCheck() {
         return effectErrors;
     }
 
-    public ArrayList<SemanticError> checkSemantics(Environment env) {
-		//create the result
-		ArrayList<SemanticError> res = new ArrayList<>();
+    public String codeGeneration(Label labelManager) {
+        StringBuilder codeGenerated = new StringBuilder();
 
+        codeGenerated.append("push $fp\n");
 
-        entry = env.lookUp(id.getID());
-        if (entry == null)
-            res.add(new SemanticError("Id "+id.getID()+" not declared."));
-        else{
-            nestingLevel = env.getNestingLevel();
-            for(ExpNode arg : parameterList)
-                res.addAll(arg.checkSemantics(env));
+        for (int i = parameterList.size()-1; i>=0; i--){
+            codeGenerated.append(parameterList.get(i).codeGeneration(labelManager)).append("\n");
+            codeGenerated.append("push $a0\n");
         }
 
-        res.addAll(checkAncestorCall());
-
-		return res;
-  }
-  
-  public TypeNode typeCheck() {  //
-	 ArrowTypeNode t=null;
-     if (entry.getType() instanceof ArrowTypeNode)
-         t=(ArrowTypeNode) entry.getType();
-     else {
-         System.err.println("Trying to invoke "+id.getID()+". But it is not a function.");
-         System.exit(0);
-     }
-
-     List<TypeNode> p = t.getParList();
-     if ( !(p.size() == parameterList.size()) ){
-         System.err.println("Wrong number of parameters in the invocation of "+id.getID());
-         System.exit(0);
-     }
-
-     for (int i = 0; i< parameterList.size(); i++)
-       if ( !(TypeUtils.isSubtype( (parameterList.get(i)).typeCheck(), p.get(i)) ) ){
-           System.err.println("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id.getID());
-           System.exit(0);
-       }
-
-     return t.getRet();
-  }
-  
-  public String codeGeneration(Label labelManager) {
-      StringBuilder codeGenerated = new StringBuilder();
-
-      codeGenerated.append("push $fp\n");
-
-      for (int i = parameterList.size()-1; i>=0; i--){
-          codeGenerated.append(parameterList.get(i).codeGeneration(labelManager)).append("\n");
-          codeGenerated.append("push $a0\n");
-      }
-
-      codeGenerated.append("mv $fp $al //put in $al actual fp\n");
+        codeGenerated.append("mv $fp $al //put in $al actual fp\n");
 
 
-      codeGenerated.append("lw $al 0($al) //go up to chain\n".repeat(Math.max(0, nestingLevel - entry.getNestingLevel())));
+        codeGenerated.append("lw $al 0($al) //go up to chain\n".repeat(Math.max(0, nestingLevel - entry.getNestingLevel())));
 
-      codeGenerated.append("push $al\n");
-      codeGenerated.append("jal  ").append(entry.getBeginFuncLabel()).append("// jump to start of function and put in $ra next instruction\n");
+        codeGenerated.append("push $al\n");
+        codeGenerated.append("jal  ").append(entry.getBeginFuncLabel()).append("// jump to start of function and put in $ra next instruction\n");
 
-      return codeGenerated.toString();
-  }
-
-
-    public ArrayList<ExpNode> getParameterList() {
-        return parameterList;
+        return codeGenerated.toString();
     }
 
-    private ArrayList<SemanticError> checkAncestorCall(){
-      ArrayList<SemanticError> res = new ArrayList<>();
-        FunNode f = new FunNode("foo", new VoidTypeNode(),id);
-        FunNode g;
-        ArrayList<Node> path = this.getAncestorsInstanceOf(f.getClass());
-        if(!path.isEmpty())
-            path.remove(0);//plain recursive functions are ok
-        for (Node parF: path) {
-            g = (FunNode) parF;
-            if(g.getId().equals(id.getID())){
-                res.add(new SemanticError("call of ancestor function in (grand-)child "));
-            }
-        }
-        return res;
+    public String toPrint(String s) {  //
+        StringBuilder parameterString= new StringBuilder();
+        for (ExpNode par: parameterList)
+            parameterString.append(par.toPrint(s + "  "));
+        return s+"Call:" + id + " at nesting level " + nestingLevel +"\n"
+                +entry.toPrint(s+"  ")
+                +parameterString;
     }
-
 }

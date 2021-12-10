@@ -14,60 +14,69 @@ import semantic.SemanticError;
 
 public class LhsNode extends MetaNode implements Dereferences {
 
-  protected LhsNode inner;
+    protected LhsNode inner;
 
-  public LhsNode (LhsNode i) {
-      inner=i;
-  }
+    public LhsNode (LhsNode i) {
+          inner=i;
+      }
 
-  public void setEntry(STentry entry) {
-      inner.setEntry(entry);
-  }
-  public String getID() {
-      return inner.getID();
-  }
 
-  public LhsNode getInner() {
-      return inner.getInner();
-  }
-
-  public int getDereferenceLevel(){
-      if (inner!=null)
-          return 1+inner.getDereferenceLevel();
-      else
-          return 0;
-  }
-
-  public STentry getEntry(){
-      if (inner!=null)
-          return inner.getEntry();
-      else
-          return null;
-  }
-    public Boolean isPointer() {
-        return inner.isPointer();
-    }
+/**
+ * =====================================================
+ * Getter
+ * =====================================================
+ **/
+    public String getID() {
+            return inner.getID();
+        }
 
     @Override
     public Effect getIdStatus(int j) {
         return this.inner.getIdStatus(j);
     }
-    
+
+    public LhsNode getInner() {
+        return inner.getInner();
+    }
+
+    public int getDereferenceLevel(){
+        if (inner!=null)
+            return 1+inner.getDereferenceLevel();
+        else
+            return 0;
+    }
+
+    public STentry getEntry(){
+        if (inner!=null)
+            return inner.getEntry();
+        else
+            return null;
+    }
+
+/**
+ * =====================================================
+ * Setter
+ * =====================================================
+ **/
+    public void setEntry(STentry entry) {
+      inner.setEntry(entry);
+    }
+
+    public void setIdStatus(Effect effect, int level){
+        this.inner.setIdStatus(effect,level);
+    }
+
+
     @Override
     public ArrayList<SemanticError> checkSemantics(Environment env) {
         return inner.checkSemantics(env);
     }
 
-    public String toPrint(String s) {
-        return s+"lhs: " + this.getDereferenceLevel()+" "+this.getID()+"\n";
-    }
-
-    //valore di ritorno non utilizzato
     public TypeNode typeCheck() {
         if (inner != null) {
             return inner.typeCheck().dereference();
         }
-        else //Questo caso non dovrebbe mai verificarsi per l'implementazione di Visitor.
+        else // Should never happen thanks to Visitor.
             return null;
     }
 
@@ -93,17 +102,23 @@ public class LhsNode extends MetaNode implements Dereferences {
 
     public String codeGeneration(Label labelManager) {
       /**
-       * Ritorna indirizzo del puntatore
+       * Load Pointer address
        */
 
       StringBuilder codeGenerated = new StringBuilder();
       codeGenerated.append(inner.codeGeneration(labelManager));
-      codeGenerated.append("lw $al 0($al) //deferencing inner\n");
+      codeGenerated.append("lw $al 0($al) // de referencing inner\n");
 
       return codeGenerated.toString();
     }
 
-    public void setIdStatus(Effect effect, int level){
-        this.inner.setIdStatus(effect,level);
+
+    public Boolean isPointer() {
+        return inner.isPointer();
     }
+
+    public String toPrint(String s) {
+        return s+"lhs: " + this.getDereferenceLevel()+" "+this.getID()+"\n";
+    }
+
 }

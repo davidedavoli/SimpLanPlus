@@ -22,6 +22,12 @@ public class STentry {
   private String endFuncLabel = "";
   private FunNode funNode;
 
+/**
+ * =====================================================
+ * Constructor
+ * =====================================================
+ **/
+
   public STentry (int nestingLevel, TypeNode type, int offset)  {
     this.nestingLevel = nestingLevel;
     this.type = type;
@@ -97,7 +103,17 @@ public class STentry {
     this.endFuncLabel = entry.endFuncLabel;
   }
 
+/**
+ * =====================================================
+ * End Constructor
+ * =====================================================
+ **/
 
+/**
+ * =====================================================
+ * Getter
+ * =====================================================
+ **/
   public String getBeginFuncLabel() {
     return beginFuncLabel;
   }
@@ -107,30 +123,6 @@ public class STentry {
   public int getOffset () {return this.offset;}
   
   public int getNestingLevel() {return this.nestingLevel;}
-  
-  public String toPrint(String s) { //
-	   return s+"ST entry: nesting level " + nestingLevel +"\n"+
-			  s+"ST entry: type\n" +
-			  type.toPrint(s+"  ") + 
-		      s+"ST entry: offset " + offset + "\n";
-  }
-
-  public void updatePointerStatusReference(Effect effect, int dereferenceLevel) {
-    this.variableStatus.set(dereferenceLevel, effect);
-  }
-
-  public void setDereferenceLevelVariableStatus(Effect effect, int dereferenceLevel) {
-    this.variableStatus.get(dereferenceLevel).updateStatus(effect);
-    //this.variableStatus.set(dereferenceLevel, effect);
-  }
-  public void reInitVariableStatus() {
-    setDereferenceLevelVariableStatus(new Effect(Effect.DELETED), 0);
-    updatePointerStatusReference(new Effect(Effect.DELETED), 0);
-    for (int i = 1; i < variableStatus.size(); i++) {
-      setDereferenceLevelVariableStatus(new Effect(Effect.INITIALIZED), i);
-      updatePointerStatusReference(new Effect(Effect.INITIALIZED), i);
-    }
-  }
 
   public Effect getDereferenceLevelVariableStatus(int dereferenceLevel) {
     return this.variableStatus.get(dereferenceLevel);
@@ -140,9 +132,6 @@ public class STentry {
     return variableStatus.size();
   }
 
-  public void setFunctionNode(FunNode funNode) {
-    this.funNode = funNode;
-  }
   public FunNode getFunctionNode() {
     return this.funNode;
   }
@@ -151,8 +140,91 @@ public class STentry {
     return this.parametersStatus;
   }
 
+/**
+ * =====================================================
+ * End Getter
+ * =====================================================
+ **/
+
+
+/**
+ * =====================================================
+ * Setter
+ * =====================================================
+ **/
+
+  public void setFunctionNode(FunNode funNode) {
+    this.funNode = funNode;
+  }
+
   public void setParameterStatus(int parameterIndex, Effect effect, int dereferenceLevel) {
     this.parametersStatus.get(parameterIndex).set(dereferenceLevel, new Effect(effect));
+  }
+
+  public void setBeginLabel(String beginFuncLabel) {
+    this.beginFuncLabel = beginFuncLabel;
+  }
+
+  public void setEndLabel(String endFuncLabel) {
+    this.endFuncLabel = endFuncLabel;
+  }
+
+/**
+ * =====================================================
+ * End setter
+ * =====================================================
+ **/
+
+/**
+ * =====================================================
+ * Effect status
+ * =====================================================
+ **/
+
+  /**
+   *
+   * @param effect Reference to the same effect of the rhs
+   * @param dereferenceLevel Dereference level of the lhs
+   * Using the same reference of the rhs
+  */
+  public void updatePointerStatusReference(Effect effect, int dereferenceLevel) {
+    this.variableStatus.set(dereferenceLevel, effect);
+  }
+
+  /**
+   *
+   * @param effect Effect from the rhs
+   * @param dereferenceLevel Dereference level of the lhs
+   * In this case we just update the status, so it will change in every reference.
+   */
+  public void setDereferenceLevelVariableStatus(Effect effect, int dereferenceLevel) {
+    this.variableStatus.get(dereferenceLevel).updateStatus(effect);
+  }
+
+  /**
+   * After deleting a pointer first update the status so every pointer to him is delete
+   * and then reinitialize the effect list to init
+   */
+  public void reInitVariableStatus() {
+    setDereferenceLevelVariableStatus(new Effect(Effect.DELETED), 0);
+    updatePointerStatusReference(new Effect(Effect.DELETED), 0);
+    for (int i = 1; i < variableStatus.size(); i++) {
+      setDereferenceLevelVariableStatus(new Effect(Effect.INITIALIZED), i);
+      updatePointerStatusReference(new Effect(Effect.INITIALIZED), i);
+    }
+  }
+
+/**
+ * =====================================================
+ * End Effect status
+ * =====================================================
+ **/
+
+  public String toPrint(String s) { //
+	   return s+"ST entry: nesting level " + nestingLevel +"\n"+
+			  s+"ST entry: type\n" +
+			  type.toPrint(s+"  ") + 
+		      s+"ST entry: offset " + offset + "\n";
   }
 
   @Override
@@ -170,13 +242,6 @@ public class STentry {
             "\n\t}";
   }
 
-  public void setBeginLabel(String beginFuncLabel) {
-    this.beginFuncLabel = beginFuncLabel;
-  }
-
-  public void setEndLabel(String endFuncLabel) {
-    this.endFuncLabel = endFuncLabel;
-  }
 
   /*public void setResultList(List<Effect> resultList) {
     TypeNode returnType = ((ArrowTypeNode) type).getRet();

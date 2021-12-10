@@ -16,124 +16,119 @@ import semantic.SemanticError;
 
 public class IfNode extends MetaNode {
 
-  private final ExpNode cond;
-  private final Node th;
-  private final Node el;
-  
-  public IfNode (ExpNode c, Node t, Node e) {
-    cond=c;
-    th=t;
-    el=e;
+    private final ExpNode condition;
+    private final Node thenBranch;
+    private final Node elseBranch;
 
-  }
-  
-  public String toPrint(String s) {
-      String print = s+"If\n" + cond.toPrint(s+"  ")
-              + th.toPrint(s+"  ");
-      if (el != null)
-          print = print + el.toPrint(s+"  ");
-      return print;
+    public IfNode (ExpNode c, Node t, Node e) {
+        condition = c;
+        thenBranch = t;
+        elseBranch = e;
+    }
 
-  }
-  
-  @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
-	  //create the result
-	  ArrayList<SemanticError> res = new ArrayList<>();
-	  
-	  //check semantics in the condition
-	  res.addAll(cond.checkSemantics(env));
-	 	  
-	  //check semantics in the then and in the else exp
-	  res.addAll(th.checkSemantics(env));
-	  if (el!=null)
-		  res.addAll(el.checkSemantics(env));
-	  
-	  return res;
-  }
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+        //create the result
+        ArrayList<SemanticError> res = new ArrayList<>();
 
+        //check semantics in the condition
+        res.addAll(condition.checkSemantics(env));
+        //check semantics in the then and in the else exp
+        res.addAll(thenBranch.checkSemantics(env));
+        if (elseBranch!=null)
+            res.addAll(elseBranch.checkSemantics(env));
+        return res;
+    }
+
+    public TypeNode typeCheck() {
+        if ( !(TypeUtils.isSubtype(condition.typeCheck(),new BoolTypeNode()))) {
+            System.err.println("Non boolean condition inside if: "+ condition.toPrint(""));
+            System.exit(0);
+        }
+        TypeNode t = thenBranch.typeCheck();
+        if(elseBranch == null){
+            return t;
+        }
+        else{
+            TypeNode e = elseBranch.typeCheck();
+
+            if (TypeUtils.isSubtype(t,e))
+                return e;
+            if (TypeUtils.isSubtype(e,t))
+                return t;
+        }
+        return null;
+    }
     public HasReturn retTypeCheck() {
-        HasReturn th_v=th.retTypeCheck();
-        HasReturn el_v=(el!=null)?el.retTypeCheck():new HasReturn(HasReturn.hasReturnType.ABS);
+        HasReturn th_v= thenBranch.retTypeCheck();
+        HasReturn el_v=(elseBranch!=null)?elseBranch.retTypeCheck():new HasReturn(HasReturn.hasReturnType.ABS);
         return HasReturn.min(th_v, el_v);
     }
 
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
 
-        ArrayList<EffectError> errors = new ArrayList<>(cond.checkEffects(env));
+        ArrayList<EffectError> errors = new ArrayList<>(condition.checkEffects(env));
 
-        if (el != null) {
+        if (elseBranch != null) {
             var thenEnv = new Environment(env);
-            errors.addAll(th.checkEffects(thenEnv));
+            errors.addAll(thenBranch.checkEffects(thenEnv));
 
             var elseEnv = new Environment(env);
-            errors.addAll(el.checkEffects(elseEnv));
+            errors.addAll(elseBranch.checkEffects(elseEnv));
 
             env.replaceWithNewEnvironment(Environment.maxEnvironment(thenEnv, elseEnv));
         } else {
-            errors.addAll(th.checkEffects(env));
+            errors.addAll(thenBranch.checkEffects(env));
         }
 
         return errors;
     }
 
-    public TypeNode typeCheck() {
-    if ( !(TypeUtils.isSubtype(cond.typeCheck(),new BoolTypeNode()))) {
-        System.err.println("Non boolean condition in if: "+cond.toPrint(""));
-        System.exit(0);
+    public String codeGeneration(Label labelManager) {
+
+        StringBuilder codeGenerated = new StringBuilder();
+        String then_branch = labelManager.freshLabel("then");
+        String end_label = labelManager.freshLabel("endIf");
+        /**
+         * Code generation condition
+         */
+        String loaded_cond = condition.codeGeneration(labelManager);
+        codeGenerated.append(loaded_cond).append("\n");
+        codeGenerated.append("bc $a0 ").append(then_branch).append("\n");
+
+        /**
+         * Code generation else
+         */
+        if(elseBranch != null){
+            String loaded_el = elseBranch.codeGeneration(labelManager);
+            codeGenerated.append(loaded_el);
+        }
+        codeGenerated.append("b ").append(end_label).append("\n");
+
+
+        /**
+         * Code generation then
+         */
+        codeGenerated.append(then_branch).append(":\n");
+        String loaded_th = thenBranch.codeGeneration(labelManager);
+        codeGenerated.append(loaded_th).append("\n");
+
+        /**
+         * Append end_if_label_count
+         */
+        codeGenerated.append(end_label).append(":\n");
+
+
+        return codeGenerated.toString();
     }
-    TypeNode t = th.typeCheck();
-    if(el == null){
-        return t;
+
+    public String toPrint(String s) {
+        String print = s+"If\n" + condition.toPrint(s+"  ")
+                + thenBranch.toPrint(s+"  ");
+        if (elseBranch != null)
+            print = print + elseBranch.toPrint(s+"  ");
+        return print;
+
     }
-    else{
-        TypeNode e = el.typeCheck();
-
-        if (TypeUtils.isSubtype(t,e))
-            return e;
-        if (TypeUtils.isSubtype(e,t))
-            return t;
-    }
-    return null;
-  }
-  
-  public String codeGeneration(Label labelManager) {
-
-      StringBuilder codeGenerated = new StringBuilder();
-      String then_branch = labelManager.freshLabel("then");
-      String end_label = labelManager.freshLabel("endIf");
-      /**
-       * Code generation condition
-       */
-      String loaded_cond = cond.codeGeneration(labelManager);
-      codeGenerated.append(loaded_cond).append("\n");
-      codeGenerated.append("bc $a0 ").append(then_branch).append("\n");
-
-      /**
-       * Code generation else
-       */
-      if(el != null){
-          String loaded_el = el.codeGeneration(labelManager);
-          codeGenerated.append(loaded_el);
-      }
-      codeGenerated.append("b ").append(end_label).append("\n");
-
-
-      /**
-       * Code generation then
-       */
-      codeGenerated.append(then_branch).append(":\n");
-      String loaded_th = th.codeGeneration(labelManager);
-      codeGenerated.append(loaded_th).append("\n");
-
-      /**
-       * Append end_if_label_count
-       */
-      codeGenerated.append(end_label).append(":\n");
-
-
-      return codeGenerated.toString();
-  }
-  
 }  

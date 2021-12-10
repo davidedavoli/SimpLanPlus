@@ -11,45 +11,45 @@ import semantic.SemanticError;
 
 public class ArgNode extends MetaNode {
 
-  private final IdNode id;
-  private final TypeNode type;
-  
-  public ArgNode (IdNode i, TypeNode t) {
-   id=i;
-   type=t;
-  }
+    private final IdNode id;
+    private final TypeNode type;
 
-  public TypeNode getType(){
+    public ArgNode (IdNode i, TypeNode t) {
+        id=i;
+        type=t;
+    }
+
+    public IdNode getIdNode() {
+        return this.id;
+    }
+
+    public TypeNode getType(){
 	  return type;
   }
-  
-  @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
+
+
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
       return new ArrayList<>();
   }
-  
-  public String toPrint(String s) {
-	  return s+"Par:" + id +"\n"
-			 +type.toPrint(s+"  ") ; 
-  }
-  public TypeNode typeCheck() {
+
+    public TypeNode typeCheck() {
      return null;
   }
   
-  public HasReturn retTypeCheck() {
+    public HasReturn retTypeCheck() {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
-  @Override
-  public ArrayList<EffectError> checkEffects (Environment env) {
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
         return new ArrayList<>();
     }
 
-  public String codeGeneration(Label labelManager) {
+    public String codeGeneration(Label labelManager) {
 		return "";
   }
 
-  public IdNode getIdNode() {
-      return this.id;
-    }
+
+    public String toPrint(String s) { return s+"Par:" + id +"\n"+type.toPrint(s+"  "); }
 }  

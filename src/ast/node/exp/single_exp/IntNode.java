@@ -15,45 +15,43 @@ import semantic.SemanticError;
 
 public class IntNode extends ExpNode {
 
-  private final Integer val;
-  
-  public IntNode (Integer n) {
-    val=n;
+    private final Integer val;
+
+    public IntNode (Integer n) {
+      val=n;
+    }
+
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+    return new ArrayList<>();
   }
-  
-  public String toPrint(String s) {
+
+    public TypeNode typeCheck() {
+      return new IntTypeNode();
+    }
+    public HasReturn retTypeCheck() {
+        return new HasReturn(HasReturn.hasReturnType.ABS);
+    }
+
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
+      return new ArrayList<>();
+    }
+
+    public String codeGeneration(Label labelManager) {
+
+        StringBuilder codeGenerated = new StringBuilder();
+        codeGenerated.append("li $a0 ").append(val).append("\n");
+        return codeGenerated.toString();
+    }
+
+    @Override
+    public List<Dereferences> variables() {
+    return new ArrayList<>();
+  }
+
+    public String toPrint(String s) {
     return s+"Int:" + val +"\n";
   }
-  
-  public TypeNode typeCheck() {
-    return new IntTypeNode();
-  } 
-  
-  @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
-    return new ArrayList<>();
-  }
-  
-  public HasReturn retTypeCheck() {
-	  return new HasReturn(HasReturn.hasReturnType.ABS);
-  }
-
-  @Override
-  public ArrayList<EffectError> checkEffects (Environment env) {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public List<Dereferences> variables() {
-    return new ArrayList<>();
-  }
-
-  public String codeGeneration(Label labelManager) {
-
-      StringBuilder codeGenerated = new StringBuilder();
-      codeGenerated.append("li $a0 ").append(val).append("\n");
-      return codeGenerated.toString();
-  }
-
 
 }  

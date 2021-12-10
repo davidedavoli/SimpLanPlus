@@ -9,40 +9,37 @@ import semantic.SemanticError;
 
 public class BoolTypeNode implements TypeNode {
   
-  public BoolTypeNode () {
-  }
-  
-  public String toPrint(String s) {
-	return s+"bool";
-  }
-  
-  public TypeNode dereference() {
-      System.err.println("Attempt to dereference a Boolean");
-      System.exit(0);
-      return null;
-  }
-    
-  public TypeNode typeCheck() {
+    public BoolTypeNode () {}
+
+    public TypeNode dereference() {
+        System.err.println("Attempt to dereference a Boolean");
+        System.exit(0);
+        return null;
+    }
+
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) { return new ArrayList<>(); }
+
+    public TypeNode typeCheck() {
     return null;
   }
   
-  public HasReturn retTypeCheck() {
+    public HasReturn retTypeCheck() {
 	  return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
-  @Override
-  public ArrayList<EffectError> checkEffects (Environment env) {
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
         return new ArrayList<>();
     }
 
-  @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
-     return new ArrayList<>();
-  }
-
-   public String codeGeneration(Label labelManager) {
+    public String codeGeneration(Label labelManager) {
 		return "";
   }
 
-    
+
+    public String toPrint(String s) {
+        return s+"bool";
+    }
+
 }  

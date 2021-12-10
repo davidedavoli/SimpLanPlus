@@ -19,25 +19,14 @@ public class CallExpNode extends ExpNode {
     }
 
     @Override
-    public String toPrint(String indent) {
-        return inner.toPrint(indent);
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+        return inner.checkSemantics(env);
     }
 
     @Override
     public TypeNode typeCheck() {
         return inner.typeCheck();
     }
-
-    @Override
-    public String codeGeneration(Label labelManager) {
-        return inner.codeGeneration(labelManager);
-    }
-
-    @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) {
-        return inner.checkSemantics(env);
-    }
-
     @Override
     public HasReturn retTypeCheck() {
         return inner.retTypeCheck();
@@ -49,10 +38,21 @@ public class CallExpNode extends ExpNode {
     }
 
     @Override
+    public String codeGeneration(Label labelManager) {
+        return inner.codeGeneration(labelManager);
+    }
+
+
+    @Override
     public List<Dereferences> variables() {
         List<Dereferences> l = new ArrayList<>();
         for (ExpNode par: inner.getParameterList())
             l.addAll(par.variables());
         return l;
+    }
+
+    @Override
+    public String toPrint(String indent) {
+        return inner.toPrint(indent);
     }
 }

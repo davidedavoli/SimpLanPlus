@@ -15,44 +15,43 @@ import semantic.Environment;
 
 public class BoolNode extends ExpNode {
 
-  private final boolean val;
+    private final boolean val;
 
-  public BoolNode (boolean n) {
-  val=n;
-  }
+    public BoolNode (boolean n) {
+    val=n;
+    }
 
-  public String toPrint(String s) {
-    if (val) return s+"Bool:true\n";
-    else return s+"Bool:false\n";
-  }
-
-  public TypeNode typeCheck() {
-  return new BoolTypeNode();
-  }
-
-  public HasReturn retTypeCheck() {
-    return new HasReturn(HasReturn.hasReturnType.ABS);
-  }
-
-  @Override
-  public ArrayList<EffectError> checkEffects (Environment env) {
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
     return new ArrayList<>();
   }
 
-  @Override
-  public List<Dereferences> variables() {
-    return new ArrayList<>();
-  }
+    public TypeNode typeCheck() {
+    return new BoolTypeNode();
+    }
+    public HasReturn retTypeCheck() {
+      return new HasReturn(HasReturn.hasReturnType.ABS);
+    }
 
-  @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
+      return new ArrayList<>();
+    }
 
-    return new ArrayList<>();
-  }
+    public String codeGeneration(Label labelManager) {
+      StringBuilder codeGenerated = new StringBuilder();
+      codeGenerated.append("li $a0 ").append(val?1:0).append("\n");
+      return codeGenerated.toString();
+    }
 
-  public String codeGeneration(Label labelManager) {
-    StringBuilder codeGenerated = new StringBuilder();
-    codeGenerated.append("li $a0 ").append(val?1:0).append("\n");
-    return codeGenerated.toString();
-  }
+    @Override
+    public List<Dereferences> variables() {
+      return new ArrayList<>();
+    }
+
+
+    public String toPrint(String s) {
+      if (val) return s+"Bool:true\n";
+      else return s+"Bool:false\n";
+    }
 }

@@ -14,67 +14,60 @@ import java.util.List;
 
 public class RetNode extends MetaNode {
 
-  private final Node val;
-  private final TypeNode returnType;// expected type
-  private FunNode parent_f;
-  private int current_nl;
+    private final Node val;
+    private final TypeNode returnType; // expected returned type
+    private FunNode parent_f;
+    private int current_nl;
 
     public RetNode (Node v, TypeNode e) {
-    val=v;
-    returnType=e;
-  }
+        val=v;
+        returnType=e;
+    }
 
-    public String toPrint(String s) {
-    return s+"Return\n" + (val!= null ? val.toPrint(s+"  ") : "");
-  }
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+        ArrayList<SemanticError> res = new ArrayList<>();
+        if(val != null){
+            res.addAll(val.checkSemantics(env));
+        }
+        current_nl=env.getNestingLevel();
 
-  @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
-	  ArrayList<SemanticError> res = new ArrayList<>();
-      if(val != null){
-          res.addAll(val.checkSemantics(env));
-      }
-      current_nl=env.getNestingLevel();
+        FunNode f = new FunNode("foo", new VoidTypeNode(),null);//parent_f.getIdNode());
+        List<Node> ancestor = this.getAncestorsInstanceOf(f.getClass());
+        if(ancestor.size()==0){
+            res.add(new SemanticError("Return expression out of a function"));
+        }
+        else{
+            parent_f = (FunNode) ancestor.get(0);
+        }
 
-      FunNode f = new FunNode("foo", new VoidTypeNode(),null);//parent_f.getIdNode());
-      List<Node> ancestor = this.getAncestorsInstanceOf(f.getClass());
-      if(ancestor.size()==0){
-          res.add(new SemanticError("Return expression out of a function"));
-      }
-      else{
-          parent_f = (FunNode) ancestor.get(0);
-      }
+        return res;
+    }
 
-	  return res;
- 	}
-
-  
-  public TypeNode typeCheck() {
+    public TypeNode typeCheck() {
         if(returnType instanceof VoidTypeNode && val != null){
             System.err.println("Trying to return value in void function: "+parent_f.getId());
             System.exit(0);
         }
         else if(returnType.getClass() == PointerTypeNode.class){
-          System.err.println("Trying to return pointer inside of function: "+parent_f.getId());
-          System.exit(0);
+            System.err.println("Trying to return pointer inside of function: "+parent_f.getId());
+            System.exit(0);
         }
         else if(val == null) {
-          return new VoidTypeNode();
+            return new VoidTypeNode();
         }
         else if (TypeUtils.isSubtype(val.typeCheck(), returnType)) {
-          return returnType;
+            return returnType;
         }
         else{
-          System.err.println("Wrong return type for function "+parent_f.getId());
-          System.exit(0);
+            System.err.println("Wrong return type for function "+parent_f.getId());
+            System.exit(0);
         }
-      return null;
-  }  
-  
-  public HasReturn retTypeCheck() {
-//        parent_f = funNode;
-	    return new HasReturn(HasReturn.hasReturnType.PRES);
-  }
+        return null;
+    }
+    public HasReturn retTypeCheck() {
+        return new HasReturn(HasReturn.hasReturnType.PRES);
+    }
 
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
@@ -82,10 +75,8 @@ public class RetNode extends MetaNode {
         if (val != null) {
             errors.addAll(val.checkEffects(env));
         }
-
         return errors;
     }
-
 
     public String codeGeneration(Label labelManager) {
         StringBuilder codeGenerated = new StringBuilder();
@@ -99,7 +90,11 @@ public class RetNode extends MetaNode {
         codeGenerated.append("lw $fp 0($fp) //Load old $fp pushed \n");
 
         codeGenerated.append("b ").append(parent_f.get_end_fun_label()).append("\n");
-		return codeGenerated.toString();
+        return codeGenerated.toString();
+    }
+
+    public String toPrint(String s) {
+    return s+"Return\n" + (val!= null ? val.toPrint(s+"  ") : "");
   }
-    
+
 }  

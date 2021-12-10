@@ -4,11 +4,6 @@ package effect;
  * Effect type and function for semantic analysis
  **/
 
-//public static final Effect IS_INIT = new Effect(INIT);
-//public static final Effect IS_RW = new Effect(RW);
-//public static final Effect IS_DEL = new Effect(DEL);
-//public static final Effect IS_ERR = new Effect(ERR);
-
 public class Effect {
     // init effect
     public static final int INIT = 0;
@@ -41,9 +36,15 @@ public class Effect {
     public Effect(final Effect effect) {
         this(effect.status);
     }
+
     public void updateStatus(Effect effect) {
         this.status = effect.status;
     }
+/**
+ * =====================================================
+ * Max Function
+ * =====================================================
+ **/
 
     public static Effect maxEffect(final Effect effect1, final Effect effect2) {
         int maxStatus = Math.max(effect1.status, effect2.status);
@@ -57,6 +58,18 @@ public class Effect {
             return effect2;
     }
 
+/**
+ * =====================================================
+ * End Max Function
+ * =====================================================
+ **/
+
+/**
+ * =====================================================
+ * Sequence Function
+ * =====================================================
+ **/
+
     public static Effect sequenceEffect(final Effect effect1, final Effect effect2) {
 
         if (maxEffect(effect1, effect2).status <= RW)
@@ -67,12 +80,30 @@ public class Effect {
         return new Effect(ERR);
     }
 
+/**
+ * =====================================================
+ * End Sequence Function
+ * =====================================================
+ **/
+
+/**
+ * =====================================================
+ * Parallel Function
+ * =====================================================
+ **/
+
     public static Effect parallelEffect(final Effect effect1, final Effect effect2) {
         Effect firstSecondEffect = sequenceEffect(effect1, effect2);
         Effect secondFirstEffect = sequenceEffect(effect2, effect1);
 
         return maxEffect(firstSecondEffect,secondFirstEffect);
     }
+
+/**
+ * =====================================================
+ * End parallel Function
+ * =====================================================
+ **/
 
     @Override
     public String toString() {

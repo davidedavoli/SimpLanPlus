@@ -18,6 +18,13 @@ public class ArrowTypeNode implements TypeNode {
     parameterList =p;
     ret=r;
   }
+  public TypeNode getRet () { //
+    return ret;
+  }
+
+  public List<TypeNode> getParList () { //
+    return parameterList;
+  }
   
   public TypeNode dereference() {
     System.err.println("Attempt to dereference a function");
@@ -25,30 +32,6 @@ public class ArrowTypeNode implements TypeNode {
     return null;
   }
 
-  public String toString(){
-    String s;
-    s= parameterList.stream()
-            .map(Object::toString)
-            .collect(Collectors.joining("x"));
-    s+="->";
-    s+= ret.getClass().getName();
-    return s;
-  }
-    
-  public String toPrint(String s) { //
-	StringBuilder parameterListString= new StringBuilder();
-    for (Node par: parameterList)
-      parameterListString.append(par.toPrint(s + "  "));
-	return s+"ArrowType\n" + parameterListString + ret.toPrint(s+"  ->") ;
-  }
-  
-  public TypeNode getRet () { //
-    return ret;
-  }
-  
-  public List<TypeNode> getParList () { //
-    return parameterList;
-  }
 
   @Override
   public ArrayList<SemanticError> checkSemantics(Environment env) {
@@ -70,6 +53,24 @@ public class ArrowTypeNode implements TypeNode {
 
   public String codeGeneration(Label labelManager) {
 		return "";
+  }
+
+
+  public String toString(){
+    String s;
+    s= parameterList.stream()
+            .map(Object::toString)
+            .collect(Collectors.joining("x"));
+    s+="->";
+    s+= ret.getClass().getName();
+    return s;
+  }
+
+  public String toPrint(String s) { //
+    StringBuilder parameterListString= new StringBuilder();
+    for (Node par: parameterList)
+      parameterListString.append(par.toPrint(s + "  "));
+    return s+"ArrowType\n" + parameterListString + ret.toPrint(s+"  ->") ;
   }
 
 }  

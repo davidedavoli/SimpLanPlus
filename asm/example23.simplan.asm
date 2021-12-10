@@ -73,7 +73,7 @@ not $a0 $a0
 
 mv $fp $al //put in $a1 (al) actual fp
 addi $al $al -4 //put in $al address of Id
-lw $al 0($al) //deferencing inner
+lw $al 0($al) // de referencing inner
 
 sw $a0 0($al) // 0($al) = $a0 c=exp
 

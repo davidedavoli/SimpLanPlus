@@ -110,7 +110,6 @@ public class Compiler {
 	private static Instruction[] compile(String fileAbsoluteName, String fileName) throws IOException {
 		String fileAsm = asmDir+fileName+".asm";
 		CommonTokenStream tokens = lexer(fileAbsoluteName);
-
 		Node ast = parser(tokens);
 		Environment env = new Environment();
 
@@ -136,8 +135,8 @@ public class Compiler {
 	}
 
 	public static void main(String[] args) {
+
 		try {
-			/* Starting compiler */
 			System.out.println("### SimpLanPlus Compiler&Interpreter ###");
 			if(args.length == 0){
 				System.err.println("No file to compile & run provided.");
@@ -156,12 +155,10 @@ public class Compiler {
 			Instruction[] code = compile(file,name);
 
 			interpreter(code,name);
-		} catch (Exception exc) {
+		}
+		catch (Exception exc) {
 			System.err.println(exc.getMessage());
 			System.exit(2);
 		}
-
 	}
-
-
 }

@@ -14,45 +14,30 @@ import semantic.SemanticError;
 
 public class NotExpNode extends ExpNode {
 
-  private final ExpNode exp;
+  	private final ExpNode exp;
   
-  public NotExpNode (ExpNode e) {
+  	public NotExpNode (ExpNode e) {
     exp=e;
   }
-  
-  @Override
- 	public ArrayList<SemanticError> checkSemantics(Environment env) {
-	  //create the result
 
-	  //check semantics in the left and in the right exp
-
-	  return new ArrayList<>(exp.checkSemantics(env));
- 	}
-  
-  public String toPrint(String s) {
-    return "not " + exp.toPrint(s);
-    }
-  
-  public TypeNode typeCheck() {
-	  TypeNode expType = exp.typeCheck();
-
-	  if (! (expType instanceof BoolTypeNode)) {
-		  System.err.println("Trying to do negate (!) of a non bool");
-		  System.exit(0);
-	  }
-		  //throw new SimplanPlusException("Exp not bool, throw exception");
-
-	  return new BoolTypeNode();
-
-  }
 	@Override
-	public List<Dereferences> variables() {
-		return exp.variables();
+	public ArrayList<SemanticError> checkSemantics(Environment env) { return new ArrayList<>(exp.checkSemantics(env)); }
+
+	public TypeNode typeCheck() {
+		TypeNode expType = exp.typeCheck();
+
+		if (! (expType instanceof BoolTypeNode)) {
+			System.err.println("Trying to do negate (!) of a non bool");
+			System.exit(0);
+		}
+		//throw new SimplanPlusException("Exp not bool, throw exception");
+
+		return new BoolTypeNode();
+
 	}
-  
-  public HasReturn retTypeCheck() {
-	  return new HasReturn(HasReturn.hasReturnType.ABS);
-  }
+	public HasReturn retTypeCheck() {
+		return new HasReturn(HasReturn.hasReturnType.ABS);
+	}
 
 	@Override
 	public ArrayList<EffectError> checkEffects (Environment env) {
@@ -63,12 +48,21 @@ public class NotExpNode extends ExpNode {
 	}
 
 	public String codeGeneration(Label labelManager) {
-	  StringBuilder codeGenerated = new StringBuilder();
-	  String loaded_exp = exp.codeGeneration(labelManager);
-	  codeGenerated.append(loaded_exp).append("\n");
-	  codeGenerated.append("not $a0 $a0\n");
+		StringBuilder codeGenerated = new StringBuilder();
+		String loaded_exp = exp.codeGeneration(labelManager);
+		codeGenerated.append(loaded_exp).append("\n");
+		codeGenerated.append("not $a0 $a0\n");
 
-	  return codeGenerated.toString();
+		return codeGenerated.toString();
 
-  }
+	}
+
+	@Override
+	public List<Dereferences> variables() {
+		return exp.variables();
+	}
+
+	public String toPrint(String s) {
+		return "not " + exp.toPrint(s);
+	}
 }  

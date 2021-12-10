@@ -18,17 +18,12 @@ import java.util.stream.Collectors;
 
 public class BlockNode extends MetaNode {
 
-  private final ArrayList<Node> declarations;
-  private final ArrayList<Node> statements;
-  private final Boolean isMain;
-  private Boolean isFunction;
-  private int current_nl;
-  private String missingReturnCode = "";
-
-
-    public int getCurrent_nl() {
-        return current_nl;
-    }
+    private final ArrayList<Node> declarations;
+    private final ArrayList<Node> statements;
+    private final Boolean isMain;
+    private Boolean isFunction;
+    private int current_nl;
+    private String missingReturnCode = "";
 
     public BlockNode(ArrayList<Node> d, ArrayList<Node> s, Boolean isMainBlock) {
         declarations=d;
@@ -36,59 +31,51 @@ public class BlockNode extends MetaNode {
         isMain = isMainBlock;
         isFunction = false;
     }
-    public void setIsFunction(Boolean isFunctionBlock){
-      isFunction = isFunctionBlock;
+
+    public int getCurrent_nl() {
+        return current_nl;
     }
 
-    public String toPrint(String s) {
-	StringBuilder declarationString= new StringBuilder();
-	StringBuilder statementString= new StringBuilder();
-    for (Node dec:declarations)
-      declarationString.append(dec.toPrint(s + "  "));
-    for (Node stat:statements)
-        statementString.append(stat.toPrint(s + "  "));
-	return s+"Block\n" + declarationString + statementString ;
-  }
-  
-  @Override
-	public ArrayList<SemanticError> checkSemantics(Environment env) {
-      if (!isFunction) {
-          env.createVoidScope();
-      }
-      current_nl = env.getNestingLevel();
-
-      //declare resulting list
-      ArrayList<SemanticError> res = new ArrayList<>();
-      if(isFunction)
-          env.functionOffset();
-      else
-          env.blockOffset();
-
-      //check semantics in the dec list
-      if(declarations.size() > 0){
-    	  //if there are children then check semantics for every child and save the results
-    	  for(Node n : declarations)
-    		  res.addAll(n.checkSemantics(env));
-      }
+    public void setIsFunction(Boolean isFunctionBlock){
+        isFunction = isFunctionBlock;
+    }
 
 
-      if(statements.size() > 0) {
-          //if there are children then check semantics for every child and save the results
-          for (Node n : statements)
-              res.addAll(n.checkSemantics(env));
-          res.addAll(this.checkCodeAfterRet());
-      }
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
+        if (!isFunction) {
+            env.createVoidScope();
+        }
+        current_nl = env.getNestingLevel();
 
-      //check semantics in the exp body      
-      //clean the scope, we are leaving a let scope
-      if(!isFunction){
-          env.popBlockScope();
-      }
+        //declare resulting list
+        ArrayList<SemanticError> res = new ArrayList<>();
+        if(isFunction)
+            env.functionOffset();
+        else
+            env.blockOffset();
 
-      //return the result
-      return res;
-	}
+        //check semantics in the dec list
+        if(declarations.size() > 0){
+            //if there are children then check semantics for every child and save the results
+            for(Node n : declarations)
+                res.addAll(n.checkSemantics(env));
+        }
 
+        if(statements.size() > 0) {
+            //if there are children then check semantics for every child and save the results
+            for (Node n : statements)
+                res.addAll(n.checkSemantics(env));
+            res.addAll(this.checkCodeAfterRet());
+        }
+        //check semantics in the exp body
+        //clean the scope, we are leaving a let scope
+        if(!isFunction){
+            env.popBlockScope();
+        }
+        //return the result
+        return res;
+    }
     private List<SemanticError> checkCodeAfterRet() {
         ArrayList<SemanticError> res = new ArrayList<>();
         boolean ret_passed= false;
@@ -106,20 +93,18 @@ public class BlockNode extends MetaNode {
     public TypeNode typeCheck() {
         TypeNode last =null;
         for (Node dec:declarations)
-          last = dec.typeCheck();
+            last = dec.typeCheck();
         for (Node stat:statements)
-          last = stat.typeCheck();
+            last = stat.typeCheck();
         return last;
-     }
-
+    }
     public HasReturn retTypeCheck() {
-	  HasReturn tmp = new HasReturn(HasReturn.hasReturnType.ABS);
-	  for (Node s:statements) {
-			  tmp= HasReturn.max(tmp, s.retTypeCheck());
-	  }
-	  return tmp;
-  }
-
+        HasReturn tmp = new HasReturn(HasReturn.hasReturnType.ABS);
+        for (Node s:statements) {
+            tmp= HasReturn.max(tmp, s.retTypeCheck());
+        }
+        return tmp;
+    }
 
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
@@ -143,61 +128,69 @@ public class BlockNode extends MetaNode {
         return errors;
     }
 
-  
-  public String codeGeneration(Label labelManager) {
-      StringBuilder codeGenerated = new StringBuilder();
+    public String codeGeneration(Label labelManager) {
+        StringBuilder codeGenerated = new StringBuilder();
 
 
-      /**
-       * Activation link
-       */
+        /**
+         * Activation link
+         */
         if (!isFunction){
             codeGenerated.append("push 0\n");
 
             if (!isMain) {
-              codeGenerated.append("push $fp //loading new block\n");
+                codeGenerated.append("push $fp //loading new block\n");
             }
 
             codeGenerated.append("mv $sp $fp //Load new $fp\n");
 
         }
 
-      Collection<Node> varDec = declarations.stream().filter(dec -> dec instanceof VarNode).collect(Collectors.toList());
-      Collection<Node> funDec = declarations.stream().filter(fun -> fun instanceof FunNode).collect(Collectors.toList());
+        Collection<Node> varDec = declarations.stream().filter(dec -> dec instanceof VarNode).collect(Collectors.toList());
+        Collection<Node> funDec = declarations.stream().filter(fun -> fun instanceof FunNode).collect(Collectors.toList());
 
-      for (Node dec:varDec)
+        for (Node dec:varDec)
             codeGenerated.append(dec.codeGeneration(labelManager)).append("\n");
 
 
-	  for (Node stat:statements)
-          codeGenerated.append(stat.codeGeneration(labelManager)).append("\n");
+        for (Node stat:statements)
+            codeGenerated.append(stat.codeGeneration(labelManager)).append("\n");
 
-      if(!isFunction){
-           if(isMain){
-               codeGenerated.append("halt\n");
-           }
-           else{
+        if(!isFunction){
+            if(isMain){
+                codeGenerated.append("halt\n");
+            }
+            else{
                 codeGenerated.append("subi $sp $fp 1 //Restore stack pointer as before block creation in blockNode\n");
                 codeGenerated.append("lw $fp 0($fp) //Load old $fp pushed \n");
             }
-      }
-      else{
-          codeGenerated.append(this.missingReturnCode);
-          this.missingReturnCode = "";
-      }
+        }
+        else{
+            codeGenerated.append(this.missingReturnCode);
+            this.missingReturnCode = "";
+        }
 
-      if (funDec.size() > 0)
-         codeGenerated.append("//Creating function:\n");
-      for (Node fun:funDec){
-          codeGenerated.append(fun.codeGeneration(labelManager)).append("\n");
-      }
-      if (funDec.size() > 0)
-          codeGenerated.append("//Ending function.\n");
-	  return  codeGenerated.toString();
+        if (funDec.size() > 0)
+            codeGenerated.append("//Creating function:\n");
+        for (Node fun:funDec){
+            codeGenerated.append(fun.codeGeneration(labelManager)).append("\n");
+        }
+        if (funDec.size() > 0)
+            codeGenerated.append("//Ending function.\n");
+        return  codeGenerated.toString();
 
-  }
-
+    }
     public void addMissingReturnFunctionCode(String missingReturnCode) {
         this.missingReturnCode = missingReturnCode;
+    }
+
+    public String toPrint(String s) {
+        StringBuilder declarationString= new StringBuilder();
+        StringBuilder statementString= new StringBuilder();
+        for (Node dec:declarations)
+            declarationString.append(dec.toPrint(s + "  "));
+        for (Node stat:statements)
+            statementString.append(stat.toPrint(s + "  "));
+        return s+"Block\n" + declarationString + statementString ;
     }
 }

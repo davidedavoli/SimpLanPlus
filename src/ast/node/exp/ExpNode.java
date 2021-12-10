@@ -14,8 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ExpNode extends MetaNode {
+
     @Override
-    public String toPrint(String indent) {
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
         return null;
     }
 
@@ -23,17 +24,6 @@ public abstract class ExpNode extends MetaNode {
     public TypeNode typeCheck() {
         return null;
     }
-
-    @Override
-    public String codeGeneration(Label labelManager) {
-        return null;
-    }
-
-    @Override
-    public ArrayList<SemanticError> checkSemantics(Environment env) {
-        return null;
-    }
-
     @Override
     public HasReturn retTypeCheck() {
         return null;
@@ -44,14 +34,23 @@ public abstract class ExpNode extends MetaNode {
         return new ArrayList<>();
     }
 
+    @Override
+    public String codeGeneration(Label labelManager) {
+        return null;
+    }
+
 
     public abstract List<Dereferences> variables();
 
     protected ArrayList<EffectError> checkExpStatus(Environment env) {
         ArrayList<EffectError> errors = new ArrayList<>();
-
         variables().forEach(var -> errors.addAll(env.checkStmStatus(var, Effect::sequenceEffect, Effect.READWRITE)));
 
         return errors;
+    }
+
+    @Override
+    public String toPrint(String indent) {
+        return null;
     }
 }

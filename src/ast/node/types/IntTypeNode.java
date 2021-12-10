@@ -9,37 +9,37 @@ import semantic.SemanticError;
 
 public class IntTypeNode implements TypeNode {
   
-  public IntTypeNode () {
-  }
+    public IntTypeNode () { }
   
-  public String toPrint(String s) {
-	return s+"int";
-  }
-  public TypeNode dereference() {
-      System.err.println("Attempt to dereference an Integer");
-      System.exit(0);
-      return null;
-  }
-  public TypeNode typeCheck() {
-    return null;
-  }
 
-  public String codeGeneration(Label labelManager) {
-		return "";
-  }
-  
-  public HasReturn retTypeCheck() {
-	  return new HasReturn(HasReturn.hasReturnType.ABS);
-  }
-
-  @Override
-  public ArrayList<EffectError> checkEffects (Environment env) {
+    public TypeNode dereference() {
+        System.err.println("Attempt to dereference an Integer");
+        System.exit(0);
+        return null;
+    }
+    @Override
+    public ArrayList<SemanticError> checkSemantics(Environment env) {
         return new ArrayList<>();
     }
 
-  @Override
-  public ArrayList<SemanticError> checkSemantics(Environment env) {
-      return new ArrayList<>();
+    public TypeNode typeCheck() {
+    return null;
   }
-  
+    public HasReturn retTypeCheck() {
+	  return new HasReturn(HasReturn.hasReturnType.ABS);
+  }
+
+    @Override
+    public ArrayList<EffectError> checkEffects (Environment env) {
+        return new ArrayList<>();
+    }
+
+    public String codeGeneration(Label labelManager) {
+        return "";
+    }
+
+
+    public String toPrint(String s) {
+        return s+"int";
+    }
 }  
