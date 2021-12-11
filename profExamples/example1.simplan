@@ -6,3 +6,7 @@
     x^ = y ;
     print x^^ ;
 }
+
+/*
+This program compile and run successfully since the dereference of the pointer match. It prints 1 and then stops.
+*/

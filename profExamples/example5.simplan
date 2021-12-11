@@ -15,3 +15,7 @@
     y = 0;
     g(x,y);
 }
+
+ /*
+Fix-point example. It raise an effect error because g could delete x twice.
+*/

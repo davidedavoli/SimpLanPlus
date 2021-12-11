@@ -2,6 +2,9 @@
  ^int x = new int;
  x^ = 1 ;
  delete x ;
- y = x^ ;   // questo codice e` sbagliato!
+ y = x^ ;
 
 }
+/*
+This program raise an effect error since y is not declared 'Id y not declared.'
+*/

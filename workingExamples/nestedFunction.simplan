@@ -1,0 +1,16 @@
+{
+
+    void printBool(bool a) {
+        void effectPrint(bool b) {
+            print b;
+        }
+
+        effectPrint(a);
+    }
+
+    printBool(true);
+}
+/*
+This example shows an example of nesting function.
+The program is well-formed and should output true(1).
+*/

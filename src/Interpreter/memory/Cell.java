@@ -24,7 +24,7 @@ public class Cell {
 
     public Integer read() {
         if(val == null){
-            System.err.println("Value is not written in memory");
+            System.err.println("\nValue is not written in memory.\nExit program...");
             System.exit(1);
         }
         return val;

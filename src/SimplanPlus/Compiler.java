@@ -135,6 +135,18 @@ public class Compiler {
 	}
 
 	public static void main(String[] args) {
+		/*try{
+			String file = "workingExamples/global.simplan";
+			String name = "global.simplan";
+			Instruction[] code = compile(file,name);
+
+			interpreter(code,name);
+		}
+		catch (Exception exc) {
+			System.err.println(exc.getMessage());
+			System.exit(2);
+		}
+		*/
 
 		try {
 			System.out.println("### SimpLanPlus Compiler&Interpreter ###");
@@ -160,5 +172,6 @@ public class Compiler {
 			System.err.println(exc.getMessage());
 			System.exit(2);
 		}
+
 	}
 }

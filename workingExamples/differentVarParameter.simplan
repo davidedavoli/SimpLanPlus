@@ -7,3 +7,7 @@
     x^ = 1;
     sum(x,2);
 }
+
+/*
+Different type of parameter during invoke. Should print 'Wrong type for 1-th parameter in the invocation of sum.'
+*/

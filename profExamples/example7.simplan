@@ -14,3 +14,7 @@
     u^ = 1;
     f(u,1);
 }
+
+/*
+The program compile successfully and print 1. No effect error is raised since a new instance of the pointer is passed at each invocation.
+*/

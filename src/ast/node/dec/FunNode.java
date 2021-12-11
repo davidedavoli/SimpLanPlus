@@ -84,7 +84,7 @@ public class FunNode extends MetaNode {
 		functionIdNode.getEntry().setEndLabel(endFuncLabel);
 
 		if ( hm.put(id,entry) != null )
-			res.add(new SemanticError("Fun id '"+id+"' already declared"));
+			res.add(new SemanticError("Fun id '"+id+"' already declared."));
 		else{
 			env.createVoidScope();
 			int parameterOffset=1;
@@ -94,7 +94,7 @@ public class FunNode extends MetaNode {
 				STentry oldEntry = env.newFunctionParameter(arg.getIdNode().getID(),arg.getType(),parameterOffset++);
 				arg.getIdNode().setEntry(env.lookUp(arg.getIdNode().getID()));
 				if(oldEntry != null)
-					res.add(new SemanticError("Parameter id '"+arg.getIdNode().getID()+"' already declared"));
+					res.add(new SemanticError("Parameter id '"+arg.getIdNode().getID()+"' already declared."));
 			}
 			//set func type
 			res.addAll(body.checkSemantics(env));
@@ -146,8 +146,10 @@ public class FunNode extends MetaNode {
 			}
 			startingEffect.add(argEffect);
 		}
-
-		return new ArrayList<>(fixPointCheckEffect(env, startingEffect));
+		Environment oldEnv = new Environment(env);
+		ArrayList<EffectError> errors = new ArrayList<>(fixPointCheckEffect(env, startingEffect));
+		env.replaceWithNewEnvironment(oldEnv);
+		return errors;
 	}
 	/**
 	 *

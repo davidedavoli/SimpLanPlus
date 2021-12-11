@@ -1,17 +1,20 @@
 {
-    void h(^int x, ^int y){
-        if (y^==0)
-            delete x ;
-        else {
-            x^ = x^ - 1;
-            h(y,x) ;
-        }
-    }
-
     ^int x = new int;
     ^int y = new int;
-
+    void h(^int x, ^int y) {
+        if (y^ == 0)
+            delete x;
+        else {
+            x^ = x^ - 1;
+            h(y,x);
+        }
+    }
     x^ = 1;
     y^ = 0;
-    h(x,y);
+    h(x, y);
+
 }
+/*
+Fix-point example.
+The program is correct and should not print anything. Both x and y will be marked as deleted. If print x^ is called after h invocation an effect error is raised.
+*/

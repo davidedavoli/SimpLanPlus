@@ -40,7 +40,7 @@ public class CallNode extends MetaNode {
 
         entry = env.lookUp(id.getID());
         if (entry == null)
-            res.add(new SemanticError("Id "+id.getID()+" not declared."));
+            res.add(new SemanticError("Fun Id "+id.getID()+" not declared."));
         else{
             nestingLevel = env.getNestingLevel();
             for(ExpNode arg : parameterList)
@@ -61,7 +61,7 @@ public class CallNode extends MetaNode {
         for (Node parF: path) {
             g = (FunNode) parF;
             if(g.getId().equals(id.getID())){
-                res.add(new SemanticError("call of ancestor function in (grand-)child "));
+                res.add(new SemanticError("call of ancestor function in (grand-)child."));
             }
         }
         return res;
@@ -78,20 +78,19 @@ public class CallNode extends MetaNode {
 
         List<TypeNode> p = t.getParList();
         if ( !(p.size() == parameterList.size()) ){
-            System.err.println("Wrong number of parameters in the invocation of "+id.getID());
+            System.err.println("Wrong number of parameters in the invocation of "+id.getID()+".");
             System.exit(0);
         }
 
         for (int i = 0; i< parameterList.size(); i++)
             if ( !(TypeUtils.isSubtype( (parameterList.get(i)).typeCheck(), p.get(i)) ) ){
-                System.err.println("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id.getID());
+                System.err.println("Wrong type for "+(i+1)+"-th parameter in the invocation of "+id.getID()+".");
                 System.exit(0);
             }
 
         return t.getRet();
     }
     public HasReturn retTypeCheck() {
-
         return new HasReturn(HasReturn.hasReturnType.ABS);
     }
 
@@ -112,17 +111,20 @@ public class CallNode extends MetaNode {
 
                 // put all the pointed var in RW
                 if (par instanceof LhsExpNode) {
-                    int maxDereferenceLevel = par.variables().get(0).getEntry().getMaxDereferenceLevel();
+                    Dereferences parameter = par.variables().get(0);
+                    int maxDereferenceLevel = parameter.getEntry().getMaxDereferenceLevel();
+
                     for (int dereferenceLevel = 0; dereferenceLevel < maxDereferenceLevel; dereferenceLevel++) {
-                        parameterEffect.add(new Effect(par.variables().get(0).getEntry().getDereferenceLevelVariableStatus(dereferenceLevel)));
+                        parameterEffect.add(new Effect(parameter.getEntry().getDereferenceLevelVariableStatus(dereferenceLevel)));
                     }
+
                 } else {
                     parameterEffect.add(new Effect(Effect.READWRITE));
                 }
                 startingEffect.add(parameterEffect);
             }
-
             effectErrors.addAll(functionNode.fixPointCheckEffect(env, startingEffect));
+
         }
 
         if (!effectErrors.isEmpty()) {
@@ -198,7 +200,6 @@ public class CallNode extends MetaNode {
             int actualDereference = 0;
             if(pointer.getEntry().getMaxDereferenceLevel() > functionEffects.get(i).size()) {
                 actualDereference = pointer.getEntry().getMaxDereferenceLevel() - functionEffects.get(i).size();
-                System.out.println(actualDereference);
             }
             /**
              * actualDereference = 5-2 = 3

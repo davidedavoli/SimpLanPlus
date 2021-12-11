@@ -47,7 +47,7 @@ public class VarNode extends MetaNode {
         }
 
         if ( hm.put(id.getID(),entry) != null )
-            res.add(new SemanticError("Var id '"+id.getID()+"' already declared"));
+            res.add(new SemanticError("Var id '"+id.getID()+"' already declared."));
 
         return res;
     }

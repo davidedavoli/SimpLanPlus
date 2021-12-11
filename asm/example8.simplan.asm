@@ -11,17 +11,6 @@ mv $fp $al //put in $al actual fp
 push $al
 jal  Function0// jump to start of function and put in $ra next instruction
 
-push $fp
-li $a0 5
-
-push $a0
-li $a0 4
-
-push $a0
-mv $fp $al //put in $al actual fp
-push $al
-jal  Function0// jump to start of function and put in $ra next instruction
-
 halt
 //Creating function:
 //BEGIN FUNCTION Function0

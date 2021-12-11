@@ -28,7 +28,8 @@ public class DeletionNode extends MetaNode {
     //create result list
     ArrayList<SemanticError> res;
     res = id.checkSemantics(env);
-    type = id.typeCheck();
+    if(res.size() == 0)
+      type = id.typeCheck();
     return res;
   }
 
@@ -51,10 +52,10 @@ public class DeletionNode extends MetaNode {
     STentry idEntry = id.getEntry();
     if (
             idEntry.getDereferenceLevelVariableStatus(0).equals(new Effect(Effect.DELETED))
-                    ||
-                    idEntry.getDereferenceLevelVariableStatus(0).equals(new Effect(Effect.ERROR))
+              ||
+            idEntry.getDereferenceLevelVariableStatus(0).equals(new Effect(Effect.ERROR))
     ) {
-      errors.add(new EffectError(id.getID() + " already deleted."));
+      errors.add(new EffectError(id.getID() + " used after deleting."));
     } else {
       errors.addAll(env.checkStmStatus(
               id,

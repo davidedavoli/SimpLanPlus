@@ -221,8 +221,8 @@ public class Environment {
 						for (int deferenceLevel = 0; deferenceLevel < maxDeference; deferenceLevel++){
 							var firstEffect = entryFirstEnv.getDereferenceLevelVariableStatus(deferenceLevel);
 							var secondEffect = entrySecondEnv.getDereferenceLevelVariableStatus(deferenceLevel);
-							//entry.setDereferenceLevelVariableStatus(Effect.maxEffect(firstEffect,secondEffect),deferenceLevel);
-							entry.updatePointerStatusReference(Effect.maxEffectNoCopy(firstEffect,secondEffect),deferenceLevel);
+							entry.setDereferenceLevelVariableStatus(Effect.maxEffect(firstEffect,secondEffect),deferenceLevel);
+							//entry.updatePointerStatusReference(Effect.maxEffectNoCopy(firstEffect,secondEffect),deferenceLevel);
 						}
 						maxScope.put(varId,entry);
 					}
@@ -408,8 +408,8 @@ public class Environment {
 			for (var scope : newEnvironment.symTable) {
 				final HashMap<String, STentry> copiedScope = new HashMap<>();
 				for (var id : scope.keySet()) {
-					copiedScope.put(id, scope.get(id));
-					//copiedScope.put(id, new STentry(scope.get(id)));
+					//copiedScope.put(id, scope.get(id));
+					copiedScope.put(id, new STentry(scope.get(id)));
 				}
 				this.symTable.add(copiedScope);
 			}
@@ -447,7 +447,7 @@ public class Environment {
 					int actualMaxDereference = entry.getValue().getMaxDereferenceLevel();
 					for (int dereferenceLevel = 0; dereferenceLevel < actualMaxDereference; dereferenceLevel++) {
 						if (entry.getValue().getDereferenceLevelVariableStatus(dereferenceLevel).equals(Effect.ERROR)) {
-							errors.add(new EffectError("The pointer " + entry.getKey() + "^".repeat(dereferenceLevel) + " is used after deletion."));
+							errors.add(new EffectError(entry.getKey() + " used after deleting."));
 						}
 					}
 				}

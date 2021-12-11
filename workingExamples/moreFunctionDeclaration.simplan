@@ -6,3 +6,6 @@
         print 2;
     }
 }
+/*
+Example of multiple function declaration in the same scope. Should print 'Fun id 'x' already declared.'
+*/
