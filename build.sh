@@ -5,6 +5,7 @@ mv org bin/
 rm -rf javax
 rm -rf META-INF
 cd bin
-find -name "*.class" > classes.txt
+# shellcheck disable=SC2185
+find . | grep .class > classes.txt
 jar cvfm SimpLanPlus.jar ../manifest.txt @classes.txt
 mv SimpLanPlus.jar ../
