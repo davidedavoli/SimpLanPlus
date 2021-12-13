@@ -144,7 +144,7 @@ public class SimpLanPlusVisitorImpl extends SimpLanPlusBaseVisitor<Node> {
 	@Override
 	public Node visitDecVar(DecVarContext ctx) {
 		//visit the type
-		TypeNode typeNode = (TypeNode) visit(ctx.type());//WARING occhio al casting
+		TypeNode typeNode = (TypeNode) visit(ctx.type());
 		
 		ExpNode expNode = null;
 		//visit the exp

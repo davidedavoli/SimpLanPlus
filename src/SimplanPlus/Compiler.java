@@ -136,8 +136,8 @@ public class Compiler {
 
 	public static void main(String[] args) {
 		/*try{
-			String file = "workingExamples/global.simplan";
-			String name = "global.simplan";
+			String file = "developmentExamples/example5.simplan";
+			String name = "example5.simplan";
 			Instruction[] code = compile(file,name);
 
 			interpreter(code,name);

@@ -76,7 +76,6 @@ public class AssignmentNode extends MetaNode {
         lhs.setIdStatus(status,i);
       }
     }
-
       /*else if(exp instanceof CallExpNode){
         STentry returnedEffectEntry = env.effectsLookUp( ((CallExpNode) exp).getIdName());//.innerEntry();
         int lhsDereferenceLevel = lhs.getDereferenceLevel();

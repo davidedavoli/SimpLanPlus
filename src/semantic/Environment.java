@@ -149,12 +149,12 @@ public class Environment {
 
 	/**
 	 * Checks the status of the variable and updates it with the given rule {@code effectFun}
-	 * If the new status is Effect::ERROR then returns a SemanticError:"ID used after deletion".
+	 * If the new status is Effect::ERROR then returns a SemanticError:"ID used after deleting".
 	 * If the variable is not declared an Exception is raised:"ID is not declared".
 	 *
 	 * @param variable {LhsNode} variable is the variable that will receive the new effect
 	 * @param effectFun {BiFunction} function from effect that has to be invoked
-	 * @param effect {int} effect to be applied
+	 * @param effect {Effect} effect to be applied
 	 */
 	public ArrayList<EffectError> checkStmStatus(
 			Dereferences variable,
@@ -222,7 +222,6 @@ public class Environment {
 							var firstEffect = entryFirstEnv.getDereferenceLevelVariableStatus(deferenceLevel);
 							var secondEffect = entrySecondEnv.getDereferenceLevelVariableStatus(deferenceLevel);
 							entry.setDereferenceLevelVariableStatus(Effect.maxEffect(firstEffect,secondEffect),deferenceLevel);
-							//entry.updatePointerStatusReference(Effect.maxEffectNoCopy(firstEffect,secondEffect),deferenceLevel);
 						}
 						maxScope.put(varId,entry);
 					}
@@ -302,14 +301,11 @@ public class Environment {
 		public static Environment updateEnvironment(Environment env1, Environment env2) {
 			Environment returnedEnvironment;
 
-			/*if (env2.symTable.size() == 0 || env1.symTable.size() == 0) {
+			if(env2.symTable.size() == 0){
 				return new Environment(env1);
-			}*/
-			if(env1.symTable.size() == 0){
-				return new Environment(env2);
 			}
-			else if(env2.symTable.size() == 0){
-				return new Environment(env1);
+			else if(env1.symTable.size() == 0){
+				return new Environment(env2);
 			}
 			HashMap<String, STentry> topScopeFirstEnvironment = env1.symTable.get(env1.symTable.size() - 1);
 			HashMap<String, STentry> topScopeSecondEnvironment = env2.symTable.get(env2.symTable.size() - 1);

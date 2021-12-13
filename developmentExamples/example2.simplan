@@ -1,0 +1,15 @@
+{
+    ^int x = new int;
+    ^int y = new int;
+    ^int z = new int;
+    x^ = 2;
+    if(true){
+        x = y;
+    }
+    else{
+        x = z;
+    }
+    delete y;
+    print x^;
+
+}

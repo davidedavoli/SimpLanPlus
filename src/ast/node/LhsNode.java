@@ -79,7 +79,6 @@ public class LhsNode extends MetaNode implements Dereferences {
         else // Should never happen thanks to Visitor.
             return null;
     }
-
     public HasReturn retTypeCheck() {
       return new HasReturn(HasReturn.hasReturnType.ABS);
   }

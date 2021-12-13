@@ -1,0 +1,12 @@
+{
+    ^int x = new int;
+    ^int z = new int;
+    void fun(^int c){
+       delete c;
+       //fun(c);
+    }
+    delete z;
+    x^ = 2;
+    fun(x);
+    print x^;
+}

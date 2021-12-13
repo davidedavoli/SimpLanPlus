@@ -1,6 +1,6 @@
 {
-    ^int x = new int;
-    ^int y = new int;
+    ^int a = new int;
+    ^int b = new int;
     void h(^int x, ^int y) {
         if (y^ == 0)
             delete x;
@@ -9,11 +9,13 @@
             h(y,x);
         }
     }
-    x^ = 1;
-    y^ = 0;
-    h(x, y);
+    a^ = 1;
+    b^ = 0;
+    h(a, b);
+    print a^;
 
 }
+
 /*
 Fix-point example.
 The program is correct and should not print anything. Both x and y will be marked as deleted. If print x^ is called after h invocation an effect error is raised.

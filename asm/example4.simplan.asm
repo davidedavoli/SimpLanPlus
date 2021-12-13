@@ -8,6 +8,18 @@ new $a0// put new address in a0
 
 push $a0
 
+new $a0// put new address in a0
+
+push $a0
+
+li $a0 2
+
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al -3 //put in $al address of Id
+lw $al 0($al) // de referencing inner
+
+sw $a0 0($al) // 0($al) = $a0 c=exp
+
 li $a0 1
 
 mv $fp $al //put in $a1 (al) actual fp
@@ -36,6 +48,12 @@ push $a0
 mv $fp $al //put in $al actual fp
 push $al
 jal  Function0// jump to start of function and put in $ra next instruction
+
+mv $fp $al //put in $al actual fp
+lw $a0 -1($al) //put in $a0 value of Id a
+
+lw $a0 0($a0)
+print $a0
 
 halt
 //Creating function:
@@ -97,9 +115,15 @@ lw $fp 0($fp) //Load old $fp pushed
 b LABELendIf2
 LABELthen1:
 mv $fp $al //put in $al actual fp
-lw $a0 1($al) //put in $a0 value of Id x
+lw $al 0($al) //go up to chain
+lw $a0 -3($al) //put in $a0 value of Id c
 
-free $a0 //free address in $a0
+lw $a0 0($a0)
+mv $fp $al //put in $a1 (al) actual fp
+addi $al $al 1 //put in $al address of Id
+lw $al 0($al) // de referencing inner
+
+sw $a0 0($al) // 0($al) = $a0 x=exp
 
 LABELendIf2:
 

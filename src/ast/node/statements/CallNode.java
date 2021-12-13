@@ -37,7 +37,6 @@ public class CallNode extends MetaNode {
         //create the result
         ArrayList<SemanticError> res = new ArrayList<>();
 
-
         entry = env.lookUp(id.getID());
         if (entry == null)
             res.add(new SemanticError("Fun Id "+id.getID()+" not declared."));
@@ -133,7 +132,7 @@ public class CallNode extends MetaNode {
         id.setEntry(env.effectsLookUp(id.getID()));
         List<List<Effect>> functionEffects = id.getEntry().getFunctionStatusList();
         /**
-         * Non pointer parameters
+         * All variables/expressions that are not pointer
          */
         List<Integer> indexOfNoPointerParameters = new ArrayList<>();
         for(int index = 0; index< parameterList.size(); index++){
@@ -141,6 +140,7 @@ public class CallNode extends MetaNode {
             if ( !( (parameter instanceof Dereferences) && ((Dereferences) parameter).isPointer() ) ) {
                 indexOfNoPointerParameters.add(index);
             }
+
         }
         /**
          * Variable in the expression of parameter
@@ -154,6 +154,7 @@ public class CallNode extends MetaNode {
 
         /**
          * Checking error on non pointer parameters
+         * Maybe is useless after the last commit
          */
         for (int index : indexOfNoPointerParameters) {
             List<Effect> actualEffectsList = functionEffects.get(index);
@@ -175,7 +176,7 @@ public class CallNode extends MetaNode {
         Environment e2 = new Environment();
 
         /**
-         * Non pointer parameters
+         * Pointer parameters
          */
         List<Integer> indexOfPointerParameters = new ArrayList<>();
         for(int index = 0; index< parameterList.size(); index++){
@@ -194,7 +195,6 @@ public class CallNode extends MetaNode {
             tmpEnvironment.createVoidScope();
 
             Dereferences pointer = parameterList.get(i).variables().get(0);
-
             STentry entry = tmpEnvironment.createNewDeclaration(pointer.getID(), pointer.getEntry().getType());
 
             int actualDereference = 0;
@@ -202,12 +202,15 @@ public class CallNode extends MetaNode {
                 actualDereference = pointer.getEntry().getMaxDereferenceLevel() - functionEffects.get(i).size();
             }
             /**
+             * fun(^int x);
+             * ^^int y;
+             * fun(y^);
              * actualDereference = 5-2 = 3
              [ [0:c0,1:c1] ]
 
-             0:c0->3:c3, 1:c1->4:c4
+             0:c0->1:c1, 1:c1->2:c2
 
-             [0:c0,1:c1,2:c2,3:c3,4:c4]
+             [0:c0,1:c1,2:c2]
 
              */
             for (int dereferenceLevel = 0; dereferenceLevel < functionEffects.get(i).size(); dereferenceLevel++) {
