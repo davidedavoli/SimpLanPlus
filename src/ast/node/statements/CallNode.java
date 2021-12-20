@@ -196,6 +196,9 @@ public class CallNode extends MetaNode {
 
             Dereferences pointer = parameterList.get(i).variables().get(0);
             STentry entry = tmpEnvironment.createNewDeclaration(pointer.getID(), pointer.getEntry().getType());
+            for (int j =0; j<entry.getMaxDereferenceLevel(); j++)
+                entry.setDereferenceLevelVariableStatus(e1.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(j), j);
+
 
             int actualDereference = 0;
             if(pointer.getEntry().getMaxDereferenceLevel() > functionEffects.get(i).size()) {
@@ -214,11 +217,11 @@ public class CallNode extends MetaNode {
 
              */
             for (int dereferenceLevel = 0; dereferenceLevel < functionEffects.get(i).size(); dereferenceLevel++) {
-                Effect u_iEffect = env.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(dereferenceLevel+actualDereference);
+                Effect u_iEffect = e1.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(dereferenceLevel+actualDereference);
                 Effect x_iEffect = functionEffects.get(i).get(dereferenceLevel);
                 Effect seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
 
-                entry.setDereferenceLevelVariableStatus(seq, dereferenceLevel);
+                entry.setDereferenceLevelVariableStatus(seq, dereferenceLevel+actualDereference);
             }
             parEnvironments.add(tmpEnvironment);
         }
@@ -233,7 +236,6 @@ public class CallNode extends MetaNode {
 
         Environment updatedEnv = Environment.updateEnvironment(e1, e2);
         env.replaceWithNewEnvironment(updatedEnv);
-
         //env.getCurrentST().get(id.getID()).setResultList(returned);
 
 
