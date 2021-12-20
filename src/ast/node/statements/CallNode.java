@@ -219,7 +219,8 @@ public class CallNode extends MetaNode {
             for (int dereferenceLevel = 0; dereferenceLevel < functionEffects.get(i).size(); dereferenceLevel++) {
                 Effect u_iEffect = e1.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(dereferenceLevel+actualDereference);
                 Effect x_iEffect = functionEffects.get(i).get(dereferenceLevel);
-                Effect seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
+//                Effect seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
+                Effect seq = Effect.parallelEffect(u_iEffect, x_iEffect);
 
                 entry.setDereferenceLevelVariableStatus(seq, dereferenceLevel+actualDereference);
             }
