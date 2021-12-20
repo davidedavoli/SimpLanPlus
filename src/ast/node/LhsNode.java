@@ -93,7 +93,7 @@ public class LhsNode extends MetaNode implements Dereferences {
         inner.setEntry(actualEntry);
 
         ArrayList<EffectError> errors = new ArrayList<>(inner.checkEffects(env));
-        for(int i=0;i<actualEntry.getMaxDereferenceLevel();i++){
+        for(int i=0;i<this.getDereferenceLevel();i++){
             Effect status = actualEntry.getDereferenceLevelVariableStatus(i);
             if (status.equals(new Effect(Effect.DELETED))) {
                 errors.add(new EffectError(this.getID() + " used after deleting."));
