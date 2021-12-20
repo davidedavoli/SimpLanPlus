@@ -118,9 +118,9 @@ public class Compiler {
 		 */
 		checkErrorAst(ast, env);
 		typeCheck(ast);
-		checkEffects(ast,env);
-
 		codeGeneration(fileAsm,ast);
+
+		checkEffects(ast,env);
 
 		CommonTokenStream tokensASM = SVMLexer(fileAsm);
 		SVMVisitorImpl visitorSVM = SVMParser(tokensASM);

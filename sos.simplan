@@ -1,0 +1,16 @@
+{
+    int x = 10;
+    ^int y = new int;
+
+    void function(int x){
+        if(false){
+            //delete y;
+            print 1;
+        }else{
+            print 10;
+        }
+    }
+    y^ = 11;
+    function(y^);
+    print y^;
+}
