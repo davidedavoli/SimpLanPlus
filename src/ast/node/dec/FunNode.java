@@ -1,5 +1,6 @@
 package ast.node.dec;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import ast.FuncBodyUtils;
 import ast.Label;
@@ -184,13 +185,17 @@ public class FunNode extends MetaNode {
 		Environment decFunEnv = new Environment(env);
 		List<List<Effect>> effectsCopy = new ArrayList<>();
 
-		for (var status : effectsFunEntry.getFunctionStatusList()) {
-			effectsCopy.add(new ArrayList<>(status));
-		}
+		effectsCopy = new ArrayList<>(effectsFunEntry.getFunctionStatusList());
+		effectsCopy.stream().map((x)->
+				x.stream().map((y)-> new Effect(y)).collect(Collectors.toList())).collect(Collectors.toList());
 
 		ArrayList<EffectError> errors = new ArrayList<>(checkInstructions(env, effectsFunEntry));
 
 		while (effectsAreDifferent(effectsFunEntry, effectsCopy)){
+			effectsCopy = new ArrayList<>(effectsFunEntry.getFunctionStatusList());
+			effectsCopy.stream().map((x)->
+					x.stream().map((y)-> new Effect(y)).collect(Collectors.toList())).collect(Collectors.toList());
+			//System.out.println(effectsCopy);
 			// effect are changed!
 			// replace the env and update status with the new effects
 			env.replaceWithNewEnvironment(decFunEnv);
@@ -207,8 +212,11 @@ public class FunNode extends MetaNode {
 					funEntry.setParameterStatus(parIndex, argStatusList.get(dereferenceLevel), dereferenceLevel);
 				}
 			}
-			effectsCopy = new ArrayList<>(effectsFunEntry.getFunctionStatusList());
 			errors.addAll(checkInstructions(env, effectsFunEntry));
+			System.out.println("fun entry status: ");
+			System.out.println(effectsFunEntry.getFunctionStatusList());
+			System.out.println("copy status: ");
+			System.out.println(effectsCopy);
 		}
 
 		env.popBlockScope();
