@@ -13,7 +13,7 @@ lw $al 0($al) // de referencing inner
 sw $a0 0($al) // 0($al) = $a0 u=exp
 
 push $fp
-li $a0 0
+li $a0 4
 
 push $a0
 mv $fp $al //put in $al actual fp

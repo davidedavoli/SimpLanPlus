@@ -424,8 +424,6 @@ public class Environment {
 			if (type instanceof ArrowTypeNode) {
 				stEntry = new STentry(nestingLevel, type, 0);
 			} else {
-				if(offset == 0)
-					offset = -1;
 				stEntry = new STentry(nestingLevel, type, --offset);
 			}
 			STentry declaration = getCurrentST().put(id, stEntry);
