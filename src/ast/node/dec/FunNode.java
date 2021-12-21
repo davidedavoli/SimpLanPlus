@@ -28,6 +28,7 @@ public class FunNode extends MetaNode {
 	private BlockNode body;
 	private final String beginFuncLabel;
 	private final String endFuncLabel;
+	private Boolean isRecursive;
 
 
 
@@ -37,7 +38,8 @@ public class FunNode extends MetaNode {
     	type=t;
 		beginFuncLabel = FuncBodyUtils.freshFunLabel();
 		endFuncLabel = FuncBodyUtils.endFreshFunLabel();
-  	}
+		isRecursive = false;
+	}
 	public String getId() {
 		return id;
 	}
@@ -62,6 +64,9 @@ public class FunNode extends MetaNode {
     	parameterList.add(p);
   	}
 
+	public void setIsRecursive(Boolean isRecursive){
+		this.isRecursive = isRecursive;
+	}
 
 	@Override
 	public ArrayList<SemanticError> checkSemantics(Environment env) {
@@ -221,9 +226,10 @@ public class FunNode extends MetaNode {
 			//System.out.println(effectsFunEntry.getFunctionStatusList());
 			//System.out.println("copy status: ");
 			//System.out.println(effectsCopy);
-		}while (effectsAreDifferent(effectsFunEntry, effectsCopy));
+		}while (effectsAreDifferent(effectsFunEntry, effectsCopy) && isRecursive);
 
 		env.popBlockScope();
+		//env.popFunScope();
 		// Update effects of arguments
 		var idEntry = env.effectsLookUp(id);
 		for (int parIndex = 0; parIndex < parameterList.size(); parIndex++) {

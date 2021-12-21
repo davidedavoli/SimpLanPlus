@@ -1,6 +1,7 @@
 package ast.node.statements;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import ast.Dereferences;
@@ -56,8 +57,15 @@ public class CallNode extends MetaNode {
         FunNode f = new FunNode("foo", new VoidTypeNode(),id);
         FunNode g;
         ArrayList<Node> path = this.getAncestorsInstanceOf(f.getClass());
-        if(!path.isEmpty())
+        System.out.println(path);
+
+        if(!path.isEmpty()){
+            FunNode par = (FunNode) path.get(0);
+            if(Objects.equals(par.getId(), this.id.getID()))
+                entry.getFunctionNode().setIsRecursive(true);
             path.remove(0);//plain recursive functions are ok
+        }
+
         for (Node parF: path) {
             g = (FunNode) parF;
             if(g.getId().equals(id.getID())){
@@ -99,7 +107,7 @@ public class CallNode extends MetaNode {
         ArrayList<EffectError> effectErrors = new ArrayList<>(id.checkEffects(env));
         parameterList.forEach((p) -> effectErrors.addAll(p.checkEffects(env)));
         //Get all actual parameter status
-
+        Environment envCopy = new Environment(env);
         //System.out.println(env);
         if(!isAlreadyCalled){
 
@@ -125,8 +133,8 @@ public class CallNode extends MetaNode {
                 }
                 startingEffect.add(parameterEffect);
             }
-            effectErrors.addAll(functionNode.fixPointCheckEffect(env, startingEffect));
 
+            effectErrors.addAll(functionNode.fixPointCheckEffect(env, startingEffect));
         }
 
         if (!effectErrors.isEmpty()) {
@@ -168,7 +176,8 @@ public class CallNode extends MetaNode {
         }
 
         // Setting all variables inside expressions to be read/write.
-        Environment e1 = new Environment(env); // Creating a copy of the environment.
+        //Environment e1 = new Environment(env); // Creating a copy of the environment.
+        Environment e1 = Environment.maxEnvironment(env,envCopy);// new Environment(envCopy); // Creating a copy of the environment.
         // exp of the parameter
         for (var variable : indexOfExpressionParameter) {
             var entryInE1 = e1.effectsLookUp(variable.getID());
@@ -198,6 +207,7 @@ public class CallNode extends MetaNode {
             tmpEnvironment.createVoidScope();
 
             Dereferences pointer = parameterList.get(i).variables().get(0);
+            System.out.println("TMP");
             STentry entry = tmpEnvironment.createNewDeclaration(pointer.getID(), pointer.getEntry().getType());
             for (int j =0; j<entry.getMaxDereferenceLevel(); j++)
                 entry.setDereferenceLevelVariableStatus(e1.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(j), j);

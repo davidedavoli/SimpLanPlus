@@ -118,9 +118,10 @@ public class Compiler {
 		 */
 		checkErrorAst(ast, env);
 		typeCheck(ast);
-
+		Environment effectEnv = new Environment(env);
+		checkEffects(ast,effectEnv);
 		codeGeneration(fileAsm,ast);
-		checkEffects(ast,env);
+
 
 		CommonTokenStream tokensASM = SVMLexer(fileAsm);
 		SVMVisitorImpl visitorSVM = SVMParser(tokensASM);

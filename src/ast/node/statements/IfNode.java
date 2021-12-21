@@ -47,13 +47,17 @@ public class IfNode extends MetaNode {
             System.err.println("Non boolean condition inside if: "+ condition.toPrint(""));
             System.exit(0);
         }
+
         TypeNode t = thenBranch.typeCheck();
-        if(elseBranch == null){
+        TypeNode e = elseBranch.typeCheck();
+        if(t == null){
+            System.err.println("Empty then.");
+            System.exit(0);
+        }
+        if(e == null){
             return t;
         }
         else{
-            TypeNode e = elseBranch.typeCheck();
-
             if (TypeUtils.isSubtype(t,e))
                 return e;
             if (TypeUtils.isSubtype(e,t))
