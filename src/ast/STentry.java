@@ -213,6 +213,7 @@ public class STentry {
    * and then reinitialize the effect list to init
    */
   public void reInitVariableStatus() {
+    this.isPar=false;
     setDereferenceLevelVariableStatus(new Effect(Effect.DELETED), 0);
     updatePointerStatusReference(new Effect(Effect.DELETED), 0);
     for (int i = 1; i < variableStatus.size(); i++) {
