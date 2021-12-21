@@ -1,6 +1,7 @@
 package ast.node;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ast.Dereferences;
 import ast.STentry;
@@ -59,7 +60,7 @@ public class IdNode extends LhsNode implements Dereferences {
         ArrayList<SemanticError> res = new ArrayList<>();
         entry = env.lookUp(id);
         if (entry == null)
-            res.add(new SemanticError("Id "+id+" not declared."));
+            res.add(new SemanticError("Id "+id+" not declared.", id));
         else
             nestingLevel = env.getNestingLevel();
         return res;
@@ -108,6 +109,12 @@ public class IdNode extends LhsNode implements Dereferences {
 
     }
 
+    @Override
+    public List<Dereferences> variables() {
+        ArrayList<Dereferences> res = new ArrayList<Dereferences>();
+        res.add(this);
+        return res;
+    }
 
     public Boolean isPointer() {
         return entry.getType() instanceof PointerTypeNode;

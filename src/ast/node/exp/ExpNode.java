@@ -40,8 +40,6 @@ public abstract class ExpNode extends MetaNode {
     }
 
 
-    public abstract List<Dereferences> variables();
-
     protected ArrayList<EffectError> checkExpStatus(Environment env) {
         ArrayList<EffectError> errors = new ArrayList<>();
         variables().forEach(var -> errors.addAll(env.checkStmStatus(var, Effect::sequenceEffect, Effect.READWRITE)));

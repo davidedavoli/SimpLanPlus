@@ -107,6 +107,14 @@ public class AssignmentNode extends MetaNode {
     return codeGenerated.toString();
   }
 
+  @Override
+  public List<Dereferences> variables(){
+    List<Dereferences> res = new ArrayList<>();
+    res.addAll(exp.variables());
+    res.add(lhs);
+    return res;
+  }
+
   public String toPrint(String s) {
     return s+"Var:" + lhs.getID() +"\n"
             +lhs.typeCheck().toPrint(s+"  ")

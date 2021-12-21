@@ -1,9 +1,12 @@
 package ast.node.statements;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import ast.Dereferences;
 import ast.node.MetaNode;
 import ast.node.Node;
+import ast.node.exp.ExpNode;
 import ast.node.exp.IdExpNode;
 import ast.node.types.*;
 import effect.EffectError;
@@ -46,6 +49,11 @@ public class PrintNode extends MetaNode {
     codeGenerated.append(val.codeGeneration(labelManager)).append("\n");
     codeGenerated.append("print $a0\n");
     return codeGenerated.toString();
+  }
+
+  @Override
+  public List<Dereferences> variables() {
+    return ((ExpNode) val).variables();
   }
 
 

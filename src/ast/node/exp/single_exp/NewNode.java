@@ -25,7 +25,7 @@ public class NewNode extends ExpNode {
 	public ArrayList<SemanticError> checkSemantics(Environment env) {
 		ArrayList<SemanticError> res = new ArrayList<>();
 		if (type == null)
-	  		res.add(new SemanticError("new operator in compound expression"));
+	  		res.add(new SemanticError("new operator in compound expression", ""));
 		return res;
 	}
 

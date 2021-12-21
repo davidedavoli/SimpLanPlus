@@ -1,9 +1,11 @@
 package ast.node.statements;
 
+import ast.Dereferences;
 import ast.Label;
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.dec.FunNode;
+import ast.node.exp.ExpNode;
 import ast.node.types.*;
 import effect.EffectError;
 import semantic.Environment;
@@ -35,7 +37,7 @@ public class RetNode extends MetaNode {
         FunNode f = new FunNode("foo", new VoidTypeNode(),null);//parent_f.getIdNode());
         List<Node> ancestor = this.getAncestorsInstanceOf(f.getClass());
         if(ancestor.size()==0){
-            res.add(new SemanticError("Return expression out of a function"));
+            res.add(new SemanticError("Return expression out of a function", ""));
         }
         else{
             parent_f = (FunNode) ancestor.get(0);
@@ -92,6 +94,12 @@ public class RetNode extends MetaNode {
         codeGenerated.append("b ").append(parent_f.get_end_fun_label()).append("\n");
         return codeGenerated.toString();
     }
+
+    @Override
+    public List<Dereferences> variables() {
+        return ((ExpNode) val).variables();
+    }
+
 
     public String toPrint(String s) {
     return s+"Return\n" + (val!= null ? val.toPrint(s+"  ") : "");

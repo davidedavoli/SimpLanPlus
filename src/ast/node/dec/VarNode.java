@@ -1,16 +1,19 @@
 package ast.node.dec;
 
+import ast.Dereferences;
 import ast.STentry;
 import ast.node.IdNode;
 import ast.node.MetaNode;
 import ast.node.Node;
-    import ast.node.types.HasReturn;
+import ast.node.exp.ExpNode;
+import ast.node.types.HasReturn;
     import ast.node.types.TypeNode;
 
     import java.util.ArrayList;
     import java.util.HashMap;
+import java.util.List;
 
-    import ast.node.types.TypeUtils;
+import ast.node.types.TypeUtils;
 import effect.Effect;
 import effect.EffectError;
 import semantic.Environment;
@@ -27,6 +30,10 @@ public class VarNode extends MetaNode {
         id=i;
         type=t;
         exp=v;
+    }
+
+    public IdNode getId() {
+        return id;
     }
 
     @Override
@@ -47,7 +54,7 @@ public class VarNode extends MetaNode {
         }
 
         if ( hm.put(id.getID(),entry) != null )
-            res.add(new SemanticError("Var id '"+id.getID()+"' already declared."));
+            res.add(new SemanticError("Var id '"+id.getID()+"' already declared.", id.getID()));
 
         return res;
     }
@@ -83,6 +90,14 @@ public class VarNode extends MetaNode {
             codeGenerated.append("subi $sp $sp 1 // No value assigned\n");
         }
         return codeGenerated.toString();
+    }
+
+    @Override
+    public List<Dereferences> variables(){
+        List<Dereferences> res = new ArrayList<>();
+        if(exp != null)
+            res.addAll(((ExpNode) exp).variables());
+        return res;
     }
 
     public String toPrint(String s) {

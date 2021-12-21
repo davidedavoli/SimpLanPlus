@@ -1,6 +1,7 @@
 package ast.node.statements;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import ast.Dereferences;
 import ast.STentry;
@@ -39,7 +40,7 @@ public class CallNode extends MetaNode {
 
         entry = env.lookUp(id.getID());
         if (entry == null)
-            res.add(new SemanticError("Fun Id "+id.getID()+" not declared."));
+            res.add(new SemanticError("Fun Id "+id.getID()+" not declared.", id.getID()));
         else{
             nestingLevel = env.getNestingLevel();
             for(ExpNode arg : parameterList)
@@ -60,7 +61,7 @@ public class CallNode extends MetaNode {
         for (Node parF: path) {
             g = (FunNode) parF;
             if(g.getId().equals(id.getID())){
-                res.add(new SemanticError("call of ancestor function in (grand-)child."));
+                res.add(new SemanticError("call of ancestor function in (grand-)child.", id.getID()));
             }
         }
         return res;
@@ -98,6 +99,8 @@ public class CallNode extends MetaNode {
         ArrayList<EffectError> effectErrors = new ArrayList<>(id.checkEffects(env));
         parameterList.forEach((p) -> effectErrors.addAll(p.checkEffects(env)));
         //Get all actual parameter status
+
+        //System.out.println(env);
         if(!isAlreadyCalled){
 
             isAlreadyCalled = true;
@@ -219,8 +222,14 @@ public class CallNode extends MetaNode {
             for (int dereferenceLevel = 0; dereferenceLevel < functionEffects.get(i).size(); dereferenceLevel++) {
                 Effect u_iEffect = e1.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(dereferenceLevel+actualDereference);
                 Effect x_iEffect = functionEffects.get(i).get(dereferenceLevel);
-//                Effect seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
-                Effect seq = Effect.parallelEffect(u_iEffect, x_iEffect);
+                Effect seq;
+
+                System.out.println((pointer.getID()));
+                System.out.println(isAccessToGlobal(pointer.getID()));
+                if (isAccessToGlobal(pointer.getID()))
+                    seq = Effect.parallelEffect(u_iEffect, x_iEffect);
+                else
+                    seq = Effect.sequenceEffect(u_iEffect, x_iEffect);
 
                 entry.setDereferenceLevelVariableStatus(seq, dereferenceLevel+actualDereference);
             }
@@ -245,6 +254,11 @@ public class CallNode extends MetaNode {
         return effectErrors;
     }
 
+    private boolean isAccessToGlobal(String id){
+//        System.out.println(entry.getFunctionNode().variables());
+        return entry.getFunctionNode().variables().stream().map((x)->x.getID()).collect(Collectors.toList()).contains(id);
+    }
+
     public String codeGeneration(Label labelManager) {
         StringBuilder codeGenerated = new StringBuilder();
 
@@ -264,6 +278,10 @@ public class CallNode extends MetaNode {
         codeGenerated.append("jal  ").append(entry.getBeginFuncLabel()).append("// jump to start of function and put in $ra next instruction\n");
 
         return codeGenerated.toString();
+    }
+
+    public List<Dereferences> variables(){
+        return parameterList.stream().flatMap((x)->x.variables().stream()).collect(Collectors.toList());
     }
 
     public String toPrint(String s) {  //

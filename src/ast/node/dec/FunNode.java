@@ -2,6 +2,7 @@ package ast.node.dec;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import ast.Dereferences;
 import ast.FuncBodyUtils;
 import ast.Label;
 import ast.STentry;
@@ -43,7 +44,9 @@ public class FunNode extends MetaNode {
 	public String get_end_fun_label(){
 		return endFuncLabel;
 	}
-
+	public IdNode getFunctionIdNode() {
+		return functionIdNode;
+	}
 	public BlockNode getBody() {
 		return body;
 	}
@@ -85,7 +88,7 @@ public class FunNode extends MetaNode {
 		functionIdNode.getEntry().setEndLabel(endFuncLabel);
 
 		if ( hm.put(id,entry) != null )
-			res.add(new SemanticError("Fun id '"+id+"' already declared."));
+			res.add(new SemanticError("Fun id '"+id+"' already declared.", id));
 		else{
 			env.createVoidScope();
 			int parameterOffset=1;
@@ -95,7 +98,7 @@ public class FunNode extends MetaNode {
 				STentry oldEntry = env.newFunctionParameter(arg.getIdNode().getID(),arg.getType(),parameterOffset++);
 				arg.getIdNode().setEntry(env.lookUp(arg.getIdNode().getID()));
 				if(oldEntry != null)
-					res.add(new SemanticError("Parameter id '"+arg.getIdNode().getID()+"' already declared."));
+					res.add(new SemanticError("Parameter id '"+arg.getIdNode().getID()+"' already declared.", arg.getIdNode().getID()));
 			}
 			//set func type
 			res.addAll(body.checkSemantics(env));
@@ -107,7 +110,7 @@ public class FunNode extends MetaNode {
 		HasReturn noReturn = new HasReturn(HasReturn.hasReturnType.ABS);
 
 		if ( body.retTypeCheck().leq(noReturn) && !(type instanceof VoidTypeNode)) {
-			res.add(new SemanticError("Possible absence of return value"));
+			res.add(new SemanticError("Possible absence of return value", id));
 		}
 		return res;
 	}
@@ -150,6 +153,7 @@ public class FunNode extends MetaNode {
 		Environment oldEnv = new Environment(env);
 		ArrayList<EffectError> errors = new ArrayList<>(fixPointCheckEffect(env, startingEffect));
 		env.replaceWithNewEnvironment(oldEnv);
+//		System.out.println(variables());
 		return errors;
 	}
 	/**
@@ -185,17 +189,17 @@ public class FunNode extends MetaNode {
 		Environment decFunEnv = new Environment(env);
 		List<List<Effect>> effectsCopy = new ArrayList<>();
 
+		/*
 		effectsCopy = new ArrayList<>(effectsFunEntry.getFunctionStatusList());
 		effectsCopy.stream().map((x)->
 				x.stream().map((y)-> new Effect(y)).collect(Collectors.toList())).collect(Collectors.toList());
+		*/
+		ArrayList<EffectError> errors = new ArrayList<>();
 
-		ArrayList<EffectError> errors = new ArrayList<>(checkInstructions(env, effectsFunEntry));
-
-		while (effectsAreDifferent(effectsFunEntry, effectsCopy)){
+		do{
 			effectsCopy = new ArrayList<>(effectsFunEntry.getFunctionStatusList());
-			effectsCopy.stream().map((x)->
+			effectsCopy=effectsCopy.stream().map((x)->
 					x.stream().map((y)-> new Effect(y)).collect(Collectors.toList())).collect(Collectors.toList());
-			//System.out.println(effectsCopy);
 			// effect are changed!
 			// replace the env and update status with the new effects
 			env.replaceWithNewEnvironment(decFunEnv);
@@ -213,11 +217,11 @@ public class FunNode extends MetaNode {
 				}
 			}
 			errors.addAll(checkInstructions(env, effectsFunEntry));
-			System.out.println("fun entry status: ");
-			System.out.println(effectsFunEntry.getFunctionStatusList());
-			System.out.println("copy status: ");
-			System.out.println(effectsCopy);
-		}
+			//System.out.println("fun entry status: ");
+			//System.out.println(effectsFunEntry.getFunctionStatusList());
+			//System.out.println("copy status: ");
+			//System.out.println(effectsCopy);
+		}while (effectsAreDifferent(effectsFunEntry, effectsCopy));
 
 		env.popBlockScope();
 		// Update effects of arguments
@@ -274,7 +278,23 @@ public class FunNode extends MetaNode {
 		return  maxReturnEffect;
 	}*/
 	private boolean effectsAreDifferent(STentry effectsFunEntry, List<List<Effect>> effectsCopy) {
-		return !effectsFunEntry.getFunctionStatusList().equals(effectsCopy);
+		List<List<Effect>> funEffects = effectsFunEntry.getFunctionStatusList();
+		if (funEffects.size()!=effectsCopy.size())
+			return true;
+
+		for (int i = 0; i < funEffects.size(); i++){
+			List<Effect> sublistA = funEffects.get(i);
+			List<Effect> sublistB = effectsCopy.get(i);
+			if (sublistA.size()!= sublistB.size()){
+				return true;
+			}
+			for (int j =0; j< sublistA.size(); j++){
+				if (!sublistA.get(j).equals(sublistB.get(j))){
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	private ArrayList<EffectError> checkInstructions(Environment env, STentry innerFunEntry){
 		ArrayList<EffectError> errors = new ArrayList<>(body.checkEffects(env));
@@ -303,6 +323,15 @@ public class FunNode extends MetaNode {
 			functionEntry.setResultList(maxReturnEffect);
 		}*/
 		return errors;
+	}
+
+	public List<Dereferences> variables(){
+		List<Dereferences> res = body.variables().stream().filter((x) ->
+				!parameterList.stream().map((y)->
+						((ArgNode) y).getIdNode().getID()).collect(Collectors.toList()).
+						contains(x.getID())).
+				collect(Collectors.toList());
+		return res;
 	}
 
 	public String codeGeneration(Label labelManager) {
@@ -350,7 +379,6 @@ public class FunNode extends MetaNode {
 
 	  return codeGenerated.toString();
   }
-
 
 	public String toPrint(String s) {
 		StringBuilder parameterString= new StringBuilder();

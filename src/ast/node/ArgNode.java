@@ -1,7 +1,9 @@
 package ast.node;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import ast.Dereferences;
 import ast.node.types.HasReturn;
 import ast.node.types.TypeNode;
 import effect.EffectError;
@@ -50,6 +52,12 @@ public class ArgNode extends MetaNode {
 		return "";
   }
 
+    @Override
+    public List<Dereferences> variables() {
+        ArrayList<Dereferences> res = new ArrayList<Dereferences>();
+        res.add(this.getIdNode());
+        return res;
+    }
 
     public String toPrint(String s) { return s+"Par:" + id +"\n"+type.toPrint(s+"  "); }
 }  

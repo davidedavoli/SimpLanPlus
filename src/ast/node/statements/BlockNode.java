@@ -1,5 +1,6 @@
 package ast.node.statements;
 
+import ast.Dereferences;
 import ast.Label;
 import ast.node.MetaNode;
 import ast.node.Node;
@@ -81,7 +82,7 @@ public class BlockNode extends MetaNode {
         boolean ret_passed= false;
         for(Node n : statements) {
             if (ret_passed){
-                res.add(new SemanticError("Code after return statement"));
+                res.add(new SemanticError("Code after return statement",""));
                 break;
             }
             if (new HasReturn(HasReturn.hasReturnType.PRES).leq( n.retTypeCheck()))
@@ -182,6 +183,26 @@ public class BlockNode extends MetaNode {
     }
     public void addMissingReturnFunctionCode(String missingReturnCode) {
         this.missingReturnCode = missingReturnCode;
+    }
+
+    @Override
+    public List<Dereferences> variables() {
+        List<Dereferences> res = new ArrayList<>();
+        List<Dereferences> dvars = new ArrayList<>();
+        for (Node d: declarations){
+            res.addAll(((MetaNode) d).variables().stream().filter((x)->
+                    !dvars.stream().map((y)->y.getID()).collect(Collectors.toList()).contains(x.getID()))
+                    .collect(Collectors.toList()));
+            if (d instanceof FunNode)
+                dvars.add(((FunNode) d).getFunctionIdNode());
+            if (d instanceof VarNode)
+                dvars.add(((VarNode) d).getId());
+        }
+        List<Dereferences> svars = statements.stream().flatMap((x)->((MetaNode) x).variables().stream()).filter((x)->
+                        !dvars.stream().map((y)->y.getID()).collect(Collectors.toList()).contains(x.getID()))
+                .collect(Collectors.toList());
+        res.addAll(svars);
+        return res;
     }
 
     public String toPrint(String s) {

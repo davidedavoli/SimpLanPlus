@@ -1,6 +1,7 @@
 package ast.node;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ast.Dereferences;
 import ast.STentry;
@@ -83,6 +84,8 @@ public class LhsNode extends MetaNode implements Dereferences {
       return new HasReturn(HasReturn.hasReturnType.ABS);
   }
 
+
+
     @Override
     public ArrayList<EffectError> checkEffects (Environment env) {
         /**
@@ -126,4 +129,10 @@ public class LhsNode extends MetaNode implements Dereferences {
         return s+"lhs: " + this.getDereferenceLevel()+" "+this.getID()+"\n";
     }
 
+    @Override
+    public List<Dereferences> variables() {
+        ArrayList<Dereferences> res = new ArrayList<Dereferences>();
+        res.add(this);
+        return res;
+    }
 }

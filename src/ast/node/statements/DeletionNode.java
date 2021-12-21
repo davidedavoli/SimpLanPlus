@@ -1,8 +1,12 @@
 package ast.node.statements;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import ast.Dereferences;
 import ast.STentry;
 import ast.node.MetaNode;
+import ast.node.exp.ExpNode;
 import ast.node.exp.IdExpNode;
 import ast.node.types.PointerTypeNode;
 import ast.node.types.HasReturn;
@@ -67,6 +71,11 @@ public class DeletionNode extends MetaNode {
     }
 
     return errors;
+  }
+
+  @Override
+  public List<Dereferences> variables() {
+    return id.variables();
   }
 
   public String codeGeneration(Label labelManager) {

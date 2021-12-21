@@ -1,7 +1,9 @@
 package ast.node.statements;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import ast.Dereferences;
 import ast.node.MetaNode;
 import ast.node.Node;
 import ast.node.exp.ExpNode;
@@ -122,6 +124,21 @@ public class IfNode extends MetaNode {
 
         return codeGenerated.toString();
     }
+
+    @Override
+    public List<Dereferences> variables() {
+        List<Dereferences> c = condition.variables();
+        List<Dereferences> t = ((MetaNode) thenBranch).variables();
+        List<Dereferences> e = null;
+        if(elseBranch!=null)
+             e = ((MetaNode) elseBranch).variables();
+
+        c.addAll(t);
+        if(e!=null)
+            c.addAll(e);
+        return c;
+    }
+
 
     public String toPrint(String s) {
         String print = s+"If\n" + condition.toPrint(s+"  ")

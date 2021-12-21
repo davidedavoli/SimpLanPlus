@@ -118,8 +118,8 @@ public class Compiler {
 		 */
 		checkErrorAst(ast, env);
 		typeCheck(ast);
-		codeGeneration(fileAsm,ast);
 
+		codeGeneration(fileAsm,ast);
 		checkEffects(ast,env);
 
 		CommonTokenStream tokensASM = SVMLexer(fileAsm);
