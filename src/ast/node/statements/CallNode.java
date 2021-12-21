@@ -105,10 +105,9 @@ public class CallNode extends MetaNode {
     @Override
     public ArrayList<EffectError> checkEffects(Environment env) {
         ArrayList<EffectError> effectErrors = new ArrayList<>(id.checkEffects(env));
-        parameterList.forEach((p) -> effectErrors.addAll(p.checkEffects(env)));
+        //parameterList.forEach((p) -> effectErrors.addAll(p.checkEffects(env)));
         //Get all actual parameter status
         Environment envCopy = new Environment(env);
-        //System.out.println(env);
         if(!isAlreadyCalled){
 
             isAlreadyCalled = true;
@@ -129,19 +128,22 @@ public class CallNode extends MetaNode {
                     }
 
                 } else {
-                    parameterEffect.add(new Effect(Effect.READWRITE));
+                    parameterEffect.add(new Effect(Effect.INITIALIZED));
                 }
                 startingEffect.add(parameterEffect);
             }
 
             effectErrors.addAll(functionNode.fixPointCheckEffect(env, startingEffect));
         }
+        System.out.println("env before fixpoint: ");
+        System.out.println(env);
 
         if (!effectErrors.isEmpty()) {
             return effectErrors;
         }
         id.setEntry(env.effectsLookUp(id.getID()));
-        List<List<Effect>> functionEffects = id.getEntry().getFunctionStatusList();
+        List<List<Effect>> functionEffects = envCopy.effectsLookUp(id.getID()).getFunctionStatusList();
+        System.out.println(functionEffects);
         /**
          * All variables/expressions that are not pointer
          */
@@ -184,6 +186,8 @@ public class CallNode extends MetaNode {
             entryInE1.setDereferenceLevelVariableStatus(Effect.sequenceEffect(entryInE1.getDereferenceLevelVariableStatus(0), Effect.READWRITE), 0);
         }
 
+        System.out.println(e1);
+
         // Creating env 2 by getting all pointer/dereference of var
         Environment e2 = new Environment();
 
@@ -208,7 +212,7 @@ public class CallNode extends MetaNode {
 
             Dereferences pointer = parameterList.get(i).variables().get(0);
             System.out.println("TMP");
-            STentry entry = tmpEnvironment.createNewDeclaration(pointer.getID(), pointer.getEntry().getType());
+            STentry entry = tmpEnvironment.createNewDeclaration(pointer.getID(), pointer.getEntry().getType(), pointer.getEntry().getisPar());
             for (int j =0; j<entry.getMaxDereferenceLevel(); j++)
                 entry.setDereferenceLevelVariableStatus(e1.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(j), j);
 
@@ -229,6 +233,8 @@ public class CallNode extends MetaNode {
              [0:c0,1:c1,2:c2]
 
              */
+            System.out.println("functionEffects: ");
+            System.out.println(functionEffects);
             for (int dereferenceLevel = 0; dereferenceLevel < functionEffects.get(i).size(); dereferenceLevel++) {
                 Effect u_iEffect = e1.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(dereferenceLevel+actualDereference);
                 Effect x_iEffect = functionEffects.get(i).get(dereferenceLevel);

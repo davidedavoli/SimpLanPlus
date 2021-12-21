@@ -151,13 +151,15 @@ public class FunNode extends MetaNode {
 			// put all the pointed var in RW
 			int maxDereferenceLevel  = argNode.getIdNode().getEntry().getMaxDereferenceLevel();
 			for(int dereferenceLevel = 0; dereferenceLevel < maxDereferenceLevel; dereferenceLevel++){
-				argEffect.add(new Effect(Effect.READWRITE));
+				argEffect.add(new Effect(Effect.INITIALIZED));
 			}
 			startingEffect.add(argEffect);
 		}
 		Environment oldEnv = new Environment(env);
 		ArrayList<EffectError> errors = new ArrayList<>(fixPointCheckEffect(env, startingEffect));
 		env.replaceWithNewEnvironment(oldEnv);
+		System.out.println("oldEnv: ");
+		System.out.println(oldEnv);
 //		System.out.println(variables());
 		return errors;
 	}
@@ -186,7 +188,7 @@ public class FunNode extends MetaNode {
 		}
 
 		// Adding the function to the current scope for non-mutual recursive calls.
-		STentry effectsFunEntry = env.createNewDeclaration(id,functionType);
+		STentry effectsFunEntry = env.createNewDeclaration(id,functionType, false);
 		// add this node to recall this checkEffects
 		effectsFunEntry.setFunctionNode(this);
 		body.setIsFunction(true);

@@ -11,6 +11,7 @@ public class STentry {
   private final int nestingLevel;
   private final TypeNode type;
   private final int offset;
+  private boolean isPar;
 
   // status of variable & return & parameter
   private final List<Effect> variableStatus;
@@ -28,10 +29,11 @@ public class STentry {
  * =====================================================
  **/
 
-  public STentry (int nestingLevel, TypeNode type, int offset)  {
+  public STentry (int nestingLevel, TypeNode type, int offset, boolean isPar)  {
     this.nestingLevel = nestingLevel;
     this.type = type;
     this.offset = offset;
+    this.isPar = isPar;
     this.variableStatus = new ArrayList<>();
     //this.returnStatus = new ArrayList<>();
     this.parametersStatus = new ArrayList<>();
@@ -74,7 +76,7 @@ public class STentry {
   }
 
   public STentry (int nestingLevel, int offset, String bFL, String eFL,TypeNode type) {
-    this (nestingLevel, type, offset);
+    this (nestingLevel, type, offset, false);
     beginFuncLabel = bFL;
     endFuncLabel = eFL;
   }
@@ -83,6 +85,7 @@ public class STentry {
     this.nestingLevel = entry.getNestingLevel();
     this.offset = entry.getOffset();
     this.type = entry.getType();
+    this.isPar = entry.getisPar();
     this.variableStatus = new ArrayList<>();
     //this.returnStatus = new ArrayList<>();
     this.parametersStatus = new ArrayList<>();
@@ -116,6 +119,10 @@ public class STentry {
  **/
   public String getBeginFuncLabel() {
     return beginFuncLabel;
+  }
+
+  public boolean getisPar() {
+    return isPar;
   }
 
   public TypeNode getType () {return this.type;}

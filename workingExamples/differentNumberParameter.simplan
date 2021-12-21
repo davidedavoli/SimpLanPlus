@@ -1,9 +1,0 @@
-{
-    void sum(int a, int b){
-        print a+b;
-    }
-    sum(1);
-}
-/*
-Wrong number of parameter during the invoke. Should print 'Wrong number of parameters in the invocation of sum.'
-*/

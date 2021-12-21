@@ -102,8 +102,22 @@ public class LhsNode extends MetaNode implements Dereferences {
                 errors.add(new EffectError(this.getID() + " used after deleting."));
             }
         }
-        if (!inner.getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()-1).equals(new Effect(Effect.READWRITE)) && errors.size()==0) {
+        if (!inner.getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()-1).equals(new Effect(Effect.READWRITE))
+                && errors.size()==0
+                && !getEntry().getisPar()
+                    ) {
             errors.add(new EffectError(inner.getID() + " has not all pointer to rw."));
+        }
+        if (!inner.getEntry().getDereferenceLevelVariableStatus(getDereferenceLevel()-1).equals(new Effect(Effect.READWRITE))
+                && errors.size()==0
+                && getEntry().getisPar()
+        ) {
+            for (int i = 0; i < getDereferenceLevel(); i++){
+                getEntry().setDereferenceLevelVariableStatus(Effect.sequenceEffect(
+                        getEntry().getDereferenceLevelVariableStatus(i),
+                        new Effect(Effect.READWRITE)
+                ), i);
+            }
         }
         return  errors;
     }

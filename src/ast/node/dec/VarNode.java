@@ -44,7 +44,7 @@ public class VarNode extends MetaNode {
 
         //return offset and decrement it by 1
         int new_offset = env.decOffset();
-        STentry entry = new STentry(env.getNestingLevel(), type, new_offset);
+        STentry entry = new STentry(env.getNestingLevel(), type, new_offset, false);
         id.setEntry(entry);
 
         if (exp != null){

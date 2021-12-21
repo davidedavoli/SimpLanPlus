@@ -1,7 +1,0 @@
-{
-    int x = 1;
-    bool x = true;
-}
-/*
-Example of multiple declaration in the same scope. Should print 'Var id 'x' already declared.'
-*/

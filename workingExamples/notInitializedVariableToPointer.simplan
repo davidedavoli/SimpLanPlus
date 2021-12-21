@@ -1,8 +1,0 @@
-{
-    ^int x = new int;
-    int y;
-    x^ = y;
-}
-/*
-Example of error while using pointer and a variable. y has not been initialized but it is on rhs so it raise a run time error 'Value is not written in memory.'
-*/

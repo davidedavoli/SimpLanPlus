@@ -1,8 +1,0 @@
-{
-    void f(int m, int n){
-        if (m>n) { print(m+n) ;}
-        else { int x = 1 ; f(m+1,n+1) ; }
-    }
-    f(5,4) ; // print 9
-    //f(4,5); // out of memory
-}

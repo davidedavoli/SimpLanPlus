@@ -215,7 +215,8 @@ public class Environment {
 						int nestingLevel = entryFirstEnv.getNestingLevel();
 						TypeNode type = entryFirstEnv.getType();
 						int offset = entryFirstEnv.getOffset();
-						var entry = new STentry(nestingLevel,type,offset);
+						boolean isPar = entryFirstEnv.getisPar();
+						var entry = new STentry(nestingLevel,type,offset, isPar);
 						entry.setFunctionNode(entryFirstEnv.getFunctionNode());
 						var maxDeference = entry.getMaxDereferenceLevel();
 						for (int deferenceLevel = 0; deferenceLevel < maxDeference; deferenceLevel++){
@@ -272,7 +273,8 @@ public class Environment {
 					if (variableIdScope1.getKey().equals(variableIdScope2.getKey())) {
 						STentry entry = resultingEnvironment.createNewDeclaration(
 								variableIdScope1.getKey(),
-								variableIdScope1.getValue().getType()
+								variableIdScope1.getValue().getType(),
+								variableIdScope1.getValue().getisPar()
 						);
 						entry.setFunctionNode(variableIdScope1.getValue().getFunctionNode());
 
@@ -318,6 +320,7 @@ public class Environment {
 			var nameIdSecondEnvironment = topScopeSecondEnvironment.entrySet().stream().findFirst().get().getKey();
 			var valueIdSecondEnvironment = topScopeSecondEnvironment.entrySet().stream().findFirst().get().getValue();
 			var typeIdSecondEnvironment = valueIdSecondEnvironment.getType();
+			var parIdSecondEnvironment = valueIdSecondEnvironment.getisPar();
 			env2.removeFirstIdentifier(nameIdSecondEnvironment);
 
 			// CASE 1
@@ -330,7 +333,7 @@ public class Environment {
 				Environment envWithOnlyU = new Environment();
 				envWithOnlyU.createVoidScope();
 
-				STentry tmpEntry = envWithOnlyU.createNewDeclaration(nameIdSecondEnvironment, typeIdSecondEnvironment);
+				STentry tmpEntry = envWithOnlyU.createNewDeclaration(nameIdSecondEnvironment, typeIdSecondEnvironment, parIdSecondEnvironment);
 				tmpEntry.setFunctionNode(valueIdSecondEnvironment.getFunctionNode());
 				int maxDereferenceIdSecondEnvironment = valueIdSecondEnvironment.getMaxDereferenceLevel();
 
@@ -371,7 +374,8 @@ public class Environment {
 				if (!scope2.containsKey(variableIdScope1.getKey())) {
 					STentry entry = resultingEnvironment.createNewDeclaration(
 							variableIdScope1.getKey(),
-							variableIdScope1.getValue().getType()
+							variableIdScope1.getValue().getType(),
+							variableIdScope1.getValue().getisPar()
 					);
 					entry.setFunctionNode(variableIdScope1.getValue().getFunctionNode());
 
@@ -419,14 +423,14 @@ public class Environment {
 		 * @param id   the identifier of the variable or function.
 		 * @param type the type of the variable or function.
 		 */
-		public STentry createNewDeclaration(final String id, final TypeNode type) {
+		public STentry createNewDeclaration(final String id, final TypeNode type, boolean isPar) {
 			STentry stEntry;
 			if (type instanceof ArrowTypeNode) {
-				stEntry = new STentry(nestingLevel, type, 0);
+				stEntry = new STentry(nestingLevel, type, 0, isPar);
 			} else {
 				if(offset == 0)
 					offset = -1;
-				stEntry = new STentry(nestingLevel, type, --offset);
+				stEntry = new STentry(nestingLevel, type, --offset, isPar);
 			}
 			STentry declaration = getCurrentST().put(id, stEntry);
 			if (declaration != null) {
@@ -511,7 +515,7 @@ public class Environment {
 
 	public STentry newFunctionParameter(final String varId, final TypeNode varType, final int offset){
 		HashMap<String, STentry> ST = this.symTable.get(this.nestingLevel);
-		STentry newEntry = new STentry(this.nestingLevel,varType,offset);
+		STentry newEntry = new STentry(this.nestingLevel,varType,offset,true);
 		return ST.put(varId,newEntry);
 	}
 
