@@ -1,0 +1,7 @@
+{
+    int x = f();
+}
+
+/*
+Example of a not declared function. Should print 'Fun Id f not declared.'
+*/

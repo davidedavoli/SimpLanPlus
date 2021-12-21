@@ -1,0 +1,33 @@
+/*
+Articolated fibonacci example
+*/
+
+{
+    int fibonacci(int n){
+        int sum(int a, int b){
+            if (a==0){
+                return b;
+            }
+            else{
+                return 1 + sum (a-1, b);
+            }
+        }
+        if (n==0){
+            return 0;
+        }
+        else if (n==1){
+            return 1;
+        }
+        else{
+            return sum(fibonacci(n-1),fibonacci(n-2));
+        }
+    }
+
+    int x = fibonacci(9);
+    print x;
+}
+/*
+Should print:
+    ;34
+
+*/

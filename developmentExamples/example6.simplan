@@ -1,0 +1,15 @@
+{
+    int f(){
+        int g(){
+            print 1;
+            f();
+            return 0;
+        }
+        print 0;
+        g();
+
+        return 1;
+    }
+    f();
+
+}

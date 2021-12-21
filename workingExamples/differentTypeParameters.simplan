@@ -1,0 +1,9 @@
+{
+    void sum(int a, int b){
+        print a+b;
+    }
+    sum(1,true);
+}
+/*
+Wrong type of parameter during invoke. Should print 'Wrong type for 2-th parameter in the invocation of sum.'
+*/

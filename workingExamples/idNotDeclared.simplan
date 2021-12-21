@@ -1,0 +1,7 @@
+{
+    int x = c;
+}
+
+/*
+Example of a not declared variable. Should print 'Id c not declared.'
+*/

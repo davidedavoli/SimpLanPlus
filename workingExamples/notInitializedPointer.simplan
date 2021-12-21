@@ -1,0 +1,8 @@
+{
+    ^int x;
+    int y;
+    x^ = y;
+}
+/*
+Example of error while using pointer. x has not all dereferences initialized so it should print 'x has not all pointer to rw.'
+*/
