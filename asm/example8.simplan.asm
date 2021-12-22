@@ -1,10 +1,10 @@
 push 0
 mv $sp $fp //Load new $fp
 push $fp
-li $a0 5
+li $a0 4
 
 push $a0
-li $a0 4
+li $a0 5
 
 push $a0
 mv $fp $al //put in $al actual fp

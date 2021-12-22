@@ -49,7 +49,9 @@ public class IfNode extends MetaNode {
         }
 
         TypeNode t = thenBranch.typeCheck();
-        TypeNode e = elseBranch.typeCheck();
+        TypeNode e = null;
+        if(elseBranch != null)
+            e = elseBranch.typeCheck();
         if(t == null){
             System.err.println("Empty then.");
             System.exit(0);

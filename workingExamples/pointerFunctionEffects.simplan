@@ -16,5 +16,6 @@
     second(spointer);
 }
 /*
-Since expression are rw the program compile successfully but raise a run time error 'Value is not written in memory.'. By removing the comment on 'fpointer^ = 2;' should solve the problem.
+Since expression are rw the program compile successfully but raise a run time error 'Value is not written in memory.'.
+By removing the comment on 'fpointer^ = 2;' should solve the problem.
 */

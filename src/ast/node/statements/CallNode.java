@@ -57,7 +57,6 @@ public class CallNode extends MetaNode {
         FunNode f = new FunNode("foo", new VoidTypeNode(),id);
         FunNode g;
         ArrayList<Node> path = this.getAncestorsInstanceOf(f.getClass());
-        System.out.println(path);
 
         if(!path.isEmpty()){
             FunNode par = (FunNode) path.get(0);
@@ -207,7 +206,6 @@ public class CallNode extends MetaNode {
             tmpEnvironment.createVoidScope();
 
             Dereferences pointer = parameterList.get(i).variables().get(0);
-            System.out.println("TMP");
             STentry entry = tmpEnvironment.createNewDeclaration(pointer.getID(), pointer.getEntry().getType());
             for (int j =0; j<entry.getMaxDereferenceLevel(); j++)
                 entry.setDereferenceLevelVariableStatus(e1.effectsLookUp(pointer.getID()).getDereferenceLevelVariableStatus(j), j);
@@ -234,8 +232,6 @@ public class CallNode extends MetaNode {
                 Effect x_iEffect = functionEffects.get(i).get(dereferenceLevel);
                 Effect seq;
 
-                System.out.println((pointer.getID()));
-                System.out.println(isAccessToGlobal(pointer.getID()));
                 if (isAccessToGlobal(pointer.getID()))
                     seq = Effect.parallelEffect(u_iEffect, x_iEffect);
                 else

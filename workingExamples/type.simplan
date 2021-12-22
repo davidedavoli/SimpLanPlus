@@ -17,3 +17,11 @@
     print boolean;
 
 }
+/*
+Correct use of type and pointer should output:
+10;
+true(1);
+
+2;
+false(0);
+*/

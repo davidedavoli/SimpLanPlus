@@ -12,11 +12,12 @@
     a^ = 1;
     b^ = 0;
     h(a, b);
-    print a^;
+    //print a^;
 
 }
 
 /*
 Fix-point example.
-The program is correct and should not print anything. Both x and y will be marked as deleted. If print x^ is called after h invocation an effect error is raised.
+The program is correct and should not print anything. Both x and y will be marked as deleted.
+If print x^ is called after h invocation an effect error is raised.
 */
